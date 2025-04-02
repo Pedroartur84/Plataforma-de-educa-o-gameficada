@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="flex min-h-screen bg-slate-900">
+    <div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+
+        <div>
+            <img class="h-15 w-auto" src="" alt="Logo">
+            <h2 class="mt-4 text-2xl/9 font-bold tracking-tight text-gray-100">Crie sua conta</h2>
+            <p class="mt-2 text-sm/6 text-gray-500">
+                Já tem uma conta?
+                <a href="" class="font-semibold text-indigo-300 hover:text-indigo-200">Faça login</a>
+            </p>
+        </div>
+
+        <div class="mt-8">
+            <div>
+
+                <form action="" method="" class="space-y-6">
+
+                    <div>
+                        <label for="email" class="block text-sm/6 font-medium text-gray-200">Username</label>
+                        <div class="mt-2">
+                            <input type="text" name="username" required class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm/6 font-medium text-gray-200">Senha</label>
+                        <div class="mt-2">
+                            <input type="password" name="senha" required class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm/6 font-medium text-gray-200">Confirmar senha</label>
+                        <div class="mt-2">
+                            <input type="password" name="confirmar_senha" required class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6">
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
