@@ -3,4 +3,7 @@ from django.http import HttpResponse
 
 # Create your views here.
 def cadastro(request):
-    return render(request, 'cadastro.html')
+    return render(request, 'core\cadastro.html')
+
+def home(request):
+    return render(request, 'core\home.html')
