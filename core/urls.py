@@ -17,8 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from usuarios import views
+from . import views
+
+app_name = 'core' #para que os nomes das rotas agrupadas sejam reconhecidas e posam ser usadas
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuarios/', include('usuarios.urls')),
+    path('', views.home, name='home'), #pagina inicial
+    path('usuarios/', include('usuarios.urls')), #incluir as urls de ususarios, prefixo usuarios
 ]

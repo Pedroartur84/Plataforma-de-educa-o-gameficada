@@ -12,5 +12,3 @@ class Usuario(AbstractUser):
         ],
         default='aluno'
     )
-    
-    
