@@ -5,5 +5,5 @@ app_name = 'usuarios' #para que os nomes das rotas agrupadas sejam reconhecidas 
 
 urlpatterns = [
     path('login/', views.login_view, name='login'), # Página de login
-    path('cadastro/', views.cadastro, name='cadastro') #pagina de cadastro
+     #pagina de cadastro
 ]
