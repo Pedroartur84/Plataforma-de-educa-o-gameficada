@@ -1,3 +1,4 @@
+/* css da pagina login */
 html, body {
     height: 100%;
 }
@@ -6,7 +7,9 @@ html, body {
     max-width: 350px;
     padding: 1rem;
 }
+/* css da pagina login */
 
+/* css da pagina home */
 .home-container {
     max-width: 800px;
     padding: 2rem;
@@ -27,3 +30,4 @@ html, body {
     padding: 0.5rem 1rem;
     font-size: 1.1rem;
 }
+/* css da pagina home */
