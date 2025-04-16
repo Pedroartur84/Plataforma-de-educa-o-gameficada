@@ -1,8 +1,55 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block body %}
-<div class="container py-5 text-center">
-    <h1 class="display-4 mb-4">Bem-vindo à home</h1>
-    <p class="lead">Conteúdo principal da sua página inicial</p>
-</div>
+{% block title %}Player - Aprendizado Gamificado{% endblock %}
+
+{% block content %}
+    <main class="w-100 m-auto text-center">
+        <div class="home-container">
+            <img src="{% static 'logo.html.jpg' %}" class="mb-4" height="120" width="122" alt="Player Logo"/>
+            <h1 class="h2 mb-3 fw-bold">Player</h1>
+            <p class="lead mb-5">Transforme seu aprendizado em uma aventura épica!</p>
+            
+            <div class="project-description mb-5 p-4 rounded-3 bg-dark bg-opacity-10">
+                <h2 class="h4 mb-3">Objetivo do Projeto</h2>
+                <p class="mb-4">
+                    O Player é uma aplicação de estudos gamificada que transforma o processo de aprendizagem 
+                    em uma jornada emocionante. Através de elementos de jogos como missões, recompensas, 
+                    níveis e rankings, motivamos os estudantes a alcançarem seus objetivos educacionais 
+                    de forma divertida e engajadora.
+                </p>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="bi bi-trophy fs-3 text-warning mb-2"></i>
+                            <h4 class="h5">Missões</h4>
+                            <p>Complete desafios educacionais e suba de nível</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="bi bi-star fs-3 text-warning mb-2"></i>
+                            <h4 class="h5">Recompensas</h4>
+                            <p>Ganhe pontos e conquistas por seu progresso</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="bi bi-people fs-3 text-warning mb-2"></i>
+                            <h4 class="h5">Competição</h4>
+                            <p>Desafie amigos e compare seu progresso</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-option p-4 rounded-3" style="max-width: 400px; margin: 0 auto;">
+                <h3 class="h4 mb-3">Comece sua jornada</h3>
+                <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-lg w-100 py-2 mb-3">
+                    <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                </a>
+                <p class="text-muted">Não tem uma conta? <a href="#" class="text-decoration-none">Cadastre-se</a></p>
+            </div>
+        </div>
+    </main>
 {% endblock %}

@@ -6,3 +6,24 @@ html, body {
     max-width: 350px;
     padding: 1rem;
 }
+
+.home-container {
+    max-width: 800px;
+    padding: 2rem;
+    margin: auto;
+}
+
+.project-description {
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.login-option {
+    background: rgba(var(--bs-dark-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.btn-lg {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+}
