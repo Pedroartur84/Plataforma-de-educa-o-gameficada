@@ -12,7 +12,12 @@
 }
 
 /* Estilos base */
+html, body {
+    height: 100%;
+}
+
 body {
+    background-color: var(--color-dark);
     color: var(--color-white);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -24,32 +29,49 @@ body {
     padding: 0 1.5rem;
 }
 
+/* Página Login */
+.auth-card {
+    background-color: var(--color-gray-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    margin: auto;
+}
+
+/* Página Home */
+.home-container {
+    max-width: 800px;
+    padding: 2rem;
+    margin: auto;
+}
+
 /* Logotipos */
 .logo-main {
     height: 120px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 10px rgba(255, 109, 0, 0.3));
+    margin-bottom: 1.5rem;
 }
 
 .logo-auth {
     height: 80px;
     width: auto;
     object-fit: contain;
+    margin-bottom: 1.5rem;
 }
 
 /* Cards */
 .project-description {
     background-color: var(--color-gray-dark);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
     backdrop-filter: blur(5px);
-}
-
-.auth-card {
-    background-color: var(--color-gray-dark);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    max-width: 400px;
-    width: 100%;
+    padding: 2rem;
+    margin-bottom: 2rem;
 }
 
 /* Grid de features */
@@ -58,6 +80,7 @@ body {
     justify-content: center;
     gap: 2rem;
     flex-wrap: wrap;
+    margin-top: 2rem;
 }
 
 .feature-item {
@@ -65,6 +88,7 @@ body {
     min-width: 200px;
     max-width: 300px;
     text-align: center;
+    padding: 1rem;
 }
 
 .feature-icon {
@@ -75,6 +99,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .bg-azul {
@@ -97,19 +122,38 @@ body {
 }
 
 /* Botões */
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .btn-primary {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
+    color: var(--color-white);
 }
 
 .btn-primary:hover {
     background-color: var(--color-primary-dark);
     border-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
 }
 
 .btn-outline-accent {
     color: var(--color-accent);
-    border-color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    background-color: transparent;
 }
 
 .btn-outline-accent:hover {
@@ -120,6 +164,12 @@ body {
 /* Formulários */
 .form-floating>label {
     color: var(--color-gray);
+}
+
+.input-estilo {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
 }
 
 /* Responsividade */
@@ -139,9 +189,15 @@ body {
     
     .feature-item {
         max-width: 100%;
+        width: 100%;
     }
     
-    .auth-card {
-        padding: 1.5rem !important;
+    .auth-card, .home-container {
+        padding: 1.5rem;
+    }
+    
+    .btn-lg {
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
     }
 }

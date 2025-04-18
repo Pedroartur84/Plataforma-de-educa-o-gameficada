@@ -6,7 +6,6 @@ class LoginForm(AuthenticationForm):
     Formulário de login personalizado que:
     - Substitui o username padrão por email
     - Inclui opção "Lembrar-me"
-    - Mantém a segurança do sistema de autenticação do Django
     """
     
     email = forms.EmailField(
