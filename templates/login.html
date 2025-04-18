@@ -1,43 +1,57 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - Player{% endblock %}
 
 {% block content %}
-    <main class="w-100 m-auto form-container">
+<div class="container d-flex justify-content-center align-items-center flex-grow-1 py-4">
+    <div class="auth-card p-4 p-md-5 rounded-4 shadow">
+        <div class="text-center mb-4">
+            <img src="{% static 'web_hi_res_512-Photoroom.png' %}" class="logo-auth mb-3" alt="Player Logo">
+            <h2 class="h3 mb-2">Acesse sua conta</h2>
+            <p class="text-muted">Entre para continuar sua jornada</p>
+        </div>
+        
         <form method="post" action="{% url 'usuarios:login' %}">
             {% csrf_token %}
             
-            <img src="{% static 'logo.html.jpg' %}" class="mb-4" height="70" width="72"/>
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-            
             {% if form.errors %}
-                <div class="alert alert-danger">
-                    E-mail ou senha inválidos. Por favor, tente novamente.
+                <div class="alert alert-danger d-flex align-items-center mb-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>E-mail ou senha inválidos. Por favor, tente novamente.</div>
                 </div>
             {% endif %}
             
-            <!-- Campo E-mail (username) -->
-            <div class="form-floating">
+            <div class="form-floating mb-3">
                 {{ form.username }}
                 <label for="{{ form.username.id_for_label }}">E-mail</label>
             </div>
             
-            <!-- Campo Senha -->
-            <div class="form-floating">
+            <div class="form-floating mb-3">
                 {{ form.password }}
                 <label for="{{ form.password.id_for_label }}">Senha</label>
             </div>
             
-            <!-- Checkbox Lembrar-me -->
-            <div class="form-check text-start my-3">
-                {{ form.remember_me }}
-                <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
-                    Lembre-me
-                </label>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    {{ form.remember_me }}
+                    <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
+                        Lembrar-me
+                    </label>
+                </div>
+                <a href="#" class="text-accent small">Esqueceu a senha?</a>
             </div>
             
-            <button type="submit" class="btn btn-primary w-100 py-2">Sign in</button>
+            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Entrar
+            </button>
+            
+            <div class="text-center mt-3">
+                <p class="text-muted">Não tem uma conta? 
+                    <a href="#" class="text-accent fw-medium">Cadastre-se</a>
+                </p>
+            </div>
         </form>
-    </main>
+    </div>
+</div>
 {% endblock %}

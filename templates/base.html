@@ -1,17 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="pt-br" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="{% static 'style.css' %}" rel="stylesheet">
-    <title>{% block title %}Formulário{% endblock %}</title>
+    <title>{% block title %}Player{% endblock %}</title>
 </head>
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
+<body class="d-flex flex-column min-vh-100 bg-dark">
     {% block content %}{% endblock %}
-
-    <!-- Scripts Bootstrap (opcional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>          
+</html> 
