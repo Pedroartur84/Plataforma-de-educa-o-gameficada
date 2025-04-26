@@ -40,9 +40,10 @@ def cadastro(request):
         if form.is_valid():
             # salva o novo usuario no banco de dados
             user = form.save()
+            login(request, user)
             messages.success(request, 'Cadastro realizado com sucesso! Faça login.')
-            return redirect('login')
+            return redirect('home')
     else:
         form = CadastroForm()
     
-    return render(request, 'cadastro.html', {'form': form})
+    return render(request, 'cadastrar.html', {'form': form})

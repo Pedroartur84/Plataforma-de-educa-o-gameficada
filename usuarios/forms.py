@@ -67,7 +67,6 @@ class CadastroForm(UserCreationForm):
         required=True
     )
     
-    
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -89,58 +88,11 @@ class CadastroForm(UserCreationForm):
         required=True
     )
     
-    
-    tipo_usuario = forms.ChoiceField(
-        choices=Usuario._meta.get_field('tipo_usuario').choices,
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'id': 'floatingTipoUsuario'
-        }),
-        label='Tipo de usuário',
-        required=True
-    )
-    
-        
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'nome de usuário',
-            'id': 'floatingUsername'
-        }),
-        label='nome de usuário',
-        required=True,
-        help_text='Obrigatório. 150 caracteres ou menos. Letras, dígitos e @/./+/-/_ apenas.'
-    )
-    
-    
-    first_name = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Seu nome',
-            'id': 'floatingFirstName'
-        }),
-        label="Nome",
-        required=True
-    )
-    
-    last_name = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Seu sobrenome',
-            'id': 'floatingLastName'
-        }),
-        label="Sobrenome",
-        required=True
-    )
-    
     class Meta:
         model = Usuario
-        fields = ['username', 'email', 'first_name', 'last_name', 'tipo_usuario', 'password1', 'password2']
+        fields = ['email', 'password1', 'password2']
         labels = {
-            'username': 'Nome de usuário',
             'email': 'E-mail',
-            'first_name': 'Nome',
-            'last_name': 'Sobrenome',
         }
         
     def clean_email(self):
@@ -150,14 +102,7 @@ class CadastroForm(UserCreationForm):
         return email
     
     
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if Usuario.objects.filter(username=username).exists():
-            raise forms.ValidationError('Este nome de usuário já está em uso.')
-        return username
-    
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #reordenar campos de necessario
-        self.field_order = ['username', 'email', 'first_name', 'last_name', 'tipo_usuario', 'password1', 'password2']
+        self.field_order = ['username', 'email', 'password1', 'password2']

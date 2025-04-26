@@ -12,3 +12,12 @@ class Usuario(AbstractUser):
         ],
         default='aluno'
     )
+    
+    username = None
+    email = models.EmailField(unique=True, verbose_name='E-mail')
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    
+    def __str__(self):
+        return self.email
