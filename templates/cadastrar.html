@@ -1,45 +1,57 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <img src="" alt="Logo" class="h-15 mb-3">
-                        <h2 class="fw-bold text-dark">Crie sua conta</h2>
-                        <p class="text-muted">
-                            Já tem uma conta?
-                            <a href="#" class="text-primary text-decoration-none">Faça login</a>
-                        </p>
-                    </div>
+{% block title %}Cadastro - Player{% endblock %}
 
-                    <form action="{% url 'cadastro' %}" method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="senha" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="senha" name="senha" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="confirmar_senha" class="form-label">Confirmar senha</label>
-                            <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 py-2">
-                            Registrar
-                        </button>
-                    </form>
-                </div>
-            </div>
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center flex-grow-1 py-4">
+    <div class="auth-card p-4 p-md-5 rounded-4 shadow">
+        <div class="text-center mb-4">
+            <img src="{% static 'web_hi_res_512-Photoroom.png' %}" class="logo-auth mb-3" alt="Player Logo">
+            <h2 class="h3 mb-2">Crie sua conta</h2>
+            <p class="text-muted">Comece sua jornada de aprendizado</p>
         </div>
+        
+        <form method="post" action="{% url 'usuarios:cadastro' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="alert alert-danger d-flex align-items-center mb-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>Por favor, corrija os erros abaixo.</div>
+                </div>
+            {% endif %}
+            
+            <div class="form-floating mb-3">
+                {{ form.username }}
+                <label for="{{ form.username.id_for_label }}">Nome de usuário</label>
+            </div>
+            
+            <div class="form-floating mb-3">
+                {{ form.email }}
+                <label for="{{ form.email.id_for_label }}">E-mail</label>
+            </div>
+            
+            <div class="form-floating mb-3">
+                {{ form.password1 }}
+                <label for="{{ form.password1.id_for_label }}">Senha</label>
+            </div>
+            
+            <div class="form-floating mb-4">
+                {{ form.password2 }}
+                <label for="{{ form.password2.id_for_label }}">Confirme sua senha</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-person-plus me-2"></i> Cadastrar
+            </button>
+            
+            <div class="text-center mt-3">
+                <p class="text-muted">Já tem uma conta? 
+                    <a href="{% url 'usuarios:login' %}" class="text-accent fw-medium">Faça login</a>
+                </p>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
