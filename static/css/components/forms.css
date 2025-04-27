@@ -1,0 +1,10 @@
+/* Formulários */
+.form-floating>label {
+    color: var(--color-gray);
+}
+
+.input-estilo {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+}

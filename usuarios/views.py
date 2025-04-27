@@ -29,7 +29,7 @@ def login_view(request):
     else:
         form = LoginForm()
     
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login\login.html', {'form': form})
 
 # view para cadastro
 def cadastro(request):
@@ -46,4 +46,4 @@ def cadastro(request):
     else:
         form = CadastroForm()
     
-    return render(request, 'cadastrar.html', {'form': form})
+    return render(request, 'cadastro\cadastrar.html', {'form': form})

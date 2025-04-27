@@ -1,0 +1,30 @@
+:root {
+    /* Cores */
+    --color-primary: #1a73e8;
+    --color-primary-dark: #0d47a1;
+    --color-accent: #ff6d00;
+    --color-accent-light: #ff9e40;
+    --color-white: #ffffff;
+    --color-dark: #121212;
+    --color-gray-light: #f3f4f6;
+    --color-gray: #6b7280;
+    --color-gray-dark: #1e1e1e;
+}
+
+/* Estilos base */
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* Container principal */
+.container {
+    max-width: 1200px;
+    padding: 0 1.5rem;
+}

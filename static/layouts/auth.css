@@ -1,0 +1,15 @@
+/* Página Login/Cadastro */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 2rem 0;
+}
+
+.logo-auth {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+}
