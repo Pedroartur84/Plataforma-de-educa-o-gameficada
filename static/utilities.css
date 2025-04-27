@@ -1,21 +1,16 @@
-/* Textos */
-.text-accent {
-    color: var(--color-accent);
-}
+/* ======================
+   CLASSES UTILITÁRIAS
+   ====================== */
+/* Cores de Texto */
+.text-accent { color: var(--color-accent); }
+.text-muted { color: var(--color-gray) !important; }
 
-.text-muted {
-    color: var(--color-gray) !important;
-}
-
-/* Responsividade */
+/* ======================
+   RESPONSIVIDADE
+   ====================== */
 @media (max-width: 768px) {
-    .logo-main {
-        height: 80px;
-    }
-    
-    .logo-auth {
-        height: 60px;
-    }
+    .logo-main { height: 80px; }
+    .logo-auth { height: 60px; }
     
     .features-grid {
         flex-direction: column;

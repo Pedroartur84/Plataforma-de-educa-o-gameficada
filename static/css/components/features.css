@@ -1,5 +1,7 @@
-/* Grid de features */
-.features-grid {
+/* ======================
+   SEÇÃO DE RECURSOS
+   ====================== */
+   .features-grid {
     display: flex;
     justify-content: center;
     gap: 2rem;
@@ -13,6 +15,8 @@
     max-width: 300px;
     text-align: center;
     padding: 1rem;
+    background-color: var(--color-gray-dark);
+    border-radius: 10px;
 }
 
 .feature-icon {
