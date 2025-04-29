@@ -1,0 +1,14 @@
+/* ===================== CONFIGURAÇÕES GLOBAIS ===================== */
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+.text-accent { color: var(--color-accent); }
+.text-muted { color: var(--color-gray) !important; }
