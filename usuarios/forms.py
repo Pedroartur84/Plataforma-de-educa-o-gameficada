@@ -105,4 +105,6 @@ class CadastroForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #reordenar campos de necessario
-        self.field_order = ['username', 'email', 'password1', 'password2']
+        self.field_pop = ['username', None]
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
