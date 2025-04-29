@@ -1,0 +1,11 @@
+/* ===================== LAYOUT PRINCIPAL ===================== */
+.container {
+    max-width: 1200px;
+    padding: 0 1.5rem;
+}
+
+.home-container {
+    max-width: 800px;
+    padding: 2rem;
+    margin: auto;
+}
