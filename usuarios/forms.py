@@ -5,8 +5,7 @@ from .models import Usuario
 class LoginForm(AuthenticationForm):
     """
     Formulário de login personalizado que:
-    - Substitui o username padrão por email
-    - Inclui opção "Lembrar-me"
+    Substitui o username padrão por email
     """
     
     email = forms.EmailField(
@@ -41,7 +40,7 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         """Configuração inicial que adapta o email para o sistema de autenticação do Django"""
         super().__init__(*args, **kwargs)
-        # Transforma o campo email em username (exigência do Django)
+        # Transforma o campo email em username
         self.fields['username'] = self.fields.pop('email')
         self.fields['username'].label = "E-mail"
         self.field_order = ['username', 'password', 'remember_me']
@@ -49,7 +48,6 @@ class LoginForm(AuthenticationForm):
     def clean(self):
         """Validação adicional dos dados do formulário"""
         cleaned_data = super().clean()
-        # Aqui você pode adicionar validações personalizadas se necessário
         return cleaned_data
     
     
