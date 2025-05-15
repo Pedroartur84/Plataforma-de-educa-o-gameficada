@@ -3,6 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from usuarios.models import Usuario
 
 # Register your models here.
+
+# Está funcional
 class UsuarioAdminConfig(UserAdmin):
     # configuração da lista
     list_display = ('email', 'first_name', 'last_name', 'tipo_usuario', 'is_active', 'is_staff')
