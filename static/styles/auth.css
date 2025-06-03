@@ -1,18 +1,38 @@
-/* ===================== PÁGINAS DE AUTENTICAÇÃO ===================== */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--space-md);
+}
+
 .auth-card {
-    background-color: var(--color-gray-dark);
+    background-color: var(--color-gray-900);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     backdrop-filter: blur(5px);
-    max-width: 400px;
     width: 100%;
-    padding: 2rem;
-    margin: auto;
+    max-width: 400px;
+    padding: var(--space-xl);
+    margin: 0 auto;
+    transition: var(--transition-normal);
 }
 
 .logo-auth {
-    height: 80px;
+    --logo-size: 80px;
     width: auto;
+    height: var(--logo-size);
+    max-height: var(--logo-size);
     object-fit: contain;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 400px) {
+    .auth-card {
+        padding: var(--space-lg);
+    }
+    
+    .logo-auth {
+        --logo-size: 70px;
+    }
 }

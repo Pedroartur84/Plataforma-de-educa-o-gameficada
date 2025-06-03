@@ -1,17 +1,26 @@
-/* ===================== PÁGINA INICIAL ===================== */
 .logo-main {
-    height: 120px;
+    --logo-height: 120px;
+    height: auto;
+    max-height: var(--logo-height);
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 10px rgba(255, 109, 0, 0.3));
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 .project-description {
-    background-color: var(--color-gray-dark);
+    background-color: var(--color-gray-900);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     backdrop-filter: blur(5px);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: clamp(var(--space-md), 3vw, var(--space-xl));
+    margin-bottom: var(--space-xl);
+    width: 100%;
+}
+
+/* Responsividade */
+@media (max-width: var(--bp-tablet)) {
+    .logo-main {
+        --logo-height: 80px;
+    }
 }

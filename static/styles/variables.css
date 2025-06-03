@@ -1,12 +1,43 @@
-/* ===================== VARIÁVEIS DE CORES ===================== */
 :root {
-    --color-primary: #1a73e8;         /* Azul principal: botões, links primários */
-    --color-primary-dark: #0d47a1;    /* Azul escuro: estados hover/active */
-    --color-accent: #ff6d00;          /* Laranja: CTAs, destaques, interações */
-    --color-accent-light: #ff9e40;    /* Laranja claro: efeitos de hover */
-    --color-white: #ffffff;           /* Texto principal e elementos claros */
-    --color-dark: #121212;            /* Cor de fundo base do tema escuro */
-    --color-gray-light: #f3f4f6;      /* Bordas sutis */
-    --color-gray: #6b7280;            /* Texto secundário e placeholders */
-    --color-gray-dark: #1e1e1e;       /* Superfícies elevadas (cards, containers) */
+    /* Cores Primárias (padronizar nomenclatura em inglês) */
+    --color-primary: #1a73e8;
+    --color-primary-dark: #0d47a1;
+    --color-accent: #ff6d00;
+    --color-accent-light: #ff9e40;
+    
+    /* Cores Neutras (adicionar variações consistentes) */
+    --color-white: #ffffff;
+    --color-light: #f8f9fa;
+    --color-gray-100: #f3f4f6;
+    --color-gray-300: #d1d5db;
+    --color-gray-500: #6b7280;
+    --color-gray-700: #374151;
+    --color-gray-900: #111827;
+    --color-dark: #121212;
+
+    /* Espaçamentos baseados em escala modular */
+    --space-xxs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-xxl: 3rem;
+
+    /* Breakpoints nomeados */
+    --bp-mobile: 576px;
+    --bp-tablet: 768px;
+    --bp-desktop: 992px;
+    --bp-large: 1200px;
+
+    /* Bordas */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-full: 9999px;
+
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.45s ease;
 }
