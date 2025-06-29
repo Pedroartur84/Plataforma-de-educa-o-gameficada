@@ -21,7 +21,7 @@ def login_view(request):
                 # verifica se o usuário marcou "lembrarme"
                 if not form.cleaned_data.get('remember_me'):
                     request.session.set_expiry(0)  # Sessão do navegador
-                return redirect('home')
+                return redirect('usuarios:pag_principal') #para redirecionar para a pagina principal
             else:
                 messages.error(request, 'Credenciais inválidas.')
         else:
@@ -29,7 +29,7 @@ def login_view(request):
     else:
         form = LoginForm()
     
-    return render(request, r'login/login.html', {'form': form})
+    return render(request, 'login/login.html', {'form': form})
 
 # view para cadastro
 def cadastro(request):
@@ -42,8 +42,11 @@ def cadastro(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Cadastro realizado com sucesso! Faça login.')
-            return redirect('home')
+            return redirect('usuarios:pag_principal')
     else:
         form = CadastroForm()
     
-    return render(request, r'cadastro/cadastrar.html', {'form': form})
+    return render(request, 'cadastro/cadastrar.html', {'form': form})
+
+def principal(request):
+    return render(request, 'principal/principal_page.html')
