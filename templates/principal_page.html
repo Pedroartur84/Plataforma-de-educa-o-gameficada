@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Salas - Player{% endblock %}
+
+{% block content %}
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <a href="#"><i class="bi bi-house-door"></i> Início</a>
+    <a href="#"><i class="bi bi-people"></i> Minhas Salas</a>
+    <a href="#"><i class="bi bi-plus-circle"></i> Criar Sala</a>
+    <a href="#"><i class="bi bi-flag"></i> Missões</a>
+    <a href="#"><i class="bi bi-bar-chart-line"></i> Ranking</a>
+    <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+    <a href="#" id="admLink" class="text-warning"><i class="bi bi-shield-lock"></i> Painel ADM</a>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar fixed-top shadow-sm" style="background-color: var(--color-gray-900); padding: var(--space-sm);">
+  <div class="container d-flex justify-content-between align-items-center">
+    <button class="btn btn-sm btn-primary d-lg-none" id="menuToggle">
+      <i class="bi bi-list fs-3"></i>
+    </button>
+    <a class="navbar-brand text-white" href="#">🎮 Player</a>
+    <div class="d-flex align-items-center">
+      <span class="me-3"><i class="bi bi-star-fill text-warning"></i> Nível 4</span>
+      <span class="me-3"><i class="bi bi-gem text-accent"></i> 120 pts</span>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle fs-5"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
+          <li><a class="dropdown-item" href="#">Configurações</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item text-danger" href="#">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Conteúdo principal -->
+<main class="content container" style="margin-top: 6rem;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Salas Criadas</h2>
+    <a href=# class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Criar Sala
+    </a>
+  </div>
+
+  <div class="grid">
+    <!-- Exemplo de sala criada -->
+    <div class="card bg-azul" style="border-radius: var(--border-radius-lg); padding: var(--space-lg);">
+      <h3 class="mb-2">Sala: Introdução à Robótica</h3>
+      <p class="text-muted">Criada por: <strong>João Silva</strong></p>
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <span><i class="bi bi-people"></i> 14 participantes</span>
+        <a href="#" class="btn btn-sm btn-primary">Entrar</a>
+      </div>
+    </div>
+
+    <div class="card bg-laranja" style="border-radius: var(--border-radius-lg); padding: var(--space-lg);">
+      <h3 class="mb-2">Sala: História da Arte</h3>
+      <p class="text-muted">Criada por: <strong>Maria Lopes</strong></p>
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <span><i class="bi bi-people"></i> 8 participantes</span>
+        <a href="#" class="btn btn-sm btn-primary">Entrar</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Script de controle da sidebar -->
+<script>
+  const tipoUsuario = 'adm'; // ou 'aluno', 'professor'
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menuToggle');
+  const admLink = document.getElementById('admLink');
+
+  window.onload = () => {
+    if (tipoUsuario === 'adm') {
+      admLink.classList.remove('hidden');
+    } else {
+      admLink.classList.add('hidden');
+    }
+  };
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('show');
+  });
+</script>
+{% endblock %}
+
+
