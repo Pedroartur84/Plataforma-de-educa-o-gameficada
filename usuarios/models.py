@@ -21,3 +21,13 @@ class Usuario(AbstractUser):
     
     def __str__(self):
         return self.email
+
+
+class Sala(models.Model):
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField()
+    criador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    data_criacao = models.DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.nome
