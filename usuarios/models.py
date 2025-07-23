@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+# necesario fazer as migrações para criar as tabelas no banco de dados
 # Create your models here.
 class Usuario(AbstractUser):
     tipo_usuario = models.CharField(
