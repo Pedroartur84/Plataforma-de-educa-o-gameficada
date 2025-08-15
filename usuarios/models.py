@@ -25,10 +25,11 @@ class Usuario(AbstractUser):
 
 
 class Sala(models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=150)
     descricao = models.TextField()
-    criador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    data_criacao = models.DateField(auto_now_add=True)
+    criador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='salas_criadas')
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    atualizada_em = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.nome

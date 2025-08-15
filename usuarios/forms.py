@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .models import Usuario
+from .models import *
 
 class LoginForm(AuthenticationForm):
     """
@@ -106,3 +107,9 @@ class CadastroForm(UserCreationForm):
         self.field_pop = ['username', None]
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+            
+
+class SalaForm(forms.ModelForm):
+    class Meta:
+        model = Sala
+        fields = ['nome', 'descricao']
