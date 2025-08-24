@@ -63,7 +63,3 @@ def criar_sala(request):
         return  redirect('usuarios:pag_principal')
     return  redirect('usuarios:pag_principal')
 
-
-def listar_salas(request):
-    salas = Sala.objects.all().order_by('-data_criacao')
-    return render(request, 'principal/principal_page.html', {'salas': salas})
