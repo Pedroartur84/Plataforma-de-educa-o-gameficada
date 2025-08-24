@@ -28,10 +28,3 @@
 
 .bg-azul { background-color: rgba(26, 115, 232, 0.1); color: var(--color-primary); }
 .bg-laranja { background-color: rgba(255, 109, 0, 0.1); color: var(--color-accent); }
-
-
-/*===================== EFEITO DE FADE IN ===================== */
-.fade-in-body{
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
