@@ -25,4 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'), #pagina inicial
     path('usuarios/', include('usuarios.urls')), #incluir as urls de ususarios, prefixo usuarios
+    path('cursos/', include('cursos.urls')), #incluir as urls de cursos, prefixo cursos
 ]
