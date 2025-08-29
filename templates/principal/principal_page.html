@@ -39,9 +39,10 @@
         <button class="btn btn-sm btn-primary d-lg-none" id="menuToggle" aria-label="Toggle sidebar" aria-expanded="false">
             <i class="bi bi-list fs-3"></i>
         </button>
-        <a class="navbar-brand text-white" href="/">
+        <!-- <a class="navbar-brand text-white" href="/">
             <img src="{% static 'img/logo.png' %}" alt="Player Logo" class="logo-main">
         </a>
+        -->
         <div class="d-flex align-items-center">
             <span class="me-3 text-white"><i class="bi bi-star-fill text-warning"></i> Nível {{ user.profile.nivel|default:0 }}</span>
             <span class="me-3 text-white"><i class="bi bi-gem text-accent"></i> {{ user.profile.pontos|default:0 }} pts</span>
