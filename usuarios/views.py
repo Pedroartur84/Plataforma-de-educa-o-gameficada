@@ -1,65 +1,91 @@
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from .forms import LoginForm, CadastroForm
-from .models import *
+from .models import Sala
+from django.contrib.auth.decorators import login_required
 
 def login_view(request):
-    # verifica se a requisição é do tipo POST
+    """Exibe e processa o formulário de login."""
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
-        # verifica se o formulario é válido
         if form.is_valid():
-            # tenta autenticar o usuario com as credencias fornecidas
             user = authenticate(
-                username=form.cleaned_data['username'],  # O email está aqui
+                username=form.cleaned_data['username'],
                 password=form.cleaned_data['password']
             )
-            # se o usuario foi autenticado com sucesso
             if user is not None:
-                # faz o login do usuario
                 login(request, user)
-                # verifica se o usuário marcou "lembrarme"
                 if not form.cleaned_data.get('remember_me'):
                     request.session.set_expiry(0)  # Sessão do navegador
-                return redirect('usuarios:pag_principal') #para redirecionar para a pagina principal
+                return redirect('usuarios:pag_principal')
             else:
                 messages.error(request, 'Credenciais inválidas.')
         else:
             messages.error(request, 'Por favor, corrija os erros abaixo.')
     else:
         form = LoginForm()
-    
     return render(request, 'login/login.html', {'form': form})
 
-# view para cadastro
 def cadastro(request):
-    # verifica se a requisicao e do tipo POST
+    """Exibe e processa o formulário de cadastro."""
     if request.method == 'POST':
         form = CadastroForm(request.POST)
-        # verifica se o formulario e valido
         if form.is_valid():
-            # salva o novo usuario no banco de dados
             user = form.save()
             login(request, user)
             messages.success(request, 'Cadastro realizado com sucesso! Faça login.')
             return redirect('usuarios:pag_principal')
     else:
         form = CadastroForm()
-    
     return render(request, 'cadastro/cadastrar.html', {'form': form})
 
-
+@login_required
 def principal(request):
-    salas = Sala.objects.all().order_by('-data_criacao')
+    """Exibe a página principal com as salas do usuário logado."""
+    salas = Sala.objects.filter(alunos=request.user).order_by('-data_criacao')
     return render(request, 'principal/principal_page.html', {'salas': salas})
 
-
+@login_required
 def criar_sala(request):
+    """Cria uma nova sala com validação básica."""
     if request.method == 'POST':
         nome = request.POST.get('nome_sala')
         descricao = request.POST.get('descricao')
-        Sala.objects.create(nome=nome, descricao=descricao, criador=request.user)
-        return  redirect('usuarios:pag_principal')
-    return  redirect('usuarios:pag_principal')
+        if nome and descricao:  # Validação básica
+            Sala.objects.create(nome=nome, descricao=descricao, criador=request.user)
+            Sala.alunos.add(request.user)  # Adiciona o criador como aluno da sala
+            messages.success(request, 'Sala criada com sucesso!')
+            return redirect('usuarios:pag_principal')
+        else:
+            messages.error(request, 'Nome e descrição são obrigatórios.')
+    return redirect('usuarios:pag_principal')
 
+@login_required
+def minhas_salas(request):
+    """Exibe a lista de salas associadas ao usuário logado."""
+    salas = Sala.objects.filter(alunos=request.user).order_by('-data_criacao')
+    return render(request, 'usuarios/minhas_salas.html', {'salas': salas})
+
+@login_required
+def missoes(request):
+    """Exibe a página de missões (placeholder)."""
+    return render(request, 'usuarios/missoes.html')
+
+@login_required
+def ranking(request):
+    """Exibe a página de ranking (placeholder)."""
+    return render(request, 'usuarios/ranking.html')
+
+@login_required
+def configuracoes(request):
+    """Exibe a página de configurações do usuário (placeholder)."""
+    return render(request, 'usuarios/configuracoes.html')
+
+@login_required
+def painel_adm(request):
+    """Exibe o painel administrativo (restrito a superusuários)."""
+    if not request.user.is_superuser:
+        messages.error(request, "Você não tem permissão para acessar o Painel ADM.")
+        return redirect('usuarios:pag_principal')
+    return render(request, 'usuarios/painel_adm.html')

@@ -24,6 +24,6 @@ app_name = 'core' #para que os nomes das rotas agrupadas sejam reconhecidas e po
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'), #pagina inicial
-    path('usuarios/', include('usuarios.urls')), #incluir as urls de ususarios, prefixo usuarios
-    path('cursos/', include('cursos.urls')), #incluir as urls de cursos, prefixo cursos
+    path('usuarios/', include('usuarios.urls', namespace='usuarios')), #incluir as urls de ususarios, prefixo usuarios
+    path('cursos/', include('cursos.urls', 'cursos')), #incluir as urls de cursos, prefixo cursos
 ]
