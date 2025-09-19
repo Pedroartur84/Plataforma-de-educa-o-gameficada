@@ -5,69 +5,76 @@
 
 {% block content %}
 
-<!-- Sidebar -->
-<aside class="sidebar list-group" id="sidebar">
-    <a href="{% url 'usuarios:pag_principal' %}" class="list-group-item list-group-item-action {% if request.path == '/usuarios/principal/' %}active{% endif %}">
-        <i class="bi bi-house-door"></i> Início
-    </a>
-    <a href="{% url 'cursos:lista_cursos' %}" class="list-group-item list-group-item-action {% if request.path|slice:':7' == '/cursos' %}active{% endif %}">
-        <i class="bi bi-book"></i> Meus Cursos
-    </a>
-    <a href="{% url 'usuarios:minhas_salas' %}" class="list-group-item list-group-item-action">
-        <i class="bi bi-people"></i> Minhas Salas
-    </a>
-    <a href="{% url 'usuarios:criar_sala' %}" class="list-group-item list-group-item-action">
-        <i class="bi bi-plus-circle"></i> Criar Sala
-    </a>
-    <a href="{% url 'usuarios:missoes' %}" class="list-group-item list-group-item-action">
-        <i class="bi bi-flag"></i> Missões
-    </a>
-    <a href="{% url 'usuarios:ranking' %}" class="list-group-item list-group-item-action">
-        <i class="bi bi-bar-chart-line"></i> Ranking
-    </a>
-    <a href="{% url 'usuarios:configuracoes' %}" class="list-group-item list-group-item-action">
-        <i class="bi bi-gear"></i> Configurações
-    </a>
-    <a href="{% url 'usuarios:painel_adm' %}" class="list-group-item list-group-item-action text-warning {% if not user.is_superuser %}hidden{% endif %}">
-        <i class="bi bi-shield-lock"></i> Painel ADM
-    </a>
-</aside>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg fixed-top shadow-sm" style="background-color: var(--color-gray-900); padding: var(--space-sm);">
-    <div class="container d-flex justify-content-between align-items-center">
-        <button class="btn btn-sm btn-primary d-lg-none" id="menuToggle" aria-label="Toggle sidebar" aria-expanded="false">
-            <i class="bi bi-list fs-3"></i>
+<!-- Navbar Unificada -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--color-gray-900); padding: var(--space-sm);">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <!-- <a class="navbar-brand text-white" href="/">
-            <img src="{% static 'img/logo.png' %}" alt="Player Logo" class="logo-main">
-        </a>
-        -->
-        <div class="d-flex align-items-center">
-            <span class="me-3 text-white"><i class="bi bi-star-fill text-warning"></i> Nível {{ user.profile.nivel|default:0 }}</span>
-            <span class="me-3 text-white"><i class="bi bi-gem text-accent"></i> {{ user.profile.pontos|default:0 }} pts</span>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle fs-5"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
-                    <li><a class="dropdown-item" href="#">Configurações</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="{% url 'usuarios:logout' %}">Sair</a></li>
-                </ul>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/usuarios/principal/' %}active{% endif %}" href="{% url 'usuarios:pag_principal' %}">
+                        <i class="bi bi-house-door"></i> Início
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path|slice:':7' == '/cursos' %}active{% endif %}" href="{% url 'cursos:lista_cursos' %}">
+                        <i class="bi bi-book"></i> Meus Cursos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:minhas_salas' %}">
+                        <i class="bi bi-people"></i> Minhas Salas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:criar_sala' %}">
+                        <i class="bi bi-plus-circle"></i> Criar Sala
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:missoes' %}">
+                        <i class="bi bi-flag"></i> Missões
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:ranking' %}">
+                        <i class="bi bi-bar-chart-line"></i> Ranking
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:configuracoes' %}">
+                        <i class="bi bi-gear"></i> Configurações
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning {% if not user.is_superuser %}d-none{% endif %}" href="{% url 'usuarios:painel_adm' %}">
+                        <i class="bi bi-shield-lock"></i> Painel ADM
+                    </a>
+                </li>
+            </ul>
+            <div class="ms-auto">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-5"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
+                        <li><a class="dropdown-item" href="#">Configurações</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'usuarios:logout' %}">Sair</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </nav>
 
 <!-- Conteúdo principal -->
-<main class="content container" style="margin-top: calc(var(--space-lg) + 4rem);">
+<main class="content container" style="margin-top: calc(var(--space-lg) + 56px);">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-accent">Salas Criadas</h2>
-        <button class="btn btn-primary" id="abrirModal" aria-label="Abrir modal para criar nova sala">
-            <i class="bi bi-plus-circle"></i> Criar Nova Sala
-        </button>
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -92,50 +99,7 @@
     </div>
 </main>
 
-<!-- Modal de Criação de Sala -->
-<div class="modal fade" id="modalCriarSala" tabindex="-1" aria-labelledby="modalCriarSalaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-gray-900 border-light">
-            <div class="modal-header">
-                <h2 class="modal-title text-accent" id="modalCriarSalaLabel">Nova Sala</h2>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'usuarios:criar_sala' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="nome_sala" class="form-label text-white">Nome da Sala</label>
-                        <input type="text" class="form-control input-estilo" id="nome_sala" name="nome_sala" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label text-white">Descrição</label>
-                        <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="3" required></textarea>
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Criar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Script de controle -->
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-<script>
-    // Sidebar toggle
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
-    });
-
-    // Modal control (usando Bootstrap)
-    const modal = new bootstrap.Modal(document.getElementById('modalCriarSala'));
-    document.getElementById('abrirModal').addEventListener('click', () => modal.show());
-    // Fechar é gerenciado pelo Bootstrap via data-bs-dismiss
-</script>
-
 {% endblock %}
 
+{% block scripts %}
+{% endblock %}

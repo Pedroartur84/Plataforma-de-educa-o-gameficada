@@ -48,17 +48,17 @@ def principal(request):
 
 @login_required
 def criar_sala(request):
-    """Cria uma nova sala com validação básica."""
     if request.method == 'POST':
         nome = request.POST.get('nome_sala')
         descricao = request.POST.get('descricao')
-        if nome and descricao:  # Validação básica
-            Sala.objects.create(nome=nome, descricao=descricao, criador=request.user)
-            Sala.alunos.add(request.user)  # Adiciona o criador como aluno da sala
+        if nome and descricao:
+            sala = Sala.objects.create(nome=nome, descricao=descricao, criador=request.user)
+            sala.alunos.add(request.user)
             messages.success(request, 'Sala criada com sucesso!')
             return redirect('usuarios:pag_principal')
         else:
             messages.error(request, 'Nome e descrição são obrigatórios.')
+            return redirect('usuarios:pag_principal')
     return redirect('usuarios:pag_principal')
 
 @login_required
