@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Criar Sala - Player{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Criar Nova Sala</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+        </div>
+        <div class="mb-3">
+            {{ form.descricao.label_tag }}
+            {{ form.descricao }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.tipo_usuario_criador.id_for_label }}">Qual o tipo de usuário?</label>
+            {{ form.tipo_usuario_criador }}
+        </div>
+        <button type="submit" class="btn btn-primary">Criar Sala</button>
+    </form>
+    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary mt-3">Voltar para Salas</a>
+</div>
+{% endblock %}

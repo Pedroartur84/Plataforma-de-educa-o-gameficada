@@ -108,8 +108,13 @@ class CadastroForm(UserCreationForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
             
-
+        
 class SalaForm(forms.ModelForm):
     class Meta:
         model = Sala
-        fields = ['nome', 'descricao']
+        fields = ['nome', 'descricao', 'tipo_usuario_criador']
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'required': True , 'rows': 3}),
+            'tipo_usuario_criador': forms.Select(attrs={'class': 'form-control', 'required': True}),
+        }

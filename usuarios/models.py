@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
-# necesario fazer as migrações para criar as tabelas no banco de dados
+# necessario fazer as migrações para criar as tabelas no banco de dados
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
@@ -50,6 +50,11 @@ class Sala(models.Model):
     criador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='salas_criadas')
     alunos = models.ManyToManyField(Usuario, related_name='salas_participando', blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
+    tipo_usuario_criador = models.CharField(
+        max_length=10,
+        choices=[('professor', 'Professor'), ('aluno', 'Aluno')],
+        default='aluno'
+    )
     atualizada_em = models.DateTimeField(auto_now=True)
     
     def __str__(self):

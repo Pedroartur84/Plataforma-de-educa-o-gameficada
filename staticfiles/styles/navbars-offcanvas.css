@@ -1,0 +1,23 @@
+body {
+    padding-top: 56px; /* Espaçamento superior para navbar fixa */
+    padding-bottom: 20px;
+    overflow: auto; /* Restaura rolagem padrão */
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra leve */
+}
+
+.offcanvas {
+    width: 250px; /* Largura fixa do offcanvas */
+    background-color: #212529; /* Cor de fundo escura */
+}
+
+.offcanvas.show ~ body {
+    overflow: hidden; /* Bloqueia rolagem apenas quando offcanvas está aberto */
+    padding-right: 0px; /* Remove padding extra */
+}
+
+.content {
+    padding-top: 10px; /* Espaçamento adicional para o conteúdo */
+}

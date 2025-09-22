@@ -1,0 +1,22 @@
+/* Mobile First - Todos os breakpoints usam variáveis */
+@media (min-width: var(--bp-mobile)) {
+    .logo-auth { --logo-size: 70px; }
+}
+
+@media (min-width: var(--bp-tablet)) {
+    .logo-auth { --logo-size: 80px; }
+    .auth-card { padding: var(--space-xl); }
+}
+
+/* Padronização de componentes responsivos */
+@media (max-width: var(--bp-tablet)) {
+    .features-grid {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .feature-item {
+        width: 100%;
+        max-width: none;
+    }
+}

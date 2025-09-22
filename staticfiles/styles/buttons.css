@@ -1,0 +1,42 @@
+.btn {
+    --btn-padding-y: var(--space-sm);
+    --btn-padding-x: var(--space-md);
+    --btn-radius: var(--border-radius-md);
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-padding-y) var(--btn-padding-x);
+    border-radius: var(--btn-radius);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    transition: var(--transition-normal);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Tamanhos */
+.btn-sm {
+    --btn-padding-y: var(--space-xs);
+    --btn-padding-x: var(--space-sm);
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    --btn-padding-y: var(--space-md);
+    --btn-padding-x: var(--space-lg);
+    font-size: 1.125rem;
+}
+
+/* Variantes */
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: 2px solid transparent;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}

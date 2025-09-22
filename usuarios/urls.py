@@ -12,6 +12,7 @@ urlpatterns = [
     path('criar-sala/', criar_sala, name='criar_sala'), #view para criar sala
     path('logout/', auth_views.LogoutView.as_view(), name='logout'), #view para logout
     path('minhas-salas/', views.minhas_salas, name='minhas_salas'),  # Nova view para listar salas do usuário
+    path('detalhe-sala/<int:sala_id>/', views.detalhe_sala, name='detalhe_sala'),  # Nova view para detalhes da sala
     path('missoes/', views.missoes, name='missoes'),  # Nova view para listar missões do usuário
     path('ranking/', views.ranking, name='ranking'),  # Nova view para o ranking global
     path('configuracoes/', views.configuracoes, name='configuracoes'),  # Nova view para configurações do usuário

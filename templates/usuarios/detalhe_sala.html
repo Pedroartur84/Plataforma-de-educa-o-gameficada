@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ sala.nome }} - Player{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ sala.nome }}</h2>
+    <p><strong>Criada por:</strong> {{ sala.criador.username }}</p>
+    <p><strong>Descrição:</strong> {{ sala.descricao }}</p>
+    <p><strong>Data de Criação:</strong> {{ sala.data_criacao }}</p>
+    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">Voltar</a>
+</div>
+{% endblock %}
