@@ -122,6 +122,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Caminho absoluto para a pasta static
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Pasta onde os arquivos estáticos serão coletados
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
