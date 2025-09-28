@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ missao.titulo }} - Chat da Missão{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Chat da Missão: {{ missao.titulo }}</h2>
+    <p>Descrição: {{ missao.descricao }}</p>
+    <p>Pontos: {{ missao.pontos }}</p>
+    <div class="chat-box" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
+        {% for mensagem in mensagens %}
+        <p><strong>{{ mensagem.usuario.email }}:</strong> {{ mensagem.texto }} <small>({{ mensagem.data_envio }})</small></p>
+        {% endfor %}
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-2">Enviar</button>
+    </form>
+</div>
+{% endblock %}

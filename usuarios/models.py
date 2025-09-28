@@ -59,3 +59,34 @@ class Sala(models.Model):
     
     def __str__(self):
         return self.nome
+    
+
+class Mensagem(models.Model):
+    sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='mensagens')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mensagens')
+    texto = models.TextField()
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.email}: {self.texto[:50]}"
+
+class Missao(models.Model):
+    sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='missões')
+    professor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='missões_criadas')
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField()
+    pontos = models.IntegerField(default=10)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+
+class MensagemMissao(models.Model):
+    missao = models.ForeignKey(Missao, on_delete=models.CASCADE, related_name='mensagens')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mensagens_missao')
+    texto = models.TextField()
+    arquivo = models.FileField(upload_to='respostas/', blank=True, null=True)  # Para PDF/PPT
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.email}: {self.texto[:50]}"

@@ -118,3 +118,32 @@ class SalaForm(forms.ModelForm):
             'descricao': forms.Textarea(attrs={'class': 'form-control', 'required': True , 'rows': 3}),
             'tipo_usuario_criador': forms.Select(attrs={'class': 'form-control', 'required': True}),
         }
+        
+        
+class MensagemForm(forms.ModelForm):
+    class Meta:
+        model = Mensagem
+        fields = ['texto']
+        widgets = {
+            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite sua mensagem...', 'required': True}),
+        }
+        
+        
+class MissaoForm(forms.ModelForm):
+    class Meta:
+        model = Missao
+        fields = ['titulo', 'descricao', 'pontos']
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título da missão', 'required': True}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da missão', 'required': True, 'rows': 3}),
+            'pontos': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Pontos', 'min': '1', 'required': True}),
+        }
+
+class MensagemMissaoForm(forms.ModelForm):
+    class Meta:
+        model = MensagemMissao
+        fields = ['texto', 'arquivo']
+        widgets = {
+            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite sua resposta...', 'required': True}),
+            'arquivo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }
