@@ -144,8 +144,9 @@ def postar_missao(request, sala_id):
             messages.success(request, 'Missão postada com sucesso!')
             return redirect('usuarios:sala_virtual', sala_id=sala_id)
     else:
-        form = MissaoForm()
-    return render(request, 'usuarios/postar_missao.html', {'form': form, 'sala': sala})
+        # Não renderiza template; o modal já está em sala_virtual.html
+        pass
+    return redirect('usuarios:sala_virtual', sala_id=sala_id)
 
 @login_required
 def chat_missao(request, missao_id):

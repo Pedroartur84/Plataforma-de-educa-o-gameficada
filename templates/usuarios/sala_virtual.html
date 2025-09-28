@@ -48,7 +48,7 @@
                 <div class="modal-body">
                     <form method="post" action="{% url 'usuarios:postar_missao' sala.id %}" id="missaoForm">
                         {% csrf_token %}
-                        {{ form_missaoS.as_p }}
+                        {{ form_missao.as_p }}
                         <button type="submit" class="btn btn-primary">Postar Missão</button>
                     </form>
                 </div>
