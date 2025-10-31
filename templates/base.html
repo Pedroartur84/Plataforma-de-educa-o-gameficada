@@ -1,15 +1,116 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br" data-bs-theme="dark">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="{% static 'styles/style.css' %}" rel="stylesheet">
     <title>{% block title %}Player{% endblock %}</title>
+    
+    <!-- CSS Global de Cores -->
+    <style>
+        :root {
+            /* Cores Primárias */
+            --color-primary: #FFC107; /* Amarelo */
+            --color-primary-dark: #FFA000; /* Amarelo escuro para hover */
+            --color-accent: #000000; /* Preto */
+            --color-accent-light: #333333; /* Preto claro para variações */
+            
+            /* Cores Neutras */
+            --color-white: #FFFFFF;
+            --color-light: #FAFAFA; /* Fundo claro */
+            --color-gray-50: #F8F9FA; /* Fundo muito claro */
+            --color-gray-100: #E9ECEF;
+            --color-gray-300: #B0B0B0;
+            --color-gray-500: #757575;
+            --color-gray-700: #424242;
+            --color-gray-900: #212121;
+            --color-dark: #000000;
+
+            /* Cores para Modo Noturno */
+            --color-dark-mode-bg: #1A1A1A;
+            --color-dark-mode-text: #FFFFFF;
+            --color-dark-mode-card: #2D2D2D;
+
+            /* Espaçamentos */
+            --space-xxs: 0.25rem;
+            --space-xs: 0.5rem;
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-xxl: 3rem;
+
+            /* Breakpoints */
+            --bp-mobile: 576px;
+            --bp-tablet: 768px;
+            --bp-desktop: 992px;
+            --bp-large: 1200px;
+
+            /* Bordas */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-full: 9999px;
+
+            /* Transições */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.45s ease;
+        }
+
+        /* Estilos Globais Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--color-gray-50);
+            color: var(--color-dark);
+            font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
+        }
+
+        .dark-mode {
+            background-color: var(--color-dark-mode-bg);
+            color: var(--color-dark-mode-text);
+        }
+
+        /* Utilitários de Cor Globais */
+        .text-accent { color: var(--color-accent); }
+        .text-muted { color: var(--color-gray-500); }
+        .bg-light { background-color: var(--color-gray-50) !important; }
+        .bg-white { background-color: var(--color-white) !important; }
+
+        .hidden { display: none !important; }
+        .visually-hidden { 
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
 </head>
 <body>
+    {% block navbar %}{% endblock %}
+    
     <div class="container mt-5">
         {% block content %}{% endblock %}
     </div>
@@ -17,5 +118,6 @@
     {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     {% endblock %}
+    
 </body>
 </html>

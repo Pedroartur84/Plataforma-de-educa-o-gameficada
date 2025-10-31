@@ -1,11 +1,379 @@
-/* style.css - Arquivo centralizador */
-@import 'variables.css';
-@import 'base.css';
-@import 'layout.css';
-@import 'auth.css';
-@import 'home.css';
-@import 'components.css';
-@import 'buttons.css';
-@import 'forms.css';
-@import 'responsive.css';
-@import 'navbars-offcanvas.css';
+/* style.css */
+/* 1. variables.css */
+:root {
+    /* Cores Primárias */
+    --color-primary: #FFC107; /* Amarelo */
+    --color-primary-dark: #FFA000; /* Amarelo escuro para hover */
+    --color-accent: #000000; /* Preto */
+    --color-accent-light: #333333; /* Preto claro para variações */
+    
+    /* Cores Neutras */
+    --color-white: #FFFFFF;
+    --color-light: #F5F5F5; /* Fundo claro */
+    --color-gray-100: #E0E0E0;
+    --color-gray-300: #B0B0B0;
+    --color-gray-500: #757575;
+    --color-gray-700: #424242;
+    --color-gray-900: #212121; /* Fundo modo noturno */
+    --color-dark: #000000; /* Preto puro */
+
+    /* Cores para Modo Noturno */
+    --color-dark-mode-bg: #212121;
+    --color-dark-mode-text: #FFFFFF;
+    --color-dark-mode-card: #333333;
+
+    /* Espaçamentos baseados em escala modular */
+    --space-xxs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-xxl: 3rem;
+
+    /* Breakpoints nomeados */
+    --bp-mobile: 576px;
+    --bp-tablet: 768px;
+    --bp-desktop: 992px;
+    --bp-large: 1200px;
+
+    /* Bordas */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-full: 9999px;
+
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.45s ease;
+}
+
+/* 2. base.css */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--color-light);
+    color: var(--color-dark);
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.dark-mode {
+    background-color: var(--color-dark-mode-bg);
+    color: var(--color-dark-mode-text);
+}
+
+.text-accent { color: var(--color-accent); }
+.text-muted { color: var(--color-gray-500); }
+
+.hidden { display: none !important; }
+.visually-hidden { 
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* 3. layout.css */
+.container {
+    width: 100%;
+    max-width: var(--bp-large);
+    padding: 0 var(--space-md);
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.home-container {
+    max-width: 800px;
+    padding: var(--space-lg);
+    margin: 0 auto;
+}
+
+:root {
+    --z-index-base: 0;
+    --z-index-dropdown: 10;
+    --z-index-sticky: 20;
+    --z-index-fixed: 30;
+    --z-index-modal: 40;
+    --z-index-toast: 50;
+}
+
+/* 4. forms.css */
+.form-floating>label {
+    color: var(--color-gray-500);
+}
+
+.input-estilo {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    color: var(--color-dark);
+    border-radius: var(--border-radius-md);
+    transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.input-estilo:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+}
+
+.dark-mode .input-estilo {
+    background-color: var(--color-dark-mode-card);
+    border-color: var(--color-gray-700);
+    color: var(--color-dark-mode-text);
+}
+
+.dark-mode .input-estilo:focus {
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 5px rgba(255, 160, 0, 0.3);
+}
+
+/* 5. buttons.css */
+.btn {
+    --btn-padding-y: var(--space-sm);
+    --btn-padding-x: var(--space-md);
+    --btn-radius: var(--border-radius-md);
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-padding-y) var(--btn-padding-x);
+    border-radius: var(--btn-radius);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    transition: var(--transition-normal);
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-sm {
+    --btn-padding-y: var(--space-xs);
+    --btn-padding-x: var(--space-sm);
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    --btn-padding-y: var(--space-md);
+    --btn-padding-x: var(--space-lg);
+    font-size: 1.125rem;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    border: 2px solid var(--color-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.dark-mode .btn-primary {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+    border-color: var(--color-primary-dark);
+}
+
+.dark-mode .btn-primary:hover {
+    background-color: var(--color-primary);
+}
+
+/* 6. navbars-offcanvas.css */
+body {
+    padding-top: 56px;
+    padding-bottom: 20px;
+    overflow: auto;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.offcanvas {
+    width: 250px;
+    background-color: var(--color-dark-mode-bg);
+}
+
+.offcanvas.show ~ body {
+    overflow: hidden;
+    padding-right: 0px;
+}
+
+.content {
+    padding-top: 10px;
+}
+
+/* 7. home.css */
+.logo-main {
+    --logo-height: 120px;
+    height: auto;
+    max-height: var(--logo-height);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.3));
+    margin-bottom: var(--space-lg);
+}
+
+.project-description {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--border-radius-lg);
+    backdrop-filter: blur(5px);
+    padding: clamp(var(--space-md), 3vw, var(--space-xl));
+    margin-bottom: var(--space-xl);
+    width: 100%;
+}
+
+.dark-mode .project-description {
+    background-color: var(--color-dark-mode-card);
+    border-color: var(--color-gray-700);
+}
+
+@media (max-width: var(--bp-tablet)) {
+    .logo-main {
+        --logo-height: 80px;
+    }
+}
+
+/* 8. auth.css */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--space-md);
+}
+
+.auth-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--border-radius-lg);
+    backdrop-filter: blur(5px);
+    width: 100%;
+    max-width: 400px;
+    padding: var(--space-xl);
+    margin: 0 auto;
+    transition: var(--transition-normal);
+}
+
+.dark-mode .auth-card {
+    background-color: var(--color-dark-mode-card);
+    border-color: var(--color-gray-700);
+}
+
+.logo-auth {
+    --logo-size: 80px;
+    width: auto;
+    height: var(--logo-size);
+    max-height: var(--logo-size);
+    object-fit: contain;
+    margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 400px) {
+    .auth-card {
+        padding: var(--space-lg);
+    }
+    
+    .logo-auth {
+        --logo-size: 70px;
+    }
+}
+
+/* 9. components.css */
+.features-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.feature-item {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+    text-align: center;
+    padding: 1rem;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+}
+
+.dark-mode .feature-icon {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+}
+
+.bg-azul { background-color: rgba(255, 193, 7, 0.1); color: var(--color-primary); }
+.bg-laranja { background-color: rgba(255, 193, 7, 0.1); color: var(--color-primary); }
+
+.card {
+    transition: transform var(--transition-normal);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.dark-mode .card {
+    background-color: var(--color-dark-mode-card);
+    border-color: var(--color-gray-700);
+    color: var(--color-dark-mode-text);
+}
+
+/* 10. responsive.css */
+@media (min-width: var(--bp-mobile)) {
+    .logo-auth { --logo-size: 70px; }
+}
+
+@media (min-width: var(--bp-tablet)) {
+    .logo-auth { --logo-size: 80px; }
+    .auth-card { padding: var(--space-xl); }
+}
+
+@media (max-width: var(--bp-tablet)) {
+    .features-grid {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .feature-item {
+        width: 100%;
+        max-width: none;
+    }
+}

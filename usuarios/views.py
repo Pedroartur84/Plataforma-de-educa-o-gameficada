@@ -152,5 +152,22 @@ def postar_missao(request, sala_id):
 def chat_missao(request, missao_id):
     missao = get_object_or_404(Missao, id=missao_id)
     mensagens = MensagemMissao.objects.filter(missao=missao).order_by('data_envio')
-    form = MensagemMissaoForm()
-    return render(request, 'usuarios/chat_missao.html', {'missao': missao, 'mensagens': mensagens, 'form': form})
+    if request.method == 'POST':
+        form = MensagemMissaoForm(request.POST, request.FILES)
+        if form.is_valid():
+            mensagem = form.save(commit=False)
+            mensagem.missao = missao
+            mensagem.usuario = request.user
+            mensagem.save()
+            messages.success(request, 'Mensagem enviada!')
+            return redirect('usuarios:chat_missao', missao_id=missao_id)
+        else:
+            messages.error(request, 'Erro ao enviar mensagem.')
+    else:
+        form = MensagemMissaoForm()
+        return render(request, 'usuarios/chat_missao.html', {
+            'missao': missao,
+            'mensagens': mensagens,
+            'form': form
+        })
+        

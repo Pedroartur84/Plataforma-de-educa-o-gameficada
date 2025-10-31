@@ -1,43 +1,48 @@
 :root {
-    /* Cores Primárias (padronizar nomenclatura em inglês) */
-    --color-primary: #1a73e8;
-    --color-primary-dark: #0d47a1;
-    --color-accent: #ff6d00;
-    --color-accent-light: #ff9e40;
-    
-    /* Cores Neutras (adicionar variações consistentes) */
-    --color-white: #ffffff;
-    --color-light: #f8f9fa;
-    --color-gray-100: #f3f4f6;
-    --color-gray-300: #d1d5db;
-    --color-gray-500: #6b7280;
-    --color-gray-700: #374151;
-    --color-gray-900: #111827;
-    --color-dark: #121212;
+      /* Cores Primárias */
+      --color-primary: #FFC107; /* Amarelo */
+      --color-primary-dark: #FFA000; /* Amarelo escuro para hover */
+      --color-accent: #000000; /* Preto */
+      --color-accent-light: #333333; /* Preto claro para variações */
+      
+      /* Cores Neutras */
+      --color-white: #FFFFFF;
+      --color-light: #F5F5F5; /* Fundo claro */
+      --color-gray-100: #E0E0E0;
+      --color-gray-300: #B0B0B0;
+      --color-gray-500: #757575;
+      --color-gray-700: #424242;
+      --color-gray-900: #212121; /* Fundo modo noturno */
+      --color-dark: #000000; /* Preto puro */
 
-    /* Espaçamentos baseados em escala modular */
-    --space-xxs: 0.25rem;
-    --space-xs: 0.5rem;
-    --space-sm: 0.75rem;
-    --space-md: 1rem;
-    --space-lg: 1.5rem;
-    --space-xl: 2rem;
-    --space-xxl: 3rem;
+      /* Cores para Modo Noturno */
+      --color-dark-mode-bg: #212121;
+      --color-dark-mode-text: #FFFFFF;
+      --color-dark-mode-card: #333333;
 
-    /* Breakpoints nomeados */
-    --bp-mobile: 576px;
-    --bp-tablet: 768px;
-    --bp-desktop: 992px;
-    --bp-large: 1200px;
+      /* Espaçamentos baseados em escala modular */
+      --space-xxs: 0.25rem;
+      --space-xs: 0.5rem;
+      --space-sm: 0.75rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-xxl: 3rem;
 
-    /* Bordas */
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
-    --border-radius-full: 9999px;
+      /* Breakpoints nomeados */
+      --bp-mobile: 576px;
+      --bp-tablet: 768px;
+      --bp-desktop: 992px;
+      --bp-large: 1200px;
 
-    /* Transições */
-    --transition-fast: 0.15s ease;
-    --transition-normal: 0.3s ease;
-    --transition-slow: 0.45s ease;
-}
+      /* Bordas */
+      --border-radius-sm: 4px;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --border-radius-full: 9999px;
+
+      /* Transições */
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s ease;
+      --transition-slow: 0.45s ease;
+  }

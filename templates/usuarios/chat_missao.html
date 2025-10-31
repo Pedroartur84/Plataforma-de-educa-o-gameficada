@@ -10,7 +10,13 @@
     <p>Pontos: {{ missao.pontos }}</p>
     <div class="chat-box" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
         {% for mensagem in mensagens %}
-        <p><strong>{{ mensagem.usuario.email }}:</strong> {{ mensagem.texto }} <small>({{ mensagem.data_envio }})</small></p>
+        <p>
+            <strong>{{ mensagem.usuario.email }}:</strong> {{ mensagem.texto }}
+            {% if mensagem.arquivo %}
+            <a href="{{ mensagem.arquivo.url }}" target="_blank">Ver arquivo</a>
+            {% endif %}
+            <small>({{ mensagem.data_envio }})</small>
+        </p>
         {% endfor %}
     </div>
     <form method="post" enctype="multipart/form-data">
@@ -18,5 +24,6 @@
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary mt-2">Enviar</button>
     </form>
+    <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-secondary mt-3">Voltar à Sala</a>
 </div>
 {% endblock %}
