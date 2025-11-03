@@ -30,13 +30,13 @@
 
 /* 2. forms.css */
 .form-floating>label {
-    color: var(--color-gray-500);
+    color: var(--color-dark-text-secondary);
 }
 
 .input-estilo {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-300);
-    color: var(--color-dark);
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
+    color: var(--color-dark-text);
     border-radius: var(--border-radius-md);
     transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
@@ -44,17 +44,8 @@
 .input-estilo:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
-}
-
-.dark-mode .input-estilo {
-    background-color: var(--color-dark-mode-card);
-    border-color: var(--color-gray-700);
-    color: var(--color-dark-mode-text);
-}
-
-.dark-mode .input-estilo:focus {
-    border-color: var(--color-primary-dark);
-    box-shadow: 0 0 5px rgba(255, 160, 0, 0.3);
+    background-color: var(--color-dark-card-light);
+    color: var(--color-dark-text);
 }
 
 /* 3. buttons.css */
@@ -90,23 +81,14 @@
 
 .btn-primary {
     background-color: var(--color-primary);
-    color: var(--color-dark);
+    color: var(--color-dark-bg);
     border: 2px solid var(--color-primary);
+    font-weight: 600;
 }
 
 .btn-primary:hover {
     background-color: var(--color-primary-dark);
     transform: translateY(-2px);
-}
-
-.dark-mode .btn-primary {
-    background-color: var(--color-primary-dark);
-    color: var(--color-white);
-    border-color: var(--color-primary-dark);
-}
-
-.dark-mode .btn-primary:hover {
-    background-color: var(--color-primary);
 }
 
 /* 4. navbars-offcanvas.css */
@@ -116,51 +98,39 @@ body {
     overflow: auto;
 }
 
+/* Navbar escura */
 .navbar {
-    background-color: var(--color-white);
+    background-color: var(--color-dark-card-light) !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: background-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.dark-mode .navbar {
-    background-color: var(--color-dark-mode-bg);
-    color: var(--color-dark-mode-text);
+.navbar-brand,
+.navbar-nav .nav-link {
+    color: var(--color-dark-text) !important;
 }
 
-.dark-mode .navbar .navbar-nav .nav-link {
-    color: var(--color-dark-mode-text);
-}
-
-.dark-mode .navbar .navbar-nav .nav-link:hover,
-.dark-mode .navbar .navbar-nav .nav-link:focus {
-    color: var(--color-primary);
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    color: var(--color-primary) !important;
 }
 
 .offcanvas {
-    width: 280px; 
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    transition: background-color var(--transition-normal), color var(--transition-normal);
-}
-
-.dark-mode .offcanvas {
-    background-color: var(--color-dark-mode-bg);
-    color: var(--color-dark-mode-text);
+    background-color: var(--color-dark-card-light) !important;
+    color: var(--color-dark-text) !important;
 }
 
 .offcanvas-header {
-    padding: 1rem 1.25rem;
-    min-height: 60px;
-    border-bottom: 1px solid var(--color-gray-300);
-}
-
-.dark-mode .offcanvas-header {
-    border-bottom-color: var(--color-gray-700);
+    background-color: var(--color-dark-card) !important;
+    border-bottom: 1px solid var(--color-dark-border) !important;
 }
 
 .offcanvas-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    color: var(--color-dark-text) !important;
+}
+
+.navbar-toggler-icon {
+    filter: invert(1); /* Inverte a cor do ícone do hamburger para branco */
 }
 
 /* Links alinhados horizontalmente */
@@ -176,7 +146,7 @@ body {
 }
 
 .offcanvas .navbar-nav .nav-link {
-    color: var(--color-dark);
+    color: var(--color-dark-text) !important;
     padding: 0.75rem 0.5rem;
     font-size: 0.9rem;
     display: flex;
@@ -188,22 +158,27 @@ body {
     transition: all var(--transition-fast);
     min-height: 60px;
     text-align: center;
-}
-
-.dark-mode .offcanvas .navbar-nav .nav-link {
-    color: var(--color-dark-mode-text);
+    background-color: transparent;
+    border: none;
 }
 
 .offcanvas .navbar-nav .nav-link i {
     font-size: 1.1rem;
     margin-bottom: 0.25rem;
+    color: var(--color-dark-text) !important;
 }
 
 .offcanvas .navbar-nav .nav-link:hover,
 .offcanvas .navbar-nav .nav-link:focus {
     background-color: rgba(255, 193, 7, 0.1);
-    color: var(--color-primary-dark);
+    color: var(--color-primary) !important;
     transform: translateY(-1px);
+    border-color: transparent;
+}
+
+.offcanvas .navbar-nav .nav-link:hover i,
+.offcanvas .navbar-nav .nav-link:focus i {
+    color: var(--color-primary) !important;
 }
 
 .offcanvas-body form.d-flex {
@@ -212,17 +187,11 @@ body {
 }
 
 .offcanvas-body .input-estilo {
-    background-color: var(--color-white);
-    border-color: var(--color-gray-300);
-    color: var(--color-dark);
+    background-color: var(--color-dark-card);
+    border-color: var(--color-dark-border);
+    color: var(--color-dark-text);
     height: 35px;
     font-size: 0.875rem;
-}
-
-.dark-mode .offcanvas-body .input-estilo {
-    background-color: var(--color-dark-mode-card);
-    border-color: var(--color-gray-700);
-    color: var(--color-dark-mode-text);
 }
 
 .offcanvas-body .btn {
@@ -252,18 +221,24 @@ body {
 }
 
 .project-description {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-300);
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
     border-radius: var(--border-radius-lg);
-    backdrop-filter: blur(5px);
     padding: clamp(var(--space-md), 3vw, var(--space-xl));
     margin-bottom: var(--space-xl);
     width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.dark-mode .project-description {
-    background-color: var(--color-dark-mode-card);
-    border-color: var(--color-gray-700);
+.project-description h2 {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.project-description p {
+    color: var(--color-dark-text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 @media (max-width: var(--bp-tablet)) {
@@ -279,13 +254,14 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: var(--space-md);
+    background-color: var(--color-dark-bg);
 }
 
 .auth-card {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-300);
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
     border-radius: var(--border-radius-lg);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     width: 100%;
     max-width: 400px;
     padding: var(--space-xl);
@@ -293,9 +269,14 @@ body {
     transition: var(--transition-normal);
 }
 
-.dark-mode .auth-card {
-    background-color: var(--color-dark-mode-card);
-    border-color: var(--color-gray-700);
+.auth-card h2,
+.auth-card h3 {
+    color: var(--color-dark-text);
+    font-weight: 600;
+}
+
+.auth-card p.text-muted {
+    color: var(--color-dark-text-muted) !important;
 }
 
 .logo-auth {
@@ -331,12 +312,41 @@ body {
     min-width: 200px;
     max-width: 300px;
     text-align: center;
-    padding: 1rem;
+    padding: 1.5rem 1rem;
+    background-color: var(--color-dark-card);
+    border: 1px solid var(--color-dark-border);
+    border-radius: var(--border-radius-lg);
+    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    border-color: var(--color-primary);
+}
+
+.feature-item h3 {
+    color: var(--color-dark-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.feature-item p {
+    color: var(--color-dark-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* CORREÇÃO ESPECÍFICA PARA text-muted mt-2 */
+.feature-item .text-muted.mt-2 {
+    color: var(--color-dark-text-muted) !important;
+    font-size: 0.9rem;
 }
 
 .feature-icon {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
@@ -344,31 +354,30 @@ body {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     background-color: var(--color-primary);
-    color: var(--color-dark);
+    color: var(--color-dark-bg);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
 }
 
-.dark-mode .feature-icon {
-    background-color: var(--color-primary-dark);
-    color: var(--color-white);
-}
-
-.bg-azul { background-color: rgba(255, 193, 7, 0.1); color: var(--color-primary); }
-.bg-laranja { background-color: rgba(255, 193, 7, 0.1); color: var(--color-primary); }
+.bg-azul { background-color: rgba(255, 193, 7, 0.15); color: var(--color-primary); }
+.bg-laranja { background-color: rgba(255, 193, 7, 0.15); color: var(--color-primary); }
 
 .card {
     transition: transform var(--transition-normal);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-300);
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card:hover {
     transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.dark-mode .card {
-    background-color: var(--color-dark-mode-card);
-    border-color: var(--color-gray-700);
-    color: var(--color-dark-mode-text);
+/* CORREÇÃO ESPECÍFICA PARA card-text text-muted */
+.card-text.text-muted {
+    color: var(--color-dark-text-muted) !important;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 /* 8. responsive.css */
@@ -391,4 +400,95 @@ body {
         width: 100%;
         max-width: none;
     }
+}
+
+/* 9. Estilo de card para todas as divs principais */
+.container > div:not(.auth-card):not(.home-content):not(.navbar):not(.text-center),
+.content > div {
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: var(--color-dark-text);
+}
+
+.project-description,
+.feature-item,
+.cta-section {
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
+    border-radius: var(--border-radius-lg);
+    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cta-section {
+    background-color: var(--color-dark-card);
+    padding: 2rem;
+}
+
+.cta-section h3 {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* 10. Ajustes para alertas e textos */
+.alert {
+    background-color: var(--color-dark-card-light);
+    border: 1px solid var(--color-dark-border);
+    color: var(--color-dark-text);
+}
+
+.alert-danger {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.text-muted {
+    color: var(--color-dark-text-muted) !important;
+}
+
+/* 11. Melhorias de contraste para textos */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-dark-text);
+    font-weight: 600;
+}
+
+.lead {
+    color: var(--color-dark-text-secondary);
+    font-size: 1.25rem;
+}
+
+a.text-accent {
+    color: var(--color-primary) !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a.text-accent:hover {
+    color: var(--color-primary-dark) !important;
+    text-decoration: underline;
+}
+
+/* 12. CORREÇÕES ESPECÍFICAS PARA CLASSES PROBLEMÁTICAS */
+.text-muted.mt-2 {
+    color: var(--color-dark-text-muted) !important;
+}
+
+.mt-2.text-muted {
+    color: var(--color-dark-text-muted) !important;
+}
+
+.card .text-muted {
+    color: var(--color-dark-text-muted) !important;
+}
+
+/* Garantir que todos os textos muted sejam legíveis */
+p.text-muted,
+span.text-muted,
+div.text-muted {
+    color: var(--color-dark-text-muted) !important;
+    opacity: 1 !important;
 }

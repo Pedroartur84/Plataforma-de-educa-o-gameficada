@@ -16,24 +16,17 @@
             /* Cores Primárias */
             --color-primary: #FFC107; /* Amarelo */
             --color-primary-dark: #FFA000; /* Amarelo escuro para hover */
-            --color-accent: #000000; /* Preto */
-            --color-accent-light: #333333; /* Preto claro para variações */
+            --color-accent: #FFFFFF; /* Branco para texto */
+            --color-accent-light: #CCCCCC; /* Cinza claro para texto secundário */
             
-            /* Cores Neutras */
-            --color-white: #FFFFFF;
-            --color-light: #FAFAFA; /* Fundo claro */
-            --color-gray-50: #F8F9FA; /* Fundo muito claro */
-            --color-gray-100: #E9ECEF;
-            --color-gray-300: #B0B0B0;
-            --color-gray-500: #757575;
-            --color-gray-700: #424242;
-            --color-gray-900: #212121;
-            --color-dark: #000000;
-
-            /* Cores para Modo Noturno */
-            --color-dark-mode-bg: #1A1A1A;
-            --color-dark-mode-text: #FFFFFF;
-            --color-dark-mode-card: #2D2D2D;
+            /* Cores para Modo Escuro (Único tema) */
+            --color-dark-bg: #1A1A1A;           /* Fundo mais escuro */
+            --color-dark-card: #2A2A2A;         /* Cards - mais claro que o fundo */
+            --color-dark-card-light: #363636;   /* Cards mais claros para destaque */
+            --color-dark-border: #444444;       /* Bordas visíveis */
+            --color-dark-text: #FFFFFF;         /* Texto principal */
+            --color-dark-text-secondary: #AAAAAA; /* Texto secundário MAIS CLARO */
+            --color-dark-text-muted: #888888;   /* Texto muted específico */
 
             /* Espaçamentos */
             --space-xxs: 0.25rem;
@@ -74,25 +67,20 @@
         }
 
         body {
-            background-color: var(--color-gray-50);
-            color: var(--color-dark);
+            background-color: var(--color-dark-bg);
+            color: var(--color-dark-text);
             font-family: 'Roboto', system-ui, -apple-system, sans-serif;
             line-height: 1.5;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
-            transition: background-color var(--transition-normal), color var(--transition-normal);
-        }
-
-        .dark-mode {
-            background-color: var(--color-dark-mode-bg);
-            color: var(--color-dark-mode-text);
         }
 
         /* Utilitários de Cor Globais */
         .text-accent { color: var(--color-accent); }
-        .text-muted { color: var(--color-gray-500); }
-        .bg-light { background-color: var(--color-gray-50) !important; }
-        .bg-white { background-color: var(--color-white) !important; }
+        .text-muted { color: var(--color-dark-text-muted) !important; }
+        .card-text.text-muted { color: var(--color-dark-text-secondary) !important; }
+        .bg-light { background-color: var(--color-dark-card-light) !important; }
+        .bg-white { background-color: var(--color-dark-card-light) !important; }
 
         .hidden { display: none !important; }
         .visually-hidden { 
