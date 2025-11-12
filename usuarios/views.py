@@ -108,7 +108,45 @@ def sala_virtual(request, sala_id):
     mensagens = Mensagem.objects.filter(sala=sala).order_by('data_envio')
     missões = Missao.objects.filter(sala=sala).order_by('-data_criacao')
     form = MensagemForm()
-    missao_form = MissaoForm()  # Adicionado para o modal
+    missao_form = MissaoForm()
+    
+    # CALCULAR RANKING DA SALA - COM TRATAMENTO DE ERROS
+    ranking_sala = []
+    for aluno in sala.alunos.all():
+        # Verificar se o aluno tem username válido
+        if not aluno or not aluno.username:
+            continue
+            
+        # Calcular pontuação do aluno nesta sala específica
+        pontuacao_total = 0
+        missoes_concluidas = 0
+        
+        try:
+            # Buscar mensagens de missão deste aluno nesta sala
+            mensagens_aluno = MensagemMissao.objects.filter(
+                usuario=aluno, 
+                missao__sala=sala
+            )
+            
+            # Calcular pontos baseado nas missões
+            for mensagem in mensagens_aluno:
+                if hasattr(mensagem.missao, 'pontos') and mensagem.missao.pontos:
+                    pontuacao_total += mensagem.missao.pontos
+                    missoes_concluidas += 1
+        except Exception as e:
+            # Em caso de erro, continuar com os próximos alunos
+            print(f"Erro ao calcular pontuação para {aluno.username}: {e}")
+            continue
+        
+        ranking_sala.append({
+            'aluno': aluno,
+            'pontuacao_total': pontuacao_total,
+            'missoes_concluidas': missoes_concluidas,
+        })
+    
+    # Ordenar por pontuação (decrescente)
+    ranking_sala.sort(key=lambda x: x['pontuacao_total'], reverse=True)
+    
     if request.method == 'POST':
         mensagem_form = MensagemForm(request.POST)
         if mensagem_form.is_valid():
@@ -120,12 +158,14 @@ def sala_virtual(request, sala_id):
             return redirect('usuarios:sala_virtual', sala_id=sala_id)
     else:
         mensagem_form = MensagemForm()
+    
     return render(request, 'usuarios/sala_virtual.html', {
         'sala': sala,
         'mensagens': mensagens,
         'missões': missões,
         'form': mensagem_form,
-        'form_missao': missao_form  # Passado ao template
+        'form_missao': missao_form,
+        'ranking_sala': ranking_sala,
     })
 
 @login_required
