@@ -136,8 +136,24 @@ class MissaoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título da missão', 'required': True}),
             'descricao': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da missão', 'required': True, 'rows': 3}),
-            'pontos': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Pontos', 'min': '1', 'required': True}),
+            'pontos': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'pontos (máimo 10)',
+                'min': 1,
+                'max': 10, # limitar pontos entre 1 e 10
+                'required': True
+            })
         }
+        
+    def clean_pontos(self):
+        """Validação para garantir que os pontos estejam entre 1 e 10"""
+        pontos = self.cleaned_data.get('pontos')
+        if pontos and (pontos < 1 or pontos > 10):
+            raise forms.ValidationError('Os pontos devem estar entre 1 e 10.')
+        if pontos and pontos < 1:
+            raise forms.ValidationError('Os pontos devem ser no mínimo 1.')
+        return pontos
+        
 
 class MensagemMissaoForm(forms.ModelForm):
     class Meta:
@@ -147,3 +163,12 @@ class MensagemMissaoForm(forms.ModelForm):
             'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite sua resposta...', 'required': True}),
             'arquivo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
+        
+
+class CorrecaoMissaoForm(forms.Form):
+    pontos_atingidos = forms.IntegerField(
+        min_value=0,
+        max_value=10,
+        label='pontos atribuidos (0-10)',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'max': 10, 'required': True})
+    )

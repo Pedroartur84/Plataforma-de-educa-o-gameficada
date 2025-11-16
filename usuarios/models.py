@@ -71,12 +71,27 @@ class Mensagem(models.Model):
         return f"{self.usuario.email}: {self.texto[:50]}"
 
 class Missao(models.Model):
+    # opção de status da missão
+    STATUS_CHOICES = [
+        ('pendente', 'Pendente'),
+        ('concluida', 'Concluída'),
+        ('corrigida', 'corrigida'),
+    ]
+    
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='missões')
     professor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='missões_criadas')
     titulo = models.CharField(max_length=200)
     descricao = models.TextField()
     pontos = models.IntegerField(default=10)
     data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    # adicionando dois novos campos
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pendente'
+    )
+    pontos_atingidos = models.IntegerField(default=0) # pontos atingidos pelo aluno na missão
 
     def __str__(self):
         return self.titulo

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import LoginForm, CadastroForm, SalaForm, MensagemForm, MissaoForm, MensagemMissaoForm
+from .forms import LoginForm, CadastroForm, SalaForm, MensagemForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -130,7 +130,7 @@ def sala_virtual(request, sala_id):
             
             # Calcular pontos baseado nas missões
             for mensagem in mensagens_aluno:
-                if hasattr(mensagem.missao, 'pontos') and mensagem.missao.pontos:
+                if hasattr(mensagem.missao, 'pontos_atingidos') and mensagem.missao.status == 'corrigida' and mensagem.missao.pontos_atingidos:
                     pontuacao_total += mensagem.missao.pontos
                     missoes_concluidas += 1
         except Exception as e:
@@ -192,22 +192,47 @@ def postar_missao(request, sala_id):
 def chat_missao(request, missao_id):
     missao = get_object_or_404(Missao, id=missao_id)
     mensagens = MensagemMissao.objects.filter(missao=missao).order_by('data_envio')
+    form = MensagemMissaoForm()
+    correcao_form = CorrecaoMissaoForm()  # NOVO: Formulário de correção
+    
+    # VERIFICAR SE É PROFESSOR (lógica existente)
+    is_professor = (request.user == missao.sala.criador and 
+                   missao.sala.tipo_usuario_criador == 'professor')
+    
     if request.method == 'POST':
-        form = MensagemMissaoForm(request.POST, request.FILES)
-        if form.is_valid():
-            mensagem = form.save(commit=False)
-            mensagem.missao = missao
-            mensagem.usuario = request.user
-            mensagem.save()
-            messages.success(request, 'Mensagem enviada!')
-            return redirect('usuarios:chat_missao', missao_id=missao_id)
-        else:
-            messages.error(request, 'Erro ao enviar mensagem.')
-    else:
-        form = MensagemMissaoForm()
-        return render(request, 'usuarios/chat_missao.html', {
-            'missao': missao,
-            'mensagens': mensagens,
-            'form': form
-        })
+        # VERIFICAR SE É CORREÇÃO (NOVO)
+        if 'corrigir_missao' in request.POST and is_professor:
+            correcao_form = CorrecaoMissaoForm(request.POST)
+            if correcao_form.is_valid():
+                pontos_atingidos = correcao_form.cleaned_data['pontos_atingidos']
+                # ATUALIZAR MISSÃO COM PONTOS E STATUS
+                missao.pontos_atingidos = pontos_atingidos
+                missao.status = 'corrigida'
+                missao.save()
+                messages.success(request, f'Missão corrigida! {pontos_atingidos} pontos atribuídos.')
+                return redirect('usuarios:chat_missao', missao_id=missao_id)
         
+        # FORMULÁRIO NORMAL DE MENSAGEM (existente)
+        else:
+            form = MensagemMissaoForm(request.POST, request.FILES)
+            if form.is_valid():
+                mensagem = form.save(commit=False)
+                mensagem.missao = missao
+                mensagem.usuario = request.user
+                mensagem.save()
+                
+                # NOVO: Se aluno enviar mensagem, marcar como concluída
+                if not is_professor and missao.status == 'pendente':
+                    missao.status = 'concluida'
+                    missao.save()
+                
+                messages.success(request, 'Mensagem enviada!')
+                return redirect('usuarios:chat_missao', missao_id=missao_id)
+    
+    return render(request, 'usuarios/chat_missao.html', {
+        'missao': missao,
+        'mensagens': mensagens,
+        'form': form,
+        'correcao_form': correcao_form,  # NOVO: Passar formulário de correção
+        'is_professor': is_professor,    # NOVO: Passar informação se é professor
+    })

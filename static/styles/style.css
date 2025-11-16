@@ -373,6 +373,17 @@ body {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
+/* nova classe: card sem trasform no hover */
+.card-no-scale{
+    transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.card-no-scale:hover {
+    transform: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    border-color: var(--color-primary);
+}
+
 /* CORREÇÃO ESPECÍFICA PARA card-text text-muted */
 .card-text.text-muted {
     color: var(--color-dark-text-muted) !important;

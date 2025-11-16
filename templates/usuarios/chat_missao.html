@@ -5,25 +5,141 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Chat da Missão: {{ missao.titulo }}</h2>
-    <p>Descrição: {{ missao.descricao }}</p>
-    <p>Pontos: {{ missao.pontos }}</p>
-    <div class="chat-box" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
-        {% for mensagem in mensagens %}
-        <p>
-            <strong>{{ mensagem.usuario.email }}:</strong> {{ mensagem.texto }}
-            {% if mensagem.arquivo %}
-            <a href="{{ mensagem.arquivo.url }}" target="_blank">Ver arquivo</a>
+    <div class="card card-no-scale">
+        <div class="card-header">
+            <h2 class="mb-0">Chat da Missão: {{ missao.titulo }}</h2>
+        </div>
+        <div class="card-body">
+            <!-- Informações da Missão -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Descrição:</strong> {{ missao.descricao }}</p>
+                    <p><strong>Pontos Máximos:</strong> {{ missao.pontos }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge 
+                            {% if missao.status == 'pendente' %}bg-warning
+                            {% elif missao.status == 'concluida' %}bg-info
+                            {% elif missao.status == 'corrigida' %}bg-success{% endif %}">
+                            {% if missao.status == 'pendente' %}Pendente
+                            {% elif missao.status == 'concluida' %}Concluída
+                            {% elif missao.status == 'corrigida' %}Corrigida{% endif %}
+                        </span>
+                    </p>
+                    {% if missao.status == 'corrigida' %}
+                    <p><strong>Pontos Obtidos:</strong> 
+                        <span class="fw-bold text-success">{{ missao.pontos_atingidos }}/{{ missao.pontos }}</span>
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <!-- Botão de Correção para Professores -->
+                {% if is_professor and missao.status == 'concluida' %}
+                <div class="col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Correção da Missão</h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ correcao_form.pontos_atingidos.id_for_label }}" class="form-label">
+                                        {{ correcao_form.pontos_atingidos.label }}
+                                    </label>
+                                    {{ correcao_form.pontos_atingidos }}
+                                    {% if correcao_form.pontos_atingidos.errors %}
+                                    <div class="text-danger">
+                                        {{ correcao_form.pontos_atingidos.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" name="corrigir_missao" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Corrigir Missão
+                                </button>
+                                <small class="form-text text-muted d-block mt-2">
+                                    Após corrigir, a missão será marcada como finalizada e os pontos não poderão ser alterados.
+                                </small>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% elif is_professor %}
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <strong>Status:</strong> 
+                        {% if missao.status == 'pendente' %}
+                        Aguardando o aluno concluir a missão.
+                        {% elif missao.status == 'corrigida' %}
+                        Missão já corrigida. Pontos: {{ missao.pontos_atingidos }}/{{ missao.pontos }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Chat -->
+            <h5>Chat da Missão</h5>
+            <div class="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background-color: var(--color-dark-card-light);">
+                {% for mensagem in mensagens %}
+                <div class="mb-3 p-3 rounded {% if mensagem.usuario == request.user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <strong>{{ mensagem.usuario.username }}</strong>
+                        <small class="{% if mensagem.usuario == request.user %}text-white-50{% else %}text-muted{% endif %}">
+                            {{ mensagem.data_envio|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+                    <p class="mb-1 mt-2">{{ mensagem.texto }}</p>
+                    {% if mensagem.arquivo %}
+                    <div class="mt-2">
+                        <a href="{{ mensagem.arquivo.url }}" target="_blank" class="btn btn-sm {% if mensagem.usuario == request.user %}btn-outline-light{% else %}btn-outline-secondary{% endif %}">
+                            <i class="bi bi-download"></i> Baixar arquivo
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">Nenhuma mensagem ainda. Seja o primeiro a comentar!</p>
+                {% endfor %}
+            </div>
+
+            <!-- Formulário de Mensagem -->
+            {% if missao.status != 'corrigida' %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            {{ form.texto }}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="{{ form.arquivo.id_for_label }}" class="form-label">Anexar arquivo (opcional):</label>
+                            {{ form.arquivo }}
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary mt-4">Enviar</button>
+                    </div>
+                </div>
+                {% if not is_professor and missao.status == 'pendente' %}
+                <small class="form-text text-muted">
+                    Ao enviar sua primeira mensagem, a missão será marcada como concluída.
+                </small>
+                {% endif %}
+            </form>
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="bi bi-info-circle"></i> Esta missão já foi corrigida e não aceita mais mensagens.
+            </div>
             {% endif %}
-            <small>({{ mensagem.data_envio }})</small>
-        </p>
-        {% endfor %}
+
+            <div class="mt-4">
+                <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar à Sala
+                </a>
+            </div>
+        </div>
     </div>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-2">Enviar</button>
-    </form>
-    <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-secondary mt-3">Voltar à Sala</a>
 </div>
 {% endblock %}
