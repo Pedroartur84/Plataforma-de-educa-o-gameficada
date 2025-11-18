@@ -35,6 +35,8 @@ class Usuario(AbstractUser):
     username = None
     email = models.EmailField(unique=True, verbose_name='E-mail')
     
+    pontos_totais = models.IntegerField(default=0, verbose_name="pontos totais")
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = [ 'tipo_usuario' ]  # Campos obrigatórios além do email e senha
     
@@ -42,6 +44,9 @@ class Usuario(AbstractUser):
     
     def __str__(self):
         return self.email
+    
+    def get_nome_exibicao(self):
+        return self.get_full_name() or self.email.split('@')[0].title()
 
 
 class Sala(models.Model):
