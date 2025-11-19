@@ -22,11 +22,22 @@
             {{ form.descricao }}
         </div>
         <div class="mb-3">
-            <label for="{{ form.tipo_usuario_criador.id_for_label }}">Qual o tipo de usuário?</label>
-            {{ form.tipo_usuario_criador }}
+            <label class="form-label">Qual será seu papel nesta sala?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tipo_na_sala" value="professor" id="professor" required>
+                <label class="form-check-label" for="professor">
+                    Professor - Pode criar missões e corrigir atividades
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="tipo_na_sala" value="aluno" id="aluno" required>
+                <label class="form-check-label" for="aluno">
+                    Aluno - Pode participar das missões e atividades
+                </label>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Criar Sala</button>
+        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">Cancelar</a>
     </form>
-    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary mt-3">Voltar para Salas</a>
 </div>
 {% endblock %}

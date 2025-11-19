@@ -4,134 +4,155 @@
 {% block title %}Chat da Missão - {{ missao.titulo }}{% endblock %}
 
 {% block content %}
-<div class="container chat-page-container">
-    <div class="chat-wrapper">
+<div class="container py-4">
 
-        <!-- Header da Missão -->
-        <div class="chat-header">
-            <h2><i class="fas fa-tasks me-2"></i>{{ missao.titulo }}</h2>
-            <p>{{ missao.descricao }}</p>
-            <div class="badges">
-                <span class="badge bg-light text-dark">
-                    {% if missao.status == 'pendente' %}Pendente{% elif missao.status == 'concluida' %}Concluída{% else %}Corrigida{% endif %}
+    <!-- Cabeçalho da Missão -->
+    <div class="card border-warning shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h2 class="h5 mb-0 fw-bold">
+                <i class="bi bi-list-task me-2"></i>{{ missao.titulo }}
+            </h2>
+        </div>
+        <div class="card-body py-3">
+            <p class="mb-2 text-muted small">{{ missao.descricao }}</p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge 
+                    {% if missao.status == 'pendente' %}bg-secondary
+                    {% elif missao.status == 'concluida' %}bg-primary
+                    {% else %}bg-success{% endif %}">
+                    {{ missao.get_status_display }}
                 </span>
-                <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> {{ missao.pontos }} pontos</span>
+                <span class="badge bg-warning text-dark">
+                    <i class="bi bi-star-fill"></i> {{ missao.pontos }} pts
+                </span>
                 {% if missao.status == 'corrigida' %}
-                <span class="badge bg-success"><i class="fas fa-trophy"></i> {{ missao.pontos_atingidos }} obtidos</span>
+                <span class="badge bg-success text-white">
+                    <i class="bi bi-trophy-fill"></i> {{ missao.pontos_atingidos }} obtidos
+                </span>
                 {% endif %}
             </div>
         </div>
+    </div>
 
-        <!-- Mensagens -->
-        <div class="chat-messages" id="messagesContainer">
+    <!-- Chat Compacto e Limpo (apenas uma div principal) -->
+    <div class="card shadow-sm mb-4" style="max-height: 420px; overflow: hidden; display: flex; flex-direction: column;">
+        <div class="card-body p-3 flex-grow-1 overflow-y-auto" id="messagesContainer">
             {% if mensagens %}
                 {% for msg in mensagens %}
-                <div class="message {% if msg.usuario == user %}me{% else %}other{% endif %}">
-                    <div class="bubble">
-                        <div class="bubble-header">
-                            <strong>
-                                {% firstof msg.usuario.get_full_name msg.usuario.email|truncatechars:20 "Usuário" %}
-                            </strong>
-                            <small class="ms-2 text-muted">{{ msg.data_envio|date:"d/m H:i" }}</small>
+                <div class="mb-4 {% if msg.usuario == user %}text-end{% endif %}">
+                    <div class="d-inline-block max-w-75">
+                       
+                        {% if msg.usuario == user %}text-primary{% else %}text-dark{% endif %}">
+                        <div class="small fw-bold mb-1">
+                            {{ msg.usuario.get_nome_exibicao|default:msg.usuario.email }}
+                            <span class="text-muted ms-2">{{ msg.data_envio|date:"H:i" }}</span>
                         </div>
-                        <div>{{ msg.texto|linebreaks }}</div>
-                        {% if msg.arquivo %}
-                        <div class="file-box">
-                            <i class="fas fa-paperclip"></i>
-                            <a href="{{ msg.arquivo.url }}" target="_blank">
-                                {{ msg.arquivo.name|slice:":35" }}{% if msg.arquivo.name|length > 35 %}...{% endif %}
-                            </a>
-                            <small>({{ msg.arquivo.size|filesizeformat }})</small>
+                        <div class="p-3 rounded-3 shadow-sm
+                            {% if msg.usuario == user %}
+                                bg-primary text-white
+                            {% else %}
+                                bg-white border border-secondary
+                            {% endif %}">
+                            {{ msg.texto|linebreaks }}
+                            {% if msg.arquivo %}
+                            <div class="mt-2 p-2 bg-white bg-opacity-75 rounded d-inline-block">
+                                <i class="bi bi-paperclip"></i>
+                                <a href="{{ msg.arquivo.url }}" target="_blank" 
+                                   class="text-decoration-none fw-bold">
+                                    {{ msg.arquivo.name|cut:"media/" }}
+                                </a>
+                                <small class="d-block text-muted">{{ msg.arquivo.size|filesizeformat }}</small>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="empty-state">
-                    <div class="text-center">
-                        <i class="fas fa-comments fa-4x mb-3 opacity-50"></i>
-                        <p>Nenhuma mensagem ainda.<br>Inicie a conversa!</p>
-                    </div>
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-chat-dots fa-3x mb-3 opacity-50"></i>
+                    <p class="mb-0">Nenhuma mensagem ainda.<br><small>Inicie a conversa!</small></p>
                 </div>
             {% endif %}
         </div>
 
-        <!-- Input de envio (aparece apenas se a missão não estiver corrigida) -->
+        <!-- Input de envio (só se não estiver corrigida) -->
         {% if missao.status != 'corrigida' %}
-        <div class="chat-input">
-            <form method="post" enctype="multipart/form-data" class="input-area">
+        <div class="border-top bg-light p-3">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <textarea name="texto" class="form-control input-estilo" placeholder="Escreva sua resposta..." rows="1" required></textarea>
-                <label class="btn btn-attach">
-                    <i class="fas fa-paperclip"></i>
-                    <input type="file" name="arquivo" style="display:none;">
-                </label>
-                <button type="submit" class="btn btn-send">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+                <div class="d-flex gap-2">
+                    <textarea name="texto" class="form-control form-control-sm" rows="1" 
+                              placeholder="Digite sua mensagem..." required 
+                              style="resize: none;"></textarea>
+                    <label class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-paperclip"></i>
+                        <input type="file" name="arquivo" style="display:none;">
+                    </label>
+                    <button type="submit" class="btn btn-warning btn-sm px-3">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+                {% if missao.status == 'pendente' and not is_professor %}
+                <small class="text-muted d-block text-center mt-2">
+                    Primeira mensagem = missão concluída
+                </small>
+                {% endif %}
             </form>
-            {% if missao.status == 'pendente' and not is_professor %}
-            <small class="text-muted text-center d-block mt-2">
-                Sua primeira mensagem marcará a missão como concluída
-            </small>
-            {% endif %}
         </div>
         {% endif %}
     </div>
 
-    <!-- Área de correção do professor -->
+    <!-- Correção do Professor -->
     {% if is_professor and missao.status == 'concluida' %}
-    <div class="card correction-box text-center">
-        <div class="card-body py-4">
-            <h4 class="text-warning mb-3"><i class="fas fa-graduation-cap"></i> Correção da Missão</h4>
-            <form method="post" class="d-inline-block">
-                {% csrf_token %}
-                <input type="hidden" name="corrigir_missao" value="true">
-                <div class="d-flex justify-content-center align-items-end gap-3 flex-wrap">
-                    <div>
-                        <label class="form-label text-white fw-bold">Pontos obtidos</label>
-                        <input type="number" name="pontos_atingidos" min="0" max="{{ missao.pontos }}"
-                               class="form-control input-estilo text-center" style="width:130px;font-size:1.8rem;" required>
-                        <small class="text-muted">máx. {{ missao.pontos }}</small>
-                    </div>
-                    <button type="submit" class="btn btn-success btn-lg px-5">
-                        <i class="fas fa-check-circle"></i> Corrigir
-                    </button>
+    <div class="text-center py-4">
+        <form method="post" class="d-inline-block">
+            {% csrf_token %}
+            <input type="hidden" name="corrigir_missao" value="true">
+            <div class="d-flex align-items-end gap-3 justify-content-center flex-wrap">
+                <div>
+                    <label class="form-label text-success fw-bold">Pontos obtidos</label>
+                    <input type="number" name="pontos_atingidos" min="0" max="{{ missao.pontos }}"
+                           class="form-control text-center fw-bold" style="width:140px; font-size:2rem;" required>
+                    <small class="text-muted d-block">/ {{ missao.pontos }}</small>
                 </div>
-                <div class="text-danger mt-3"><i class="fas fa-exclamation-triangle"></i> Ação irreversível</div>
-            </form>
-        </div>
+                <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                    <i class="bi bi-check-circle-fill"></i> Corrigir
+                </button>
+            </div>
+            <small class="text-danger mt-3 d-block">
+                <i class="bi bi-exclamation-triangle-fill"></i> Ação irreversível
+            </small>
+        </form>
     </div>
     {% endif %}
 
-    <!-- Missão já corrigida -->
+    <!-- Missão Corrigida -->
     {% if missao.status == 'corrigida' %}
-    <div class="alert alert-info text-center mt-4">
-        <i class="fas fa-lock fa-2x"></i><br>
-        <strong>Missão corrigida!</strong> Chat bloqueado para novas mensagens.
+    <div class="alert alert-success text-center mb-4">
+        <i class="bi bi-lock-fill"></i> Missão corrigida – chat bloqueado
     </div>
     {% endif %}
 
-    <div class="text-center mt-4">
-        <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-outline-secondary btn-lg">
-            <i class="fas fa-arrow-left"></i> Voltar à Sala
+    <!-- Botão Voltar -->
+    <div class="text-center">
+        <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" 
+           class="btn btn-outline-warning px-5">
+            <i class="bi bi-arrow-left-circle"></i> Voltar à Sala
         </a>
     </div>
+
 </div>
 
 <script>
-    // Scroll automático para o final
-    const container = document.getElementById('messagesContainer');
-    container.scrollTop = container.scrollHeight;
+    // Scroll para o final
+    const chat = document.getElementById('messagesContainer');
+    if (chat) chat.scrollTop = chat.scrollHeight;
 
-    // Auto-resize do textarea
-    const textarea = document.querySelector('textarea[name="texto"]');
-    if (textarea) {
-        textarea.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
-    }
+    // Auto-resize textarea
+    document.querySelector('textarea')?.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
 </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import LoginForm, CadastroForm, SalaForm, MensagemForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm
+from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -44,38 +44,60 @@ def cadastro(request):
 @login_required
 def principal(request):
     """Exibe a página principal com as salas do usuário logado (como aluno ou criador)."""
-    salas = Sala.objects.filter(Q(alunos=request.user) | Q(criador=request.user)).order_by('-data_criacao')
+    # Buscar salas onde o usuário participa (como aluno ou professor)
+    salas_participantes = ParticipacaoSala.objects.filter(usuario=request.user).select_related('sala')
+    salas = [participacao.sala for participacao in salas_participantes]
     return render(request, 'principal/principal_page.html', {'salas': salas})
 
 @login_required
 def criar_sala(request):
     if request.method == 'POST':
         form = SalaForm(request.POST)
-        if form.is_valid():
+        tipo_na_sala = request.POST.get('tipo_na_sala')  # rádio button no template
+        
+        if form.is_valid() and tipo_na_sala in ['professor', 'aluno']:
             sala = form.save(commit=False)
             sala.criador = request.user
             sala.save()
-            if sala.tipo_usuario_criador == 'aluno':
-                sala.alunos.add(request.user)
-            # se for professor, o criador já está associado via criador, sem necessidade de adicionar a alunos
-            messages.success(request, 'Sala criada')
-            return redirect('usuarios:pag_principal')
+
+            # Criar participação do usuário na sala
+            ParticipacaoSala.objects.create(
+                usuario=request.user,
+                sala=sala,
+                tipo_na_sala=tipo_na_sala
+            )
+            
+            messages.success(request, f"Sala '{sala.nome}' criada! Você entrou como {tipo_na_sala}.")
+            return redirect('usuarios:sala_virtual', sala_id=sala.id)
         else:
-            messages.error(request, 'Corrija os erros do formulario.')
+            messages.error(request, 'Por favor, selecione um tipo de participação válido.')
     else:
         form = SalaForm()
-        return render(request, 'usuarios/criar_sala.html', {'form': form})
+    
+    return render(request, 'usuarios/criar_sala.html', {
+        'form': form
+    })
     
 @login_required
 def detalhe_sala(request, sala_id):
     """Exibe os detalhes de uma sala específica."""
-    sala = get_object_or_404(Sala, id=sala_id, alunos=request.user)
-    return render(request, 'usuarios/detalhe_sala.html', {'sala': sala})
+    sala = get_object_or_404(Sala, id=sala_id)
+    # Verificar se usuário participa da sala
+    participacao = ParticipacaoSala.objects.filter(usuario=request.user, sala=sala).first()
+    if not participacao:
+        messages.error(request, 'Você não tem acesso a esta sala.')
+        return redirect('usuarios:pag_principal')
+        
+    return render(request, 'usuarios/detalhe_sala.html', {
+        'sala': sala,
+        'minha_participacao': participacao
+    })
 
 @login_required
 def minhas_salas(request):
     """Exibe a lista de salas associadas ao usuário logado."""
-    salas = Sala.objects.filter(alunos=request.user).order_by('-data_criacao')
+    participacoes = ParticipacaoSala.objects.filter(usuario=request.user).select_related('sala')
+    salas = [participacao.sala for participacao in participacoes]
     return render(request, 'usuarios/minhas_salas.html', {'salas': salas})
 
 @login_required
@@ -104,135 +126,149 @@ def painel_adm(request):
 @login_required
 def sala_virtual(request, sala_id):
     sala = get_object_or_404(Sala, id=sala_id)
-    sala.alunos.add(request.user)
-    mensagens = Mensagem.objects.filter(sala=sala).order_by('data_envio')
-    missões = Missao.objects.filter(sala=sala).order_by('-data_criacao')
-    form = MensagemForm()
-    missao_form = MissaoForm()
     
-    # CALCULAR RANKING DA SALA - COM TRATAMENTO DE ERROS
+    # Verificar se usuário participa da sala
+    participacao = ParticipacaoSala.objects.filter(usuario=request.user, sala=sala).first()
+    if not participacao:
+        messages.error(request, 'Você não tem acesso a esta sala.')
+        return redirect('usuarios:pag_principal')
+
+    # MISSÕES DA SALA
+    missoes_da_sala = Missao.objects.filter(sala=sala)
+
+    # RANKING - usar participantes reais da sala
     ranking_sala = []
-    for aluno in sala.alunos.all():
-        # Verificar se o aluno tem username válido
-        if not aluno or not aluno.username:
-            continue
-            
-        # Calcular pontuação do aluno nesta sala específica
-        pontuacao_total = 0
-        missoes_concluidas = 0
-        
-        try:
-            # Buscar mensagens de missão deste aluno nesta sala
-            mensagens_aluno = MensagemMissao.objects.filter(
-                usuario=aluno, 
-                missao__sala=sala
-            )
-            
-            # Calcular pontos baseado nas missões
-            for mensagem in mensagens_aluno:
-                if hasattr(mensagem.missao, 'pontos_atingidos') and mensagem.missao.status == 'corrigida' and mensagem.missao.pontos_atingidos:
-                    pontuacao_total += mensagem.missao.pontos
-                    missoes_concluidas += 1
-        except Exception as e:
-            # Em caso de erro, continuar com os próximos alunos
-            print(f"Erro ao calcular pontuação para {aluno.username}: {e}")
-            continue
-        
+    participantes_alunos = ParticipacaoSala.objects.filter(sala=sala, tipo_na_sala='aluno')
+    
+    for participante in participantes_alunos:
+        aluno = participante.usuario
+        pontos_na_sala = 0
+        missoes_entregues = 0
+
+        for missao in missoes_da_sala:
+            if (missao.status == 'corrigida' and 
+                missao.mensagens.filter(usuario=aluno).exists()):
+                pontos_na_sala += missao.pontos_atingidos or 0
+                missoes_entregues += 1
+
         ranking_sala.append({
             'aluno': aluno,
-            'pontuacao_total': pontuacao_total,
-            'missoes_concluidas': missoes_concluidas,
+            'pontos_sala': pontos_na_sala,
+            'pontos_total': aluno.pontos_totais,
+            'missoes_entregues': missoes_entregues,
         })
+
+    ranking_sala.sort(key=lambda x: x['pontos_sala'], reverse=True)
     
-    # Ordenar por pontuação (decrescente)
-    ranking_sala.sort(key=lambda x: x['pontuacao_total'], reverse=True)
-    
-    if request.method == 'POST':
-        mensagem_form = MensagemForm(request.POST)
-        if mensagem_form.is_valid():
-            mensagem = mensagem_form.save(commit=False)
-            mensagem.sala = sala
-            mensagem.usuario = request.user
-            mensagem.save()
-            messages.success(request, 'Mensagem enviada!')
-            return redirect('usuarios:sala_virtual', sala_id=sala_id)
-    else:
-        mensagem_form = MensagemForm()
-    
-    return render(request, 'usuarios/sala_virtual.html', {
+    for i, item in enumerate(ranking_sala, 1):
+        item['posicao'] = i
+
+    # Verificar se usuário é professor nesta sala
+    is_professor_na_sala = participacao.tipo_na_sala == 'professor'
+
+    context = {
         'sala': sala,
-        'mensagens': mensagens,
-        'missões': missões,
-        'form': mensagem_form,
-        'form_missao': missao_form,
+        'missoes': missoes_da_sala,
         'ranking_sala': ranking_sala,
-    })
+        'is_professor_na_sala': is_professor_na_sala,
+        'minha_participacao': participacao,
+    }
+    return render(request, 'usuarios/sala_virtual.html', context)
 
 @login_required
 def postar_missao(request, sala_id):
     sala = get_object_or_404(Sala, id=sala_id)
-    if sala.tipo_usuario_criador != 'professor' or request.user != sala.criador:
-        messages.error(request, 'Apenas professores podem postar missões.')
+    
+    # Verificar se usuário é professor nesta sala específica
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user, 
+        sala=sala, 
+        tipo_na_sala='professor'
+    ).first()
+    
+    if not participacao:
+        messages.error(request, 'Apenas professores desta sala podem postar missões.')
         return redirect('usuarios:sala_virtual', sala_id=sala_id)
+        
     if request.method == 'POST':
         form = MissaoForm(request.POST)
         if form.is_valid():
             missao = form.save(commit=False)
             missao.sala = sala
-            missao.professor = request.user
             missao.save()
             messages.success(request, 'Missão postada com sucesso!')
             return redirect('usuarios:sala_virtual', sala_id=sala_id)
-    else:
-        # Não renderiza template; o modal já está em sala_virtual.html
-        pass
+        else:
+            messages.error(request, 'Erro ao postar missão. Verifique os dados.')
+    
     return redirect('usuarios:sala_virtual', sala_id=sala_id)
 
 @login_required
 def chat_missao(request, missao_id):
     missao = get_object_or_404(Missao, id=missao_id)
-    mensagens = MensagemMissao.objects.filter(missao=missao).order_by('data_envio')
-    form = MensagemMissaoForm()
-    correcao_form = CorrecaoMissaoForm()  # NOVO: Formulário de correção
     
-    # VERIFICAR SE É PROFESSOR (lógica existente)
-    is_professor = (request.user == missao.sala.criador and 
-                   missao.sala.tipo_usuario_criador == 'professor')
+    # Verificar se usuário tem acesso à missão (participa da sala)
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user, 
+        sala=missao.sala
+    ).first()
     
-    if request.method == 'POST':
-        # VERIFICAR SE É CORREÇÃO (NOVO)
-        if 'corrigir_missao' in request.POST and is_professor:
-            correcao_form = CorrecaoMissaoForm(request.POST)
-            if correcao_form.is_valid():
-                pontos_atingidos = correcao_form.cleaned_data['pontos_atingidos']
-                # ATUALIZAR MISSÃO COM PONTOS E STATUS
-                missao.pontos_atingidos = pontos_atingidos
-                missao.status = 'corrigida'
-                missao.save()
-                messages.success(request, f'Missão corrigida! {pontos_atingidos} pontos atribuídos.')
-                return redirect('usuarios:chat_missao', missao_id=missao_id)
+    if not participacao:
+        messages.error(request, 'Você não tem acesso a esta missão.')
+        return redirect('usuarios:pag_principal')
         
-        # FORMULÁRIO NORMAL DE MENSAGEM (existente)
+    mensagens = missao.mensagens.all().order_by('data_envio')
+    is_professor_na_sala = participacao.tipo_na_sala == 'professor'
+
+    if request.method == 'POST':
+        if missao.status == 'corrigida':
+            messages.error(request, 'Esta missão já foi corrigida.')
         else:
-            form = MensagemMissaoForm(request.POST, request.FILES)
-            if form.is_valid():
-                mensagem = form.save(commit=False)
-                mensagem.missao = missao
-                mensagem.usuario = request.user
-                mensagem.save()
-                
-                # NOVO: Se aluno enviar mensagem, marcar como concluída
-                if not is_professor and missao.status == 'pendente':
+            # Envio de mensagem normal (aluno)
+            if 'texto' in request.POST:
+                texto = request.POST.get('texto')
+                arquivo = request.FILES.get('arquivo')
+                MensagemMissao.objects.create(
+                    missao=missao,
+                    usuario=request.user,
+                    texto=texto,
+                    arquivo=arquivo
+                )
+                # Se for a primeira mensagem → missão concluída
+                if mensagens.count() == 0:
                     missao.status = 'concluida'
                     missao.save()
-                
-                messages.success(request, 'Mensagem enviada!')
                 return redirect('usuarios:chat_missao', missao_id=missao_id)
-    
-    return render(request, 'usuarios/chat_missao.html', {
+
+            # Correção pelo professor
+            elif 'corrigir_missao' in request.POST and is_professor_na_sala:
+                pontos_atingidos = int(request.POST.get('pontos_atingidos', 0))
+                if pontos_atingidos > missao.pontos:
+                    messages.error(request, f'Pontos não podem exceder {missao.pontos}')
+                else:
+                    missao.pontos_atingidos = pontos_atingidos
+                    missao.status = 'corrigida'
+                    missao.save()
+
+                    # SOMAR PONTOS AO ALUNO
+                    primeira_mensagem = mensagens.first()
+                    if primeira_mensagem and primeira_mensagem.usuario != request.user:
+                        aluno = primeira_mensagem.usuario
+                        aluno.pontos_totais += pontos_atingidos
+                        aluno.save()
+
+                        messages.success(request,
+                            f'Correção salva! {aluno.get_nome_exibicao()} ganhou {pontos_atingidos} pontos. '
+                            f'Total dele: {aluno.pontos_totais} pts')
+                    else:
+                        messages.success(request, f'Missão corrigida com {pontos_atingidos} pontos.')
+
+                return redirect('usuarios:chat_missao', missao_id=missao_id)
+
+    context = {
         'missao': missao,
         'mensagens': mensagens,
-        'form': form,
-        'correcao_form': correcao_form,  # NOVO: Passar formulário de correção
-        'is_professor': is_professor,    # NOVO: Passar informação se é professor
-    })
+        'is_professor_na_sala': is_professor_na_sala,
+        'minha_participacao': participacao,
+    }
+    return render(request, 'usuarios/chat_missao.html', context)

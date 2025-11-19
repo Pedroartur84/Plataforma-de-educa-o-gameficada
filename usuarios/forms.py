@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Usuario
+from .models import Usuario, Sala, Missao, MensagemMissao
 from .models import *
 
 class LoginForm(AuthenticationForm):
@@ -112,20 +112,10 @@ class CadastroForm(UserCreationForm):
 class SalaForm(forms.ModelForm):
     class Meta:
         model = Sala
-        fields = ['nome', 'descricao', 'tipo_usuario_criador']
+        fields = ['nome', 'descricao']
         widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'required': True , 'rows': 3}),
-            'tipo_usuario_criador': forms.Select(attrs={'class': 'form-control', 'required': True}),
-        }
-        
-        
-class MensagemForm(forms.ModelForm):
-    class Meta:
-        model = Mensagem
-        fields = ['texto']
-        widgets = {
-            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite sua mensagem...', 'required': True}),
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da sala'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
         
         
@@ -134,25 +124,10 @@ class MissaoForm(forms.ModelForm):
         model = Missao
         fields = ['titulo', 'descricao', 'pontos']
         widgets = {
-            'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título da missão', 'required': True}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da missão', 'required': True, 'rows': 3}),
-            'pontos': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'pontos (máimo 10)',
-                'min': 1,
-                'max': 10, # limitar pontos entre 1 e 10
-                'required': True
-            })
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'pontos': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
         }
-        
-    def clean_pontos(self):
-        """Validação para garantir que os pontos estejam entre 1 e 10"""
-        pontos = self.cleaned_data.get('pontos')
-        if pontos and (pontos < 1 or pontos > 10):
-            raise forms.ValidationError('Os pontos devem estar entre 1 e 10.')
-        if pontos and pontos < 1:
-            raise forms.ValidationError('Os pontos devem ser no mínimo 1.')
-        return pontos
         
 
 class MensagemMissaoForm(forms.ModelForm):
@@ -160,8 +135,7 @@ class MensagemMissaoForm(forms.ModelForm):
         model = MensagemMissao
         fields = ['texto', 'arquivo']
         widgets = {
-            'texto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite sua resposta...', 'required': True}),
-            'arquivo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'texto': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
         
 
