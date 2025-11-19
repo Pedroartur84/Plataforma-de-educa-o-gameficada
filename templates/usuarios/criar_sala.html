@@ -6,11 +6,6 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Criar Nova Sala</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
@@ -37,7 +32,7 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Criar Sala</button>
-        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary">Voltar</a>
     </form>
 </div>
 {% endblock %}
