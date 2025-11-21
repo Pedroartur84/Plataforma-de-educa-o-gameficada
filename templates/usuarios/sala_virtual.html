@@ -10,11 +10,19 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0 text-warning fw-bold">{{ sala.nome }}</h1>
-            <p class="text-muted mb-0">Professor: {{ sala.professor.get_nome_exibicao }}</p>
+            <p class="text-muted mb-0">Criador: {{ sala.criador.get_nome_exibicao }}</p>
         </div>
-        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary">
-            <i class="fas fa-home"></i> Voltar
-        </a>
+        <div>
+            <!-- Botão para Postar Missão (apenas para professores) -->
+            {% if is_professor_na_sala %}
+            <button type="button" class="btn btn-warning text-dark fw-bold me-2" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
+                <i class="fas fa-plus"></i> Postar Missão
+            </button>
+            {% endif %}
+            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Voltar
+            </a>
+        </div>
     </div>
 
     <!-- ABAS -->
@@ -49,7 +57,7 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                     {% for missao in missoes %}
                     <div class="col">
-                        <div class="card h-100 border-warning shadow-sm">
+                        <div class="card h-100 border-warning shadow-sm card-no-scale">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title text-warning fw-bold">{{ missao.titulo }}</h5>
                                 <p class="card-text text-muted small flex-grow-1">{{ missao.descricao|truncatewords:18 }}</p>
@@ -57,17 +65,30 @@
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="badge bg-warning text-dark fs-6">{{ missao.pontos }} pts</span>
                                         <span class="badge 
-                                            {% if missao.status == 'corrigida' %}bg-success
+                                            {% if missao.status == 'corrigida' %}bg-warning text-dark
                                             {% elif missao.status == 'concluida' %}bg-primary
                                             {% else %}bg-secondary{% endif %}">
                                             {{ missao.get_status_display }}
                                         </span>
                                     </div>
                                     <a href="{% url 'usuarios:chat_missao' missao.id %}" class="btn btn-outline-warning btn-sm w-100">
-                                        {% if missao.status == 'corrigida' %}Ver Correção{% else %}Acessar{% endif %}
+                                        {% if missao.status == 'corrigida' %}
+                                            Ver Correção
+                                        {% elif missao.status == 'concluida' %}
+                                            Ver Entrega
+                                        {% else %}
+                                            Acessar Missão
+                                        {% endif %}
                                     </a>
                                 </div>
                             </div>
+                            {% if is_professor_na_sala %}
+                            <div class="card-footer bg-transparent border-top-0 pt-0">
+                                <small class="text-muted">
+                                    Criada em: {{ missao.data_criacao|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -76,21 +97,30 @@
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-list-task fa-5x opacity-50"></i>
                     <h5>Nenhuma missão disponível</h5>
+                    {% if is_professor_na_sala %}
+                    <p class="mt-3">Seja o primeiro a postar uma missão!</p>
+                    <button type="button" class="btn btn-warning text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
+                        <i class="fas fa-plus"></i> Criar Primeira Missão
+                    </button>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
 
         <!-- CHAT -->
         <div class="tab-pane fade" id="chat" role="tabpanel">
-            <div class="alert alert-info text-center py-5">
-                <i class="bi bi-chat-dots fa-5x mb-3"></i>
-                <h5>Chat da Sala em desenvolvimento</h5>
+            <div class="card card-no-scale">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-chat-dots text-muted fa-5x mb-3"></i>
+                    <h5 class="text-muted">Chat Geral da Sala em desenvolvimento</h5>
+                    <p class="text-muted">Enquanto isso, use o chat individual de cada missão para se comunicar.</p>
+                </div>
             </div>
         </div>
 
-        <!-- RANKING – CORES DO BASE.HTML -->
+        <!-- RANKING -->
         <div class="tab-pane fade" id="ranking" role="tabpanel">
-            <div class="card border-warning shadow-lg">
+            <div class="card border-warning shadow-lg card-no-scale">
                 <div class="card-header bg-warning text-dark text-center py-4">
                     <h4 class="mb-0 fw-bold"><i class="bi bi-trophy"></i> Ranking da Sala</h4>
                 </div>
@@ -99,7 +129,7 @@
                     <ol class="list-group list-group-flush list-group-numbered">
                         {% for item in ranking_sala %}
                         <li class="list-group-item bg-dark d-flex justify-content-between align-items-center py-4
-                                   {% if item.aluno == request.user %}border-start border-warning border-5 bg-primary bg-opacity-10{% endif %}">
+                                   {% if item.aluno == request.user %}border-start border-warning border-5 bg-warning bg-opacity-10{% endif %}">
 
                             <div class="d-flex align-items-center flex-grow-1">
                                 <div class="me-4 text-center" style="width: 90px;">
@@ -141,6 +171,7 @@
                     <div class="text-center py-5 text-white-50">
                         <i class="bi bi-trophy fa-5x mb-3"></i>
                         <h5>O ranking está vazio!</h5>
+                        <p>Complete missões para aparecer no ranking.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -149,20 +180,72 @@
 
         <!-- INFORMAÇÕES -->
         <div class="tab-pane fade" id="info" role="tabpanel">
-            <div class="card">
+            <div class="card card-no-scale">
                 <div class="card-body">
                     <h5 class="text-warning"><i class="bi bi-info-circle"></i> Informações da Sala</h5>
                     <hr>
-                    <p><strong>Código:</strong> {{ sala.codigo }}</p>
+                    <p><strong>Código:</strong> <code>{{ sala.codigo }}</code></p>
                     <p><strong>Criada em:</strong> {{ sala.data_criacao|date:"d/m/Y" }}</p>
-                    <p><strong>Alunos:</strong> {{ sala.alunos.count }}</p>
-                    <p><strong>Professor:</strong> {{ sala.professor.get_nome_exibicao }}</p>
+                    <p><strong>Descrição:</strong> {{ sala.descricao }}</p>
+                    <p><strong>Criador:</strong> {{ sala.criador.get_nome_exibicao }}</p>
+                    <p><strong>Seu papel:</strong> 
+                        <span class="badge {% if minha_participacao.tipo_na_sala == 'professor' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+                            {{ minha_participacao.get_tipo_na_sala_display }}
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>
 
     </div>
 </div>
+
+<!-- Modal para Postar Missão -->
+{% if is_professor_na_sala %}
+<div class="modal fade" id="postarMissaoModal" tabindex="-1" aria-labelledby="postarMissaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="postarMissaoModalLabel">
+                    <i class="fas fa-plus"></i> Postar Nova Missão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'usuarios:postar_missao' sala.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label text-white">Título da Missão</label>
+                        <input type="text" class="form-control input-estilo" id="titulo" name="titulo" required 
+                               placeholder="Ex: Atividade de Matemática">
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label text-white">Descrição</label>
+                        <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="3" 
+                                  placeholder="Descreva os objetivos e requisitos da missão..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pontos" class="form-label text-white">Pontos</label>
+                        <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
+                               min="1" max="1000" value="10" required>
+                        <div class="form-text text-muted">Pontos que os alunos podem ganhar ao completar esta missão.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_limite" class="form-label text-white">Data Limite (opcional)</label>
+                        <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
+                    </div>
+                </div>
+                <div class="modal-footer border-warning">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold">
+                        <i class="fas fa-paper-plane"></i> Postar Missão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Bronze (única cor extra necessária) -->
 <style>
