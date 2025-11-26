@@ -44,9 +44,22 @@ def cadastro(request):
 @login_required
 def principal(request):
     """Exibe a página principal com as salas do usuário logado (como aluno ou criador)."""
-    # Buscar salas onde o usuário participa (como aluno ou professor)
-    salas_participantes = ParticipacaoSala.objects.filter(usuario=request.user).select_related('sala')
-    salas = [participacao.sala for participacao in salas_participantes]
+    salas = Sala.objects.filter(
+        Q(participantes__usuario=request.user) | Q(criador=request.user)
+    ).distinct().order_by('-data_criacao') # Ordenar por data de criação mais recente
+    
+    if request.method == 'POST':
+        codigo = request.POST.get('codigo', '').strip().upper()
+        try:
+            sala = Sala.objects.get(codigo=codigo)
+            if ParticipacaoSala.objects.filter(usuario=request.user, sala=sala).exists():
+                messages.info(request, f'Você já está na sala {sala.nome}.')
+            else:
+                ParticipacaoSala.objects.create(usuario=request.user, sala=sala, tipo_na_sala='aluno')
+                messages.success(request, f'Você entrou na sala {sala.nome} como aluno.')
+                return redirect('usuarios:sala_virtual', sala_id=sala.id)
+        except Sala.DoesNotExist:
+            messages.error(request, 'Código de sala inválido.')
     return render(request, 'principal/principal_page.html', {'salas': salas})
 
 @login_required

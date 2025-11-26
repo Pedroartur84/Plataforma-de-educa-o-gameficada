@@ -48,19 +48,74 @@
 </nav>
 
 <div class="content container">
+    <!-- TÍTULO ACIMA DOS BOTÕES -->
     <h1>Salas Criadas</h1>
     <p class="lead">
-        Esta página exibe as salas criadas na plataforma. Abaixo, você verá uma lista de salas disponíveis, com opções para entrar ou criar novas. Redimensione a janela para testar o menu offcanvas!
+        Esta página exibe as salas criadas na plataforma. Abaixo, você verá uma lista de salas disponíveis, com opções para entrar ou criar novas.
     </p>
-    <p>
-        <a href="{% url 'usuarios:criar_sala' %}" class="btn btn-primary">Criar Nova Sala &raquo;</a>
-    </p>
+
+    <!-- BOTÕES PRINCIPAIS ALINHADOS À ESQUERDA -->
+    <div class="mb-5">
+        <a href="{% url 'usuarios:criar_sala' %}" class="btn btn-primary px-4 me-3">
+            Criar Nova Sala
+        </a>
+        
+        <!-- BOTÃO ENTRAR POR CÓDIGO -->
+        <button type="button" class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#codigoModal">
+            Entrar com Código
+        </button>
+    </div>
+
+    <!-- MODAL PARA ENTRAR COM CÓDIGO -->
+    <div class="modal fade" id="codigoModal" tabindex="-1" aria-labelledby="codigoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="codigoModalLabel">Entrar na Sala com Código</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="{% url 'usuarios:pag_principal' %}">
+                    {% csrf_token %}
+                    <div class="modal-body text-center">
+                        <p class="mb-3">Digite o código que o professor passou:</p>
+                        <div class="input-group mb-3">
+                            <input type="text" name="codigo" class="form-control text-center text-uppercase fw-bold" 
+                                   placeholder="EX: A1B2C3D4" maxlength="10" required 
+                                   style="font-size: 1.2rem; letter-spacing: 3px;">
+                        </div>
+                        <small class="text-muted">O código geralmente tem 8 caracteres (letras e números)</small>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Entrar na Sala</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENSAGENS -->
+    {% if messages %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- LISTA DE SALAS -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for sala in salas %}
         <div class="col">
             <div class="card h-100">
                 <div class="card-body">
                     <h3 class="card-title mb-2">{{ sala.nome }}</h3>
+                    <p class="card-text text-muted">Código: <strong>{{ sala.codigo }}</strong></p>
                     <p class="card-text text-muted">Criada por: <strong>{{ sala.criador.username }}</strong></p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <span><i class="bi bi-people"></i> Participantes (futuramente)</span>
