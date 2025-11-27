@@ -1,6 +1,20 @@
 /* style.css - Estilos Específicos dos Componentes */
+/* ==========================================================================
+   ARQUIVO PRINCIPAL DE ESTILOS
+   Organização: 
+   1. Layout e estrutura
+   2. Formulários e inputs
+   3. Sistema de botões
+   4. Navegação e offcanvas
+   5. Página inicial
+   6. Autenticação
+   7. Componentes diversos
+   8. Responsividade
+   9. Utilitários globais
+   10. Botões responsivos (NOVO)
+   ========================================================================== */
 
-/* 1. layout.css */
+/* ===== 1. LAYOUT E ESTRUTURA ===== */
 .container {
     width: 100%;
     max-width: var(--bp-large);
@@ -19,6 +33,7 @@
     margin: 0 auto;
 }
 
+/* Sistema de z-index */
 :root {
     --z-index-base: 0;
     --z-index-dropdown: 10;
@@ -28,7 +43,7 @@
     --z-index-toast: 50;
 }
 
-/* 2. forms.css */
+/* ===== 2. FORMULÁRIOS E INPUTS ===== */
 .form-floating>label {
     color: var(--color-dark-text-secondary);
 }
@@ -48,7 +63,7 @@
     color: var(--color-dark-text);
 }
 
-/* 3. buttons.css */
+/* ===== 3. SISTEMA DE BOTÕES ORIGINAL ===== */
 .btn {
     --btn-padding-y: var(--space-sm);
     --btn-padding-x: var(--space-md);
@@ -91,7 +106,7 @@
     transform: translateY(-2px);
 }
 
-/* 4. navbars-offcanvas.css */
+/* ===== 4. NAVEGAÇÃO E OFFCANVAS ===== */
 body {
     padding-top: 56px;
     padding-bottom: 20px;
@@ -209,7 +224,7 @@ body {
     padding-top: 10px;
 }
 
-/* 5. home.css */
+/* ===== 5. PÁGINA INICIAL ===== */
 .logo-main {
     --logo-height: 120px;
     height: auto;
@@ -247,7 +262,7 @@ body {
     }
 }
 
-/* 6. auth.css */
+/* ===== 6. AUTENTICAÇÃO ===== */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -298,7 +313,7 @@ body {
     }
 }
 
-/* 7. components.css */
+/* ===== 7. COMPONENTES DIVERSOS ===== */
 .features-grid {
     display: flex;
     justify-content: center;
@@ -391,7 +406,7 @@ body {
     line-height: 1.5;
 }
 
-/* 8. responsive.css */
+/* ===== 8. RESPONSIVIDADE ===== */
 @media (min-width: var(--bp-mobile)) {
     .logo-auth { --logo-size: 70px; }
 }
@@ -413,7 +428,9 @@ body {
     }
 }
 
-/* 9. Estilo de card para todas as divs principais */
+/* ===== 9. UTILITÁRIOS GLOBAIS ===== */
+
+/* Estilo de card para todas as divs principais */
 .container > div:not(.auth-card):not(.home-content):not(.navbar):not(.text-center),
 .content > div {
     background-color: var(--color-dark-card-light);
@@ -445,7 +462,7 @@ body {
     font-weight: 600;
 }
 
-/* 10. Ajustes para alertas e textos */
+/* Ajustes para alertas e textos */
 .alert {
     background-color: var(--color-dark-card-light);
     border: 1px solid var(--color-dark-border);
@@ -461,7 +478,7 @@ body {
     color: var(--color-dark-text-muted) !important;
 }
 
-/* 11. Melhorias de contraste para textos */
+/* Melhorias de contraste para textos */
 h1, h2, h3, h4, h5, h6 {
     color: var(--color-dark-text);
     font-weight: 600;
@@ -483,7 +500,7 @@ a.text-accent:hover {
     text-decoration: underline;
 }
 
-/* 12. CORREÇÕES ESPECÍFICAS PARA CLASSES PROBLEMÁTICAS */
+/* CORREÇÕES ESPECÍFICAS PARA CLASSES PROBLEMÁTICAS */
 .text-muted.mt-2 {
     color: var(--color-dark-text-muted) !important;
 }
@@ -502,4 +519,291 @@ span.text-muted,
 div.text-muted {
     color: var(--color-dark-text-muted) !important;
     opacity: 1 !important;
+}
+
+/* ===== 10. SISTEMA DE BOTÕES RESPONSIVOS (NOVAS ADIÇÕES) ===== */
+
+/**
+ * BOTÕES RESPONSIVOS - SISTEMA COMPLEMENTAR
+ * 
+ * Propósito: Extender o sistema de botões existente com
+ * funcionalidades responsivas avançadas sem quebrar estilos atuais.
+ */
+
+/* Classe complementar para botões responsivos */
+.btn-responsive {
+    /* Mantém todas as propriedades do .btn original */
+    transition: all var(--transition-normal);
+    font-weight: 500;
+    border-radius: var(--border-radius-md);
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* Container especializado para grupos de botões responsivos */
+.buttons-container {
+    display: flex;
+    gap: var(--space-md);
+    width: 100%;
+}
+
+/* Grupo responsivo alternativo */
+.btn-group-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+/* ===== RESPONSIVIDADE PARA BOTÕES ===== */
+
+/* Mobile (até 768px) - Empilhamento vertical */
+@media (max-width: 768px) {
+    .buttons-container {
+        flex-direction: column;
+        gap: var(--space-sm) !important;
+    }
+    
+    .btn-responsive {
+        width: 100%;
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.95rem;
+    }
+    
+    .btn-group-responsive {
+        flex-direction: column;
+    }
+    
+    .btn-group-responsive .btn {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    /* ESPAÇAMENTO REDUZIDO PARA TELAS MUITO PEQUENAS */
+    @media (max-width: 400px) {
+        .buttons-container {
+            gap: var(--space-xs) !important; /* 0.5rem em vez de 0.75rem */
+        }
+        
+        .btn-responsive {
+            padding: var(--space-xs) var(--space-sm); /* Padding menor */
+            font-size: 0.9rem; /* Fonte ligeiramente menor */
+        }
+        
+        /* Para botões com classe btn-sm em telas muito pequenas */
+        .btn-responsive.btn-sm {
+            padding: var(--space-xxs) var(--space-xs); /* 0.25rem 0.5rem */
+            font-size: 0.85rem;
+        }
+    }
+    
+    /* ESPAÇAMENTO AINDA MAIS REDUZIDO PARA TELAS EXTRA PEQUENAS */
+    @media (max-width: 360px) {
+        .buttons-container {
+            gap: 0.375rem !important; /* ~6px */
+        }
+        
+        .btn-responsive {
+            padding: 0.5rem 0.75rem; /* Padding compacto */
+        }
+        
+        .btn-responsive.btn-sm {
+            padding: 0.375rem 0.625rem; /* Padding ultra compacto */
+        }
+    }
+}
+
+/* Tablet (769px - 992px) - Layout horizontal com padding otimizado */
+@media (min-width: 769px) and (max-width: 992px) {
+    .btn-responsive {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: 0.9rem;
+    }
+    
+    /* Botões pequenos em tablet */
+    .btn-responsive.btn-sm {
+        padding: var(--space-xs) var(--space-md);
+        font-size: 0.85rem;
+    }
+}
+
+/* Desktop (acima de 993px) - Espaço generoso */
+@media (min-width: 993px) {
+    .btn-responsive {
+        padding: var(--space-md) var(--space-xl);
+        font-size: 1rem;
+    }
+    
+    /* Botões pequenos em desktop */
+    .btn-responsive.btn-sm {
+        padding: var(--space-sm) var(--space-lg);
+        font-size: 0.9rem;
+    }
+}
+
+/* ===== MELHORIAS DE INTERAÇÃO E ACESSIBILIDADE ===== */
+
+/* Efeito hover complementar */
+.btn-responsive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+/* Estados de foco para acessibilidade */
+.btn:focus,
+.btn-responsive:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Respeitar preferência de reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .btn, .btn-responsive, .feature-item, .card {
+        transition: none;
+        transform: none !important;
+    }
+}
+
+/* Loading states para operações assíncronas */
+.btn-loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== SEÇÃO CTA MELHORADA ===== */
+
+.cta-section {
+    background: linear-gradient(135deg, var(--color-dark-card) 0%, var(--color-dark-card-light) 100%);
+    border: 1px solid var(--color-dark-border);
+    border-radius: var(--border-radius-lg);
+    padding: clamp(var(--space-lg), 4vw, var(--space-xxl));
+    margin: var(--space-xl) auto;
+    max-width: 800px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), transparent);
+}
+
+.cta-section h3 {
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+}
+
+.cta-section .buttons-container {
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== UTILITÁRIOS COMPLEMENTARES ===== */
+
+/* Botões de largura total apenas em mobile */
+.btn-full-mobile {
+    width: auto;
+}
+
+@media (max-width: 768px) {
+    .btn-full-mobile {
+        width: 100%;
+    }
+}
+
+/* Grid de botões para layouts complexos */
+@media (max-width: 768px) {
+    .buttons-container.grid-buttons {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+}
+
+/* ===== CORREÇÕES ESPECÍFICAS PARA RANKING ===== */
+
+/* Ajustes para ranking em mobile */
+@media (max-width: 768px) {
+    .list-group-numbered {
+        padding-left: 0;
+    }
+    
+    .list-group-item {
+        padding: 1rem 0.75rem;
+    }
+    
+    /* Ícones de troféu menores em mobile */
+    .fs-4.fs-md-1 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Para telas muito pequenas */
+@media (max-width: 576px) {
+    .list-group-item {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .fs-4.fs-md-1 {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Badges menores */
+    .badge.fs-6 {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* ===== UTILITÁRIOS PARA LAYOUT ===== */
+
+/* Garantir que containers não quebrem */
+.min-width-0 {
+    min-width: 0;
+}
+
+/* ===== MELHORIAS GERAIS DE RESPONSIVIDADE ===== */
+
+/* Ajustes para cards em mobile */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-text {
+        font-size: 0.9rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 }

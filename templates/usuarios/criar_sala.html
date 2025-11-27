@@ -31,8 +31,10 @@
                 </label>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Criar Sala</button>
-        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary">Voltar</a>
+        <div class="buttons-container">
+            <button type="submit" class="btn btn-primary btn-responsive">Criar Sala</button>
+            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary btn-responsive">Voltar</a>
+        </div>
     </form>
 </div>
 {% endblock %}
