@@ -159,9 +159,10 @@ def sala_virtual(request, sala_id):
         missoes_entregues = 0
 
         for missao in missoes_da_sala:
-            if (missao.status == 'corrigida' and 
-                missao.mensagens.filter(usuario=aluno).exists()):
-                pontos_na_sala += missao.pontos_atingidos or 0
+            # verifiacar se o aluno foi corrigido na missão
+            correcao = correcaoMissao.objects.filter(missao=missao, aluno=aluno).first()
+            if correcao:
+                pontos_na_sala += correcao.pontos_atingidos or 0
                 missoes_entregues += 1
 
         ranking_sala.append({
@@ -216,72 +217,135 @@ def postar_missao(request, sala_id):
     
     return redirect('usuarios:sala_virtual', sala_id=sala_id)
 
+
 @login_required
 def chat_missao(request, missao_id):
     missao = get_object_or_404(Missao, id=missao_id)
-    
-    # Verificar se usuário tem acesso à missão (participa da sala)
+
+    # Verifica se o usuário participa da sala da missão
     participacao = ParticipacaoSala.objects.filter(
-        usuario=request.user, 
+        usuario=request.user,
         sala=missao.sala
     ).first()
-    
+
     if not participacao:
         messages.error(request, 'Você não tem acesso a esta missão.')
         return redirect('usuarios:pag_principal')
-        
+
+    # Todas as mensagens do chat
     mensagens = missao.mensagens.all().order_by('data_envio')
+
     is_professor_na_sala = participacao.tipo_na_sala == 'professor'
 
-    if request.method == 'POST':
-        if missao.status == 'corrigida':
-            messages.error(request, 'Esta missão já foi corrigida.')
-        else:
-            # Envio de mensagem normal (aluno)
-            if 'texto' in request.POST:
-                texto = request.POST.get('texto')
-                arquivo = request.FILES.get('arquivo')
+    # Verifica se o aluno já entregou a missão
+    ja_entregou = missao.mensagens.filter(
+        usuario=request.user,
+        tipo='entrega'
+    ).exists()
+
+    # === LISTA DE ENTREGAS PARA O PROFESSOR (funciona com SQLite!) ===
+    entregas_com_dados = []
+    if is_professor_na_sala:
+        # Pega apenas os IDs dos alunos que entregaram (distinct funciona aqui no SQLite)
+        alunos_com_entrega = missao.mensagens.filter(tipo='entrega')\
+            .values_list('usuario_id', flat=True).distinct()
+
+        for aluno_id in alunos_com_entrega:
+            # Pega a entrega mais recente de cada aluno
+            ultima_entrega = missao.mensagens.filter(
+                tipo='entrega',
+                usuario_id=aluno_id
+            ).order_by('-data_envio').first()
+
+            if ultima_entrega:
+                entregas_com_dados.append({
+                    'aluno': ultima_entrega.usuario,
+                    'entrega': ultima_entrega,
+                })
+
+    # === PROCESSAMENTO DE ENVIO (POST) ===
+    if request.method == 'POST' and missao.status != 'corrigida':
+
+        # 1. Comentário normal (aluno ou professor)
+        if 'texto' in request.POST and 'entregar' not in request.POST and 'corrigir' not in request.POST:
+            MensagemMissao.objects.create(
+                missao=missao,
+                usuario=request.user,
+                texto=request.POST.get('texto'),
+                arquivo=request.FILES.get('arquivo'),
+                tipo='comentario',
+            )
+            messages.success(request, 'Comentário enviado!')
+            return redirect('usuarios:chat_missao', missao_id=missao_id)
+
+        # 2. Aluno entregando a missão
+        elif 'entregar' in request.POST and not ja_entregou and not is_professor_na_sala:
+            MensagemMissao.objects.create(
+                missao=missao,
+                usuario=request.user,
+                texto=request.POST.get('texto'),
+                arquivo=request.FILES.get('arquivo'),
+                tipo='entrega',
+            )
+            missao.status = 'concluida'
+            missao.save()
+            messages.success(request, 'Missão entregue com sucesso! Aguarde a correção.')
+            return redirect('usuarios:chat_missao', missao_id=missao_id)
+
+        # 3. Professor corrigindo um aluno
+        elif 'corrigir' in request.POST and is_professor_na_sala:
+            aluno_id = request.POST.get('aluno_id')
+            aluno = get_object_or_404(Usuario, id=aluno_id)
+            pontos_atingidos = int(request.POST.get('pontos_atingidos', 0))
+
+            if pontos_atingidos < 0 or pontos_atingidos > missao.pontos:
+                messages.error(request, f'Pontuação deve ser entre 0 e {missao.pontos}.')
+            else:
+                # Mensagem de correção no chat
                 MensagemMissao.objects.create(
                     missao=missao,
                     usuario=request.user,
-                    texto=texto,
-                    arquivo=arquivo
+                    texto=f'Correção: {pontos_atingidos}/{missao.pontos} pontos',
+                    tipo='correcao',
                 )
-                # Se for a primeira mensagem → missão concluída
-                if mensagens.count() == 0:
-                    missao.status = 'concluida'
-                    missao.save()
-                return redirect('usuarios:chat_missao', missao_id=missao_id)
 
-            # Correção pelo professor
-            elif 'corrigir_missao' in request.POST and is_professor_na_sala:
-                pontos_atingidos = int(request.POST.get('pontos_atingidos', 0))
-                if pontos_atingidos > missao.pontos:
-                    messages.error(request, f'Pontos não podem exceder {missao.pontos}')
-                else:
-                    missao.pontos_atingidos = pontos_atingidos
+                # Salva/atualiza a correção oficial
+                correcao, created = correcaoMissao.objects.update_or_create(
+                    missao=missao,
+                    aluno=aluno,
+                    defaults={'professor': request.user, 'pontos_atingidos': pontos_atingidos}
+                )
+
+                # Atualiza pontos totais do aluno (só soma a diferença)
+                if not created and correcao.pontos_atingidos < pontos_atingidos:
+                    diferenca = pontos_atingidos - correcao.pontos_atingidos
+                    aluno.pontos_totais += diferenca
+                    aluno.save()
+                elif created:
+                    aluno.pontos_totais += pontos_atingidos
+                    aluno.save()
+
+                messages.success(request, f'Correção salva! {aluno.get_nome_exibicao()} recebeu {pontos_atingidos} pontos.')
+
+                # Verifica se todos que entregaram já foram corrigidos
+                total_entregas = missao.mensagens.filter(tipo='entrega').values('usuario').distinct().count()
+                total_correcoes = correcaoMissao.objects.filter(missao=missao).count()
+
+                if total_entregas > 0 and total_entregas == total_correcoes:
                     missao.status = 'corrigida'
                     missao.save()
+                    messages.info(request, 'Todas as entregas foram corrigidas. Missão finalizada!')
 
-                    # SOMAR PONTOS AO ALUNO
-                    primeira_mensagem = mensagens.first()
-                    if primeira_mensagem and primeira_mensagem.usuario != request.user:
-                        aluno = primeira_mensagem.usuario
-                        aluno.pontos_totais += pontos_atingidos
-                        aluno.save()
+            return redirect('usuarios:chat_missao', missao_id=missao_id)
 
-                        messages.success(request,
-                            f'Correção salva! {aluno.get_nome_exibicao()} ganhou {pontos_atingidos} pontos. '
-                            f'Total dele: {aluno.pontos_totais} pts')
-                    else:
-                        messages.success(request, f'Missão corrigida com {pontos_atingidos} pontos.')
-
-                return redirect('usuarios:chat_missao', missao_id=missao_id)
-
+    # === CONTEXT PARA O TEMPLATE ===
     context = {
         'missao': missao,
         'mensagens': mensagens,
         'is_professor_na_sala': is_professor_na_sala,
+        'ja_entregou': ja_entregou,
+        'entregas_com_dados': entregas_com_dados,
         'minha_participacao': participacao,
     }
+
     return render(request, 'usuarios/chat_missao.html', context)

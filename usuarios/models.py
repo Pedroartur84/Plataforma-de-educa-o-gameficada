@@ -145,6 +145,14 @@ class Missao(models.Model):
 # MENSAGEM NO CHAT DA MISSÃO
 # ==============================
 class MensagemMissao(models.Model):
+    TIPO_CHOICES = [
+        ('comentario', 'Comentário'),
+        ('entrega', 'Entrega'),
+        ('correcao', 'Correção'),
+    ]
+    
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='comentario')
+    
     missao = models.ForeignKey(Missao, on_delete=models.CASCADE, related_name='mensagens')
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mensagens_enviadas')
     texto = models.TextField()
@@ -158,3 +166,20 @@ class MensagemMissao(models.Model):
         ordering = ['data_envio']
         verbose_name = 'Mensagem da Missão'
         verbose_name_plural = 'Mensagens das Missões'
+        
+# ==============================
+# CORREÇÃO DA MISSÃO]
+# ==============================
+class correcaoMissao(models.Model):
+    missao = models.ForeignKey(Missao, on_delete=models.CASCADE, related_name='correcoes')
+    aluno = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='correcoes_recebidas')
+    professor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='correcoes_feitas')
+    
+    pontos_atingidos = models.IntegerField()
+    data_correcao = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        unique_together = ('missao', 'aluno')
+        verbose_name = 'Correção da Missão'
+        verbose_name_plural = 'Correções das Missões'
