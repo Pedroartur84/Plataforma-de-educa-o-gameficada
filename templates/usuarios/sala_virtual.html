@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container py-4">
 
-        <!-- Cabeçalho + Botão Voltar - VERSÃO RESPONSIVA -->
+    <!-- Cabeçalho + Botão Voltar - VERSÃO RESPONSIVA -->
     <div class="mb-4">
         <!-- Layout para desktop -->
         <div class="d-none d-md-flex justify-content-between align-items-center">
@@ -92,12 +92,14 @@
                                         </span>
                                     </div>
                                     <a href="{% url 'usuarios:chat_missao' missao.id %}" class="btn btn-outline-warning btn-sm w-100">
-                                        {% if missao.status == 'corrigida' %}
-                                            Ver Correção
+                                        {% if is_professor_na_sala and missao.status == 'concluida' %}
+                                            <i class="fas fa-check-double"></i> Corrigir
+                                        {% elif missao.status == 'corrigida' %}
+                                            <i class="fas fa-check-circle"></i> Ver Correção
                                         {% elif missao.status == 'concluida' %}
-                                            Ver Entrega
+                                            <i class="fas fa-eye"></i> Ver Entrega
                                         {% else %}
-                                            Acessar Missão
+                                            <i class="fas fa-play-circle"></i> Acessar
                                         {% endif %}
                                     </a>
                                 </div>
