@@ -36,6 +36,11 @@ python manage.py runserver
 
 A plataforma estará disponível em: http://localhost:8000
 
+A aplicação já está rodando no render:
+```bash
+https://player-pnce.onrender.com
+```
+
 ## 📅 Informações Acadêmicas
 - **Status do Projeto**: Em desenvolvimento ativo
 - **Início do Desenvolvimento**: 2024
