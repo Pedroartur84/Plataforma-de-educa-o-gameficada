@@ -26,6 +26,7 @@ def detalhe_curso(request, sala_id):
 
 @login_required
 def marcar_aula_concluida(request, aula_id):
-    aula = get_object_or_404(Aula, id=aula_id, sala__alunos=request.user)
+    # Verifica se a aula pertence a uma sala em que o usuário é participante
+    aula = get_object_or_404(Aula, id=aula_id, sala__participantes__usuario=request.user)
     aula.concluida_por.add(request.user)
     return redirect('cursos:detalhe_curso', sala_id=aula.sala.id)

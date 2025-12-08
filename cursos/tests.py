@@ -9,9 +9,9 @@ from .models import Aula, Progresso
 
 class CursosTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(email='aluno@test.com', password='test123')
+        self.user = get_user_model().objects.create_user(email='aluno@test.com', password='test123', tipo_usuario='aluno')
         self.sala = Sala.objects.create(nome='Curso Teste', descricao='Descrição', criador=self.user)
-        self.sala.alunos.add(self.user)
+        self.sala.participantes.create(usuario=self.user, tipo_na_sala='aluno')
         self.aula = Aula.objects.create(sala=self.sala, titulo='Aula 1', conteudo='Conteúdo', ordem=1)
 
     def test_lista_cursos(self):
