@@ -339,8 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const chat = document.querySelector('.chat-container');
     if (chat) chat.scrollTop = chat.scrollHeight;
 
-    // Atualização automática a cada 12 segundos
-    setInterval(() => { if (!document.hidden) location.reload(); }, 12000);
 });
 </script>
 {% endblock %}
