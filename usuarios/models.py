@@ -183,3 +183,18 @@ class correcaoMissao(models.Model):
         unique_together = ('missao', 'aluno')
         verbose_name = 'Correção da Missão'
         verbose_name_plural = 'Correções das Missões'
+
+
+class ChatMessage(models.Model):
+    sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='chat_messages')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='chat_messages')
+    texto = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['criado_em']
+        verbose_name = 'Mensagem de Chat'
+        verbose_name_plural = 'Mensagens de Chat'
+
+    def __str__(self):
+        return f"{self.usuario.get_nome_exibicao()} @ {self.sala.nome}: {self.texto[:30]}"

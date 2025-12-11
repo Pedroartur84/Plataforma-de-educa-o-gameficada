@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'), #view para logout
     path('minhas-salas/', views.minhas_salas, name='minhas_salas'),  # Nova view para listar salas do usuário
     path('sala-virtual/<int:sala_id>/', views.sala_virtual, name='sala_virtual'),  # Nova view para sala virtual
+    path('sala/<int:sala_id>/messages/', views.sala_messages, name='sala_messages'),
     path('detalhe-sala/<int:sala_id>/', views.detalhe_sala, name='detalhe_sala'),  # Nova view para detalhes da sala
     path('chat-missao/<int:missao_id>/', views.chat_missao, name='chat_missao'),  # Nova view para chat e missõess
     path('postar-missao/<int:sala_id>/', views.postar_missao, name='postar_missao'),

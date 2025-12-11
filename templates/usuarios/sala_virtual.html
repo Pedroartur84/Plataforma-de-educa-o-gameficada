@@ -132,10 +132,17 @@
         <!-- CHAT -->
         <div class="tab-pane fade" id="chat" role="tabpanel">
             <div class="card card-no-scale">
-                <div class="card-body text-center py-5">
-                    <i class="bi bi-chat-dots text-muted fa-5x mb-3"></i>
-                    <h5 class="text-muted">Chat Geral da Sala em desenvolvimento</h5>
-                    <p class="text-muted">Enquanto isso, use o chat individual de cada missão para se comunicar.</p>
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Chat Geral</h5>
+                </div>
+                <div class="card-body bg-dark text-white p-3 d-flex flex-column" style="height:420px;">
+                    <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2" style="border:1px solid rgba(255,255,255,0.05); border-radius:6px; background:#0b0b0b;"></div>
+
+                    <form class="d-flex gap-2" onsubmit="return false;">
+                        {% csrf_token %}
+                        <textarea id="sala-chat-input" class="form-control input-estilo bg-dark text-white" rows="2" placeholder="Escreva uma mensagem..."></textarea>
+                        <button id="sala-chat-send" class="btn btn-warning text-dark">Enviar</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -282,4 +289,10 @@
 <style>
     .text-bronze { color: #CD7F32 !important; }
 </style>
+<script>
+    const CHAT_MESSAGES_URL = "{% url 'usuarios:sala_messages' sala.id %}";
+    const CURRENT_USER_ID = {{ request.user.id }};
+    const CURRENT_USER_NAME = "{{ request.user.get_nome_exibicao }}";
+</script>
+<script src="{% static 'js/chat_sala.js' %}"></script>
 {% endblock %}

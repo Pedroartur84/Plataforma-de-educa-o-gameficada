@@ -5,6 +5,8 @@ from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissao
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import JsonResponse, HttpResponseBadRequest
+import json
 
 def login_view(request):
     """Exibe e processa o formulário de login."""
@@ -188,6 +190,63 @@ def sala_virtual(request, sala_id):
         'minha_participacao': participacao,
     }
     return render(request, 'usuarios/sala_virtual.html', context)
+
+
+@login_required
+def sala_messages(request, sala_id):
+    """API simples para obter e postar mensagens do chat geral da sala.
+
+    GET: retorna JSON com as últimas mensagens (até 100)
+    POST: cria uma nova mensagem (espera campo 'texto' em form-data ou JSON)
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+
+    # Verificar se usuário participa da sala
+    participacao = ParticipacaoSala.objects.filter(usuario=request.user, sala=sala).first()
+    if not participacao:
+        return JsonResponse({'error': 'Acesso negado à sala.'}, status=403)
+
+    if request.method == 'GET':
+        msgs = ChatMessage.objects.filter(sala=sala).order_by('-criado_em')[:100]
+        msgs = reversed(list(msgs))
+        data = [
+            {
+                'id': m.id,
+                'usuario_id': m.usuario.id,
+                'usuario_nome': m.usuario.get_nome_exibicao(),
+                'texto': m.texto,
+                'criado_em': m.criado_em.isoformat(),
+            }
+            for m in msgs
+        ]
+        return JsonResponse(data, safe=False)
+
+    elif request.method == 'POST':
+        # suporta form-data ou JSON
+        texto = request.POST.get('texto')
+        if not texto:
+            try:
+                body = json.loads(request.body.decode('utf-8') or '{}')
+                texto = body.get('texto')
+            except Exception:
+                texto = None
+
+        if not texto or not texto.strip():
+            return HttpResponseBadRequest('Campo texto é obrigatório.')
+
+        msg = ChatMessage.objects.create(sala=sala, usuario=request.user, texto=texto.strip())
+
+        data = {
+            'id': msg.id,
+            'usuario_id': msg.usuario.id,
+            'usuario_nome': msg.usuario.get_nome_exibicao(),
+            'texto': msg.texto,
+            'criado_em': msg.criado_em.isoformat(),
+        }
+        return JsonResponse(data, status=201)
+
+    else:
+        return JsonResponse({'error': 'Método não permitido.'}, status=405)
 
 @login_required
 def postar_missao(request, sala_id):
