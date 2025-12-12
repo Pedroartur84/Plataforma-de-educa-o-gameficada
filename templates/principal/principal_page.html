@@ -71,41 +71,33 @@
         </button>
     </div>
 
-    <!-- MODAL PARA ENTRAR COM CÓDIGO (ESTILO DO PROJETO) -->
+    <!-- MODAL PARA ENTRAR COM CÓDIGO (ESTILO ADAPTADO DO POSTAR MISSÃO) -->
     <div class="modal fade" id="codigoModal" tabindex="-1" aria-labelledby="codigoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content card-no-scale shadow-sm">
-                <div class="modal-header border-0 pb-0">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-qr-code-scan fs-4 text-accent"></i>
-                        <div>
-                            <h5 class="modal-title mb-0" id="codigoModalLabel">Entrar com Código</h5>
-                            <small class="text-muted">Cole ou digite o código da sala</small>
-                        </div>
-                    </div>
+            <div class="modal-content bg-dark text-white border-warning">
+                <div class="modal-header bg-warning text-dark border-warning">
+                    <h5 class="modal-title fw-bold" id="codigoModalLabel"><i class="bi bi-qr-code-scan"></i> Entrar com Código</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
 
-                <form method="post" action="{% url 'usuarios:pag_principal' %}" class="modal-body">
+                <form method="post" action="{% url 'usuarios:pag_principal' %}">
                     {% csrf_token %}
+                    <div class="modal-body">
+                        <p class="text-white-50 mb-2">Cole ou digite o código fornecido pelo professor.</p>
 
-                    <p class="small text-muted mb-2">Peça ao professor o código alfanumérico (ex.: A1B2C3D4).</p>
-
-                    <div class="mb-3">
-                        <label for="codigo-input" class="form-label visually-hidden">Código da Sala</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-key-fill"></i></span>
+                        <div class="mb-3">
+                            <label for="codigo-input" class="form-label text-white">Código da Sala</label>
                             <input id="codigo-input" name="codigo" type="text" inputmode="text" pattern="[A-Za-z0-9]{6,10}"
                                    title="Use 6 a 10 caracteres alfanuméricos" maxlength="10"
-                                   class="form-control text-center text-uppercase fw-bold border-start-0"
+                                   class="form-control input-estilo text-center text-uppercase fw-bold"
                                    placeholder="A1B2C3D4" required aria-label="Código da sala">
+                            <div class="form-text text-white-50 small mt-1">Somente letras e números — 6 a 10 caracteres.</div>
                         </div>
-                        <div class="form-text text-muted small mt-1">Somente letras e números — 6 a 10 caracteres.</div>
                     </div>
 
-                    <div class="d-flex justify-content-center gap-2 mt-3">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Entrar na Sala</button>
+                    <div class="modal-footer border-warning">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fas fa-sign-in-alt"></i> Entrar na Sala</button>
                     </div>
                 </form>
             </div>

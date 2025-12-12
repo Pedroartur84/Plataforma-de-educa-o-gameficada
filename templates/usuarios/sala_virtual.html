@@ -241,7 +241,7 @@
 <!-- Modal para Postar Missão -->
 {% if is_professor_na_sala %}
 <div class="modal fade" id="postarMissaoModal" tabindex="-1" aria-labelledby="postarMissaoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
         <div class="modal-content bg-dark text-white border-warning">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="postarMissaoModalLabel">
@@ -253,29 +253,32 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="titulo" class="form-label text-white">Título da Missão</label>
+                        <label for="titulo" class="form-label text-white fw-bold">Título da Missão</label>
                         <input type="text" class="form-control input-estilo" id="titulo" name="titulo" required 
                                placeholder="Ex: Atividade de Matemática">
                     </div>
                     <div class="mb-3">
-                        <label for="descricao" class="form-label text-white">Descrição</label>
-                        <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="3" 
+                        <label for="descricao" class="form-label text-white fw-bold">Descrição</label>
+                        <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="4" 
                                   placeholder="Descreva os objetivos e requisitos da missão..." required></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="pontos" class="form-label text-white">Pontos</label>
-                        <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
-                               min="1" max="1000" value="10" required>
-                        <div class="form-text text-muted">Pontos que os alunos podem ganhar ao completar esta missão.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="data_limite" class="form-label text-white">Data Limite (opcional)</label>
-                        <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <label for="pontos" class="form-label text-white fw-bold">Pontos</label>
+                            <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
+                                   min="1" max="1000" value="10" required>
+                            <div class="form-text text-white-50 small">Pontos da missão</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="data_limite" class="form-label text-white fw-bold">Data Limite</label>
+                            <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
+                            <div class="form-text text-white-50 small">Opcional</div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer border-warning">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold">
+                <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
                         <i class="fas fa-paper-plane"></i> Postar Missão
                     </button>
                 </div>
