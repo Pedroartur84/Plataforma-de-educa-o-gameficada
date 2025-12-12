@@ -7,37 +7,37 @@ html.light-mode {
     --color-primary-dark: #FFA000;
     --color-accent: #000000;
     --color-accent-light: #333333;
-    
-    /* Cores para Modo Claro */
+
+    /* Cores para Modo Claro (ajustadas para melhor contraste) */
     --color-dark-bg: #F5F5F5;
     --color-dark-card: #FFFFFF;
     --color-dark-card-light: #FAFAFA;
     --color-dark-border: #E0E0E0;
-    --color-dark-text: #1A1A1A;
-    --color-dark-text-secondary: #555555;
-    --color-dark-text-muted: #888888;
+    --color-dark-text: #0F1720; /* Texto principal - mais escuro para melhor legibilidade */
+    --color-dark-text-secondary: #374151; /* Texto secundário */
+    --color-dark-text-muted: #6B7280; /* Texto muted */
 }
 
 html.light-mode body {
-    background-color: #F5F5F5;
-    color: #1A1A1A;
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
 }
 
 html.light-mode .card,
 html.light-mode .card-no-scale {
-    background-color: #FFFFFF;
-    color: #1A1A1A;
-    border-color: #E0E0E0 !important;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-dark-border) !important;
 }
 
 html.light-mode .card-header {
-    background-color: #F9F9F9;
-    border-bottom-color: #E0E0E0;
-    color: #1A1A1A;
+    background-color: var(--color-dark-card-light);
+    border-bottom-color: var(--color-dark-border);
+    color: var(--color-dark-text);
 }
 
 html.light-mode .card-body {
-    color: #1A1A1A;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .card-footer {
@@ -99,53 +99,53 @@ html.light-mode .alert-danger {
 html.light-mode .form-control,
 html.light-mode .form-control-sm,
 html.light-mode textarea {
-    background-color: #FFFFFF;
-    color: #1A1A1A;
-    border-color: #DDD;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .form-control:focus,
 html.light-mode .form-control-sm:focus,
 html.light-mode textarea:focus {
-    background-color: #FFFFFF;
-    color: #1A1A1A;
-    border-color: #FFC107;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
 }
 
 html.light-mode .form-control::placeholder {
-    color: #999;
+    color: var(--color-dark-text-muted);
 }
 
 html.light-mode .text-muted {
-    color: #888888 !important;
+    color: var(--color-dark-text-muted) !important;
 }
 
 html.light-mode .text-secondary {
-    color: #6C757D !important;
+    color: var(--color-dark-text-secondary) !important;
 }
 
 html.light-mode .bg-light {
-    background-color: #F9F9F9 !important;
+    background-color: var(--color-dark-card-light) !important;
 }
 
 html.light-mode .bg-white {
-    background-color: #FFFFFF !important;
+    background-color: var(--color-dark-card) !important;
 }
 
 html.light-mode .table {
-    color: #1A1A1A;
-    border-color: #E0E0E0;
+    color: var(--color-dark-text);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: #F9F9F9;
+    background-color: var(--color-dark-card-light);
 }
 
 html.light-mode .table th {
-    background-color: #F5F5F5;
-    border-color: #E0E0E0;
-    color: #1A1A1A;
+    background-color: var(--color-dark-card-light);
+    border-color: var(--color-dark-border);
+    color: var(--color-dark-text);
 }
 
 html.light-mode .nav-tabs {
@@ -153,7 +153,7 @@ html.light-mode .nav-tabs {
 }
 
 html.light-mode .nav-tabs .nav-link {
-    color: #666;
+    color: var(--color-dark-text-muted);
 }
 
 html.light-mode .nav-tabs .nav-link:hover {
@@ -162,9 +162,9 @@ html.light-mode .nav-tabs .nav-link:hover {
 }
 
 html.light-mode .nav-tabs .nav-link.active {
-    color: #1A1A1A;
-    background-color: #FFFFFF;
-    border-color: #E0E0E0 #E0E0E0 #FFC107;
+    color: var(--color-dark-text);
+    background-color: var(--color-dark-card);
+    border-color: var(--color-dark-border) var(--color-dark-border) var(--color-primary);
 }
 
 html.light-mode .badge {
@@ -172,8 +172,8 @@ html.light-mode .badge {
 }
 
 html.light-mode .badge.bg-light {
-    background-color: #E9ECEF !important;
-    color: #1A1A1A;
+    background-color: var(--color-dark-card-light) !important;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .badge.bg-warning {
@@ -187,7 +187,7 @@ html.light-mode .badge.bg-primary {
 }
 
 html.light-mode .chat-container {
-    background: #F5F5F5;
+    background: var(--color-dark-bg);
     background-image: none;
 }
 
@@ -211,8 +211,8 @@ html.light-mode .message-bubble.bg-warning {
 }
 
 html.light-mode .message-bubble.bg-light {
-    background-color: #E9ECEF;
-    color: #1A1A1A;
+    background-color: var(--color-dark-card-light);
+    color: var(--color-dark-text);
 }
 
 html.light-mode .navbar {
