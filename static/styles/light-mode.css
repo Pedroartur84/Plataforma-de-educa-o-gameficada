@@ -41,59 +41,59 @@ html.light-mode .card-body {
 }
 
 html.light-mode .card-footer {
-    background-color: #F9F9F9;
-    border-top-color: #E0E0E0;
+    background-color: var(--color-dark-card-light);
+    border-top-color: var(--color-dark-border);
 }
 
 html.light-mode .btn-primary {
-    background-color: #FFC107;
-    border-color: #FFC107;
-    color: #000000;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-black);
 }
 
 html.light-mode .btn-primary:hover {
-    background-color: #FFB300;
-    border-color: #FFB300;
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
 }
 
 html.light-mode .btn-secondary {
-    background-color: #6C757D;
-    border-color: #6C757D;
-    color: #FFFFFF;
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: var(--color-accent);
 }
 
 html.light-mode .btn-outline-primary {
-    color: #FFC107;
-    border-color: #FFC107;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 
 html.light-mode .btn-outline-primary:hover {
-    background-color: #FFC107;
-    color: #000000;
+    background-color: var(--color-primary);
+    color: var(--color-black);
 }
 
 html.light-mode .alert-warning {
-    background-color: #FFF3CD;
-    border-color: #FFE69C;
-    color: #856404;
+    background-color: var(--color-warning-bg);
+    border-color: var(--color-warning-border);
+    color: var(--color-warning);
 }
 
 html.light-mode .alert-success {
-    background-color: #D4EDDA;
-    border-color: #C3E6CB;
-    color: #155724;
+    background-color: var(--color-success-bg);
+    border-color: var(--color-success-border);
+    color: var(--color-success-text);
 }
 
 html.light-mode .alert-info {
-    background-color: #D1ECF1;
-    border-color: #BEE5EB;
-    color: #0C5460;
+    background-color: var(--color-info-bg);
+    border-color: var(--color-info-border);
+    color: var(--color-info);
 }
 
 html.light-mode .alert-danger {
-    background-color: #F8D7DA;
-    border-color: #F5C6CB;
-    color: #721C24;
+    background-color: var(--color-danger-bg);
+    border-color: var(--color-danger-border);
+    color: var(--color-danger);
 }
 
 html.light-mode .form-control,
@@ -149,7 +149,7 @@ html.light-mode .table th {
 }
 
 html.light-mode .nav-tabs {
-    border-bottom-color: #E0E0E0;
+    border-bottom-color: var(--color-dark-border);
 }
 
 html.light-mode .nav-tabs .nav-link {
@@ -157,8 +157,8 @@ html.light-mode .nav-tabs .nav-link {
 }
 
 html.light-mode .nav-tabs .nav-link:hover {
-    color: #FFC107;
-    border-color: #E0E0E0;
+    color: var(--color-primary);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .nav-tabs .nav-link.active {
@@ -168,7 +168,7 @@ html.light-mode .nav-tabs .nav-link.active {
 }
 
 html.light-mode .badge {
-    color: #FFFFFF;
+    color: var(--color-accent);
 }
 
 html.light-mode .badge.bg-light {
@@ -177,13 +177,13 @@ html.light-mode .badge.bg-light {
 }
 
 html.light-mode .badge.bg-warning {
-    background-color: #FFC107 !important;
-    color: #000;
+    background-color: var(--color-warning) !important;
+    color: var(--color-black);
 }
 
 html.light-mode .badge.bg-primary {
-    background-color: #FFC107 !important;
-    color: #000;
+    background-color: var(--color-primary) !important;
+    color: var(--color-black);
 }
 
 html.light-mode .chat-container {
@@ -196,18 +196,18 @@ html.light-mode .message-bubble {
 }
 
 html.light-mode .message-bubble.bg-primary {
-    background-color: #FFC107;
-    color: #000;
+    background-color: var(--color-primary);
+    color: var(--color-black);
 }
 
 html.light-mode .message-bubble.bg-success {
-    background-color: #28a745;
-    color: #FFFFFF;
+    background-color: var(--color-success);
+    color: var(--color-accent);
 }
 
 html.light-mode .message-bubble.bg-warning {
-    background-color: #FFC107;
-    color: #000;
+    background-color: var(--color-warning);
+    color: var(--color-black);
 }
 
 html.light-mode .message-bubble.bg-light {
@@ -216,89 +216,89 @@ html.light-mode .message-bubble.bg-light {
 }
 
 html.light-mode .navbar {
-    background-color: #FFFFFF;
-    border-bottom: 1px solid #E0E0E0;
+    background-color: var(--color-dark-card);
+    border-bottom: 1px solid var(--color-dark-border);
 }
 
 html.light-mode .navbar-dark .navbar-brand {
-    color: #1A1A1A;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .navbar-dark .navbar-nav .nav-link {
-    color: #666666;
+    color: var(--color-dark-text-muted);
 }
 
 html.light-mode .navbar-dark .navbar-nav .nav-link:hover {
-    color: #FFC107;
+    color: var(--color-primary);
 }
 
 html.light-mode .navbar-dark .navbar-nav .nav-link.active {
-    color: #FFC107;
+    color: var(--color-primary);
 }
 
 html.light-mode .dropdown-menu {
-    background-color: #FFFFFF;
-    border-color: #E0E0E0;
+    background-color: var(--color-dark-card);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .dropdown-menu .dropdown-item {
-    color: #1A1A1A;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .dropdown-menu .dropdown-item:hover,
 html.light-mode .dropdown-menu .dropdown-item:focus {
-    background-color: #F5F5F5;
-    color: #FFC107;
+    background-color: var(--color-dark-card-light);
+    color: var(--color-primary);
 }
 
 html.light-mode .dropdown-divider {
-    border-color: #E0E0E0;
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .modal-content {
-    background-color: #FFFFFF;
-    color: #1A1A1A;
-    border-color: #E0E0E0;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .modal-header {
-    background-color: #F9F9F9;
-    border-bottom-color: #E0E0E0;
+    background-color: var(--color-dark-card-light);
+    border-bottom-color: var(--color-dark-border);
 }
 
 html.light-mode .modal-footer {
-    background-color: #F9F9F9;
-    border-top-color: #E0E0E0;
+    background-color: var(--color-dark-card-light);
+    border-top-color: var(--color-dark-border);
 }
 
 html.light-mode .modal-title {
-    color: #1A1A1A;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .close {
-    color: #1A1A1A;
+    color: var(--color-dark-text);
 }
 
 html.light-mode .page-link {
-    color: #FFC107;
-    background-color: #FFFFFF;
-    border-color: #E0E0E0;
+    color: var(--color-primary);
+    background-color: var(--color-dark-card);
+    border-color: var(--color-dark-border);
 }
 
 html.light-mode .page-link:hover {
-    color: #FFF;
-    background-color: #FFC107;
-    border-color: #FFC107;
+    color: var(--color-accent);
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 
 html.light-mode .page-item.active .page-link {
-    background-color: #FFC107;
-    border-color: #FFC107;
-    color: #000;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-accent);
 }
 
 html.light-mode hr {
-    border-color: #E0E0E0;
+    border-color: var(--color-dark-border);
     opacity: 1;
 }
 
@@ -309,44 +309,44 @@ html.light-mode ::-webkit-scrollbar {
 }
 
 html.light-mode ::-webkit-scrollbar-track {
-    background: #F5F5F5;
+    background: var(--color-dark-card-light);
 }
 
 html.light-mode ::-webkit-scrollbar-thumb {
-    background: #DDD;
+    background: var(--color-dark-border);
     border-radius: 4px;
 }
 
 html.light-mode ::-webkit-scrollbar-thumb:hover {
-    background: #BBB;
+    background: var(--color-dark-text-muted);
 }
 
 /* Links em modo claro */
 html.light-mode a {
-    color: #FFC107;
+    color: var(--color-primary);
 }
 
 html.light-mode a:hover {
-    color: #FFB300;
+    color: var(--color-primary-dark);
 }
 
 /* Inputs de file em modo claro */
 html.light-mode .form-control::file-selector-button {
-    background-color: #FFC107;
-    color: #000;
-    border: 1px solid #FFC107;
+    background-color: var(--color-primary);
+    color: var(--color-black);
+    border: 1px solid var(--color-primary);
 }
 
 html.light-mode .form-control::file-selector-button:hover {
-    background-color: #FFB300;
-    border-color: #FFB300;
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
 }
 
 /* Botão de tema em modo claro */
 html.light-mode #theme-toggle {
     background: none !important;
     border: none !important;
-    color: #1A1A1A !important;
+    color: var(--color-dark-text) !important;
     padding: 0.75rem 0.5rem !important;
     font-size: 1.1rem !important;
     cursor: pointer;
@@ -355,8 +355,8 @@ html.light-mode #theme-toggle {
 
 html.light-mode #theme-toggle:hover,
 html.light-mode #theme-toggle:focus {
-    color: #FFC107 !important;
-    background-color: rgba(255, 193, 7, 0.15) !important;
+    color: var(--color-primary) !important;
+    background-color: var(--color-primary-rgba) !important;
     transform: translateY(-1px);
 }
 
