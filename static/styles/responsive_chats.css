@@ -127,24 +127,68 @@
 
 @media (max-width: 768px) {
     .btn-responsive {
-        padding: 0.5rem 1rem;
-        font-size: 0.95rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
     }
 
     .btn-sm {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    /* Botões padrão reduzidos */
+    .btn {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.9rem;
     }
 
     /* Botões em grid colapsam para uma coluna */
     .buttons-container {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 
     .buttons-container .btn {
         width: 100%;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.8rem !important;
+        line-height: 1.2;
+    }
+
+    .btn-lg {
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .btn i {
+        margin-right: 0.25rem;
+    }
+
+    /* Esconder texto de botões em telas muito pequenas, manter ícone */
+    .btn-responsive .btn-text {
+        display: none;
+    }
+
+    .buttons-container .btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Buttons em modais */
+    .modal-footer .btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
     }
 }
 

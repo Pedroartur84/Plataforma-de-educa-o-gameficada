@@ -4,324 +4,345 @@
 {% block title %}Missão - {{ missao.titulo }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Cabeçalho - VERSÃO RESPONSIVA -->
-    <div class="mb-4">
-        <!-- Layout para desktop -->
-        <div class="d-none d-md-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="h3 mb-1 text-warning fw-bold">{{ missao.titulo }}</h1>
-                <p class="text-muted mb-0">
-                    Sala: {{ missao.sala.nome }} • 
-                    Pontos: <span class="badge bg-warning text-dark">{{ missao.pontos }}</span> • 
-                    Status: <span class="badge 
-                        {% if missao.status == 'corrigida' %}bg-warning text-dark
-                        {% elif missao.status == 'concluida' %}bg-primary
-                        {% else %}bg-secondary{% endif %}">
-                        {{ missao.get_status_display }}
-                    </span>
-                </p>
-            </div>
-            <div class="buttons-container" style="max-width: 200px;">
-                <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-primary btn-responsive btn-sm">
-                    Voltar
-                </a>
-            </div>
-        </div>
-
-        <!-- Layout para mobile -->
-        <div class="d-md-none">
-            <div class="text-center mb-3">
-                <h1 class="h4 text-warning fw-bold">{{ missao.titulo }}</h1>
-                <div class="d-flex justify-content-center gap-2 flex-wrap mb-2">
-                    <span class="badge bg-warning text-dark">{{ missao.pontos }} pts</span>
-                    <span class="badge 
-                        {% if missao.status == 'corrigida' %}bg-warning text-dark
-                        {% elif missao.status == 'concluida' %}bg-primary
-                        {% else %}bg-secondary{% endif %}">
-                        {{ missao.get_status_display }}
-                    </span>
+<div class="container-fluid py-3">
+    <!-- CABEÇALHO SIMPLIFICADO -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="flex-grow-1">
+                    <h1 class="h4 h-md-3 text-warning fw-bold mb-2">{{ missao.titulo }}</h1>
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <span class="badge bg-warning text-dark">{{ missao.pontos }} pts</span>
+                        <span class="badge 
+                            {% if missao.status == 'corrigida' %}bg-warning text-dark
+                            {% elif missao.status == 'concluida' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ missao.get_status_display }}
+                        </span>
+                        <small class="text-muted">{{ missao.sala.nome }}</small>
+                    </div>
                 </div>
-                <p class="text-muted small">Sala: {{ missao.sala.nome }}</p>
-            </div>
-            <div class="buttons-container">
-                <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-primary btn-responsive btn-sm">
-                    Voltar para Sala
-                </a>
+                <div>
+                    <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-arrow-left"></i> <span class="d-none d-md-inline">Voltar</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- CONTEÚDO PRINCIPAL COM ABAS -->
     <div class="row">
-        <!-- Painel Esquerdo: Descrição e Status -->
-        <div class="col-lg-4 col-md-5 mb-4 order-2 order-lg-1">
-            <!-- Descrição da Missão -->
-            <div class="card card-no-scale mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Descrição da Missão</h5>
-                </div>
-                <div class="card-body">
-                    <p>{{ missao.descricao|linebreaks }}</p>
-                    
-                    {% if missao.data_limite %}
-                    <div class="alert alert-warning mt-3 bg-warning bg-opacity-10 border-warning">
-                        <small>
-                            <strong>Data limite:</strong> {{ missao.data_limite|date:"d/m/Y H:i" }}
-                        </small>
-                    </div>
-                    {% endif %}
+        <div class="col-12">
+            <ul class="nav nav-tabs nav-fill mb-3" id="missaoTabs" role="tablist">
+                <!-- Aba do Chat (padrão em mobile) -->
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat-pane" type="button" role="tab">
+                        <i class="bi bi-chat-dots"></i> <span class="d-none d-md-inline">Chat</span>
+                    </button>
+                </li>
+                
+                <!-- Aba de Informações -->
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
+                        <i class="bi bi-info-circle"></i> <span class="d-none d-md-inline">Informações</span>
+                    </button>
+                </li>
 
-                    <!-- Informações para professores -->
-                    {% if is_professor_na_sala %}
-                    <hr>
-                    <div class="mt-3">
-                        <h6 class="text-muted">Informações do Professor</h6>
-                        <small class="text-muted d-block">
-                            <strong>Criada em:</strong> {{ missao.data_criacao|date:"d/m/Y H:i" }}
-                        </small>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+                <!-- Aba de Correções (apenas professor) -->
+                {% if is_professor_na_sala and entregas_com_dados %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="correcoes-tab" data-bs-toggle="tab" data-bs-target="#correcoes-pane" type="button" role="tab">
+                        <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Corrigir</span>
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
 
-            <!-- Status do Usuário -->
-            <div class="card card-no-scale">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Seu Status</h5>
-                </div>
-                <div class="card-body">
-                    {% if not is_professor_na_sala %}
-                        {% if ja_entregou %}
-                            <div class="alert alert-success">
-                                <strong>Você já entregou esta missão!</strong>
-                                <p class="mb-0 small mt-1">Aguarde a correção do professor.</p>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-warning bg-warning bg-opacity-10">
-                                <strong>Missão pendente</strong>
-                                <p class="mb-0 small mt-1">Você ainda não entregou esta missão.</p>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-muted d-block">
-                                    <strong>Dica:</strong> Use o botão "Entregar Missão" quando finalizar.
-                                </small>
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="alert alert-info bg-info bg-opacity-10">
-                            <strong>Modo Professor</strong>
-                            <p class="mb-0 small mt-1">Você pode corrigir as entregas dos alunos.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Correções Pendentes (APENAS PROFESSOR) -->
-            {% if is_professor_na_sala and entregas_com_dados %}
-            <div class="card card-no-scale mt-4 border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Correções Pendentes</h5>
-                </div>
-                <div class="card-body">
-                    {% for item in entregas_com_dados %}
-                    {% with aluno=item.aluno entrega=item.entrega %}
-                    <div class="mb-3 p-3 border rounded">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <strong>{{ aluno.get_nome_exibicao }}</strong>
-                            <button type="button" class="btn btn-warning btn-sm" 
-                                    data-bs-toggle="modal" data-bs-target="#correcaoModal{{ aluno.id }}">
-                                Corrigir
-                            </button>
-                        </div>
-                        
-                        {% if entrega.texto %}
-                        <p class="small mb-2 text-muted">{{ entrega.texto|truncatewords:15 }}</p>
-                        {% endif %}
-                        
-                        {% if entrega.arquivo %}
-                        <a href="{{ entrega.arquivo.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                            Ver Entrega
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <!-- Modal de Correção -->
-                    <div class="modal fade" id="correcaoModal{{ aluno.id }}" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header bg-warning text-dark">
-                                    <h5 class="modal-title">Corrigir entrega de {{ aluno.get_nome_exibicao }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="aluno_id" value="{{ aluno.id }}">
-                                    <div class="modal-body">
-                                        <p><strong>Aluno:</strong> {{ aluno.get_nome_exibicao }}</p>
-                                        
-                                        {% if entrega.texto %}
-                                        <div class="mb-3">
-                                            <strong>Resposta escrita:</strong>
-                                            <div class="p-3 bg-light rounded mt-2">{{ entrega.texto|linebreaks }}</div>
-                                        </div>
-                                        {% endif %}
-
-                                        {% if entrega.arquivo %}
-                                        <p>
-                                            <strong>Arquivo anexado:</strong><br>
-                                            <a href="{{ entrega.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-                                                Baixar Arquivo
-                                            </a>
-                                        </p>
-                                        {% endif %}
-
-                                        <div class="mt-4">
-                                            <label class="form-label fw-bold">
-                                                Pontuação atribuída (0 a {{ missao.pontos }}):
-                                            </label>
-                                            <input type="number" name="pontos_atingidos" class="form-control form-control-lg text-center" 
-                                                   min="0" max="{{ missao.pontos }}" value="0" required>
+            <!-- CONTEÚDO DAS ABAS -->
+            <div class="tab-content" id="missaoTabContent">
+                
+                <!-- ABA 1: CHAT -->
+                <div class="tab-pane fade show active" id="chat-pane" role="tabpanel">
+                    <div class="card card-no-scale border-0">
+                        <div class="card-body d-flex flex-column p-0" style="height: calc(100vh - 240px); max-height: 600px;">
+                            <!-- Área de Mensagens -->
+                            <div class="chat-container flex-grow-1 overflow-y-auto p-3 border-bottom mb-0" style="min-height: 300px;">
+                                {% if mensagens %}
+                                    {% for mensagem in mensagens %}
+                                    <div class="chat-message mb-3 {% if mensagem.usuario == request.user %}text-end{% endif %}">
+                                        <div class="d-flex {% if mensagem.usuario == request.user %}justify-content-end{% endif %}">
+                                            <div class="message-bubble 
+                                                {% if mensagem.tipo == 'entrega' %}bg-success text-white
+                                                {% elif mensagem.tipo == 'correcao' %}bg-warning text-dark
+                                                {% elif mensagem.usuario == request.user %}bg-primary text-white
+                                                {% else %}bg-light text-dark{% endif %}" 
+                                                 style="border-radius: 18px; padding: 10px 14px;">
+                                                
+                                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                                    <strong class="small">
+                                                        {{ mensagem.usuario.get_nome_exibicao }}
+                                                        {% if mensagem.tipo == 'entrega' %}<span class="badge bg-dark ms-1">ENTREGA</span>{% endif %}
+                                                        {% if mensagem.tipo == 'correcao' %}<span class="badge bg-dark ms-1">CORREÇÃO</span>{% endif %}
+                                                    </strong>
+                                                    <small class="text-muted opacity-75">{{ mensagem.data_envio|date:"H:i" }}</small>
+                                                </div>
+                                                
+                                                {% if mensagem.texto %}
+                                                <p class="mb-2 small">{{ mensagem.texto|linebreaks }}</p>
+                                                {% endif %}
+                                                
+                                                {% if mensagem.arquivo %}
+                                                <div class="mt-2">
+                                                    <a href="{{ mensagem.arquivo.url }}" target="_blank" 
+                                                       class="btn btn-sm {% if mensagem.tipo == 'entrega' or mensagem.tipo == 'correcao' %}btn-light{% else %}btn-outline-primary{% endif %}">
+                                                        <i class="bi bi-download"></i> Arquivo
+                                                    </a>
+                                                </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" name="corrigir" class="btn btn-success btn-lg">
-                                            Salvar Correção
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center text-muted py-5">
+                                        <i class="bi bi-chat-dots fs-4 opacity-50"></i>
+                                        <p class="mt-2">Nenhuma mensagem ainda</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Formulário de Envio -->
+                            {% if missao.status != 'corrigida' %}
+                            <div class="p-3 bg-light border-top">
+                                {% if not is_professor_na_sala %}
+                                    {% if not ja_entregou %}
+                                        <form method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <textarea class="form-control form-control-sm" name="texto" rows="2" 
+                                                          placeholder="Escreva sua resposta..." required></textarea>
+                                            </div>
+                                            <div class="row g-2 mb-2">
+                                                <div class="col-12">
+                                                    <input type="file" class="form-control form-control-sm" name="arquivo" 
+                                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
+                                                </div>
+                                            </div>
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                        <i class="bi bi-chat-left"></i> Comentar
+                                                    </button>
+                                                </div>
+                                                <div class="col-6">
+                                                    <button type="submit" name="entregar" class="btn btn-success btn-sm w-100">
+                                                        <i class="bi bi-check-circle"></i> Entregar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted d-block mt-2">Use "Entregar" quando terminar.</small>
+                                        </form>
+                                    {% else %}
+                                        <form method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <textarea class="form-control form-control-sm" name="texto" rows="2" 
+                                                          placeholder="Adicionar comentário..." required></textarea>
+                                            </div>
+                                            <div class="row g-2 mb-2">
+                                                <div class="col-12">
+                                                    <input type="file" class="form-control form-control-sm" name="arquivo">
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                <i class="bi bi-send"></i> Enviar
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-2">
+                                            <textarea class="form-control form-control-sm" name="texto" rows="2" 
+                                                      placeholder="Feedback para os alunos..." required></textarea>
+                                        </div>
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-12">
+                                                <input type="file" class="form-control form-control-sm" name="arquivo">
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                                            <i class="bi bi-send"></i> Enviar
                                         </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="text-center text-muted py-3">
+                                <small><i class="bi bi-lock"></i> Missão corrigida - Chat encerrado</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 2: INFORMAÇÕES -->
+                <div class="tab-pane fade" id="info-pane" role="tabpanel">
+                    <div class="row g-3">
+                        <!-- Descrição da Missão -->
+                        <div class="col-12 col-lg-6">
+                            <div class="card card-no-scale h-100">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="bi bi-file-text"></i> Descrição</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{ missao.descricao|linebreaks }}</p>
+                                    
+                                    {% if missao.data_limite %}
+                                    <div class="alert alert-warning mt-3 bg-warning bg-opacity-10 border-warning mb-0">
+                                        <small>
+                                            <i class="bi bi-calendar-event"></i> <strong>Data limite:</strong> {{ missao.data_limite|date:"d/m/Y H:i" }}
+                                        </small>
                                     </div>
-                                </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status do Usuário -->
+                        <div class="col-12 col-lg-6">
+                            <div class="card card-no-scale h-100">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0"><i class="bi bi-person-check"></i> Seu Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if not is_professor_na_sala %}
+                                        {% if ja_entregou %}
+                                            <div class="alert alert-success mb-0">
+                                                <i class="bi bi-check-circle"></i> <strong>Entregue!</strong>
+                                                <p class="mb-0 small mt-1">Aguardando correção do professor.</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-warning bg-warning bg-opacity-10 mb-0">
+                                                <i class="bi bi-exclamation-circle"></i> <strong>Pendente</strong>
+                                                <p class="mb-0 small mt-1">Você ainda não entregou esta missão.</p>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="alert alert-info bg-info bg-opacity-10 mb-0">
+                                            <i class="bi bi-mortarboard"></i> <strong>Modo Professor</strong>
+                                            <p class="mb-0 small mt-1">Você pode corrigir as entregas dos alunos na aba "Corrigir".</p>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if is_professor_na_sala %}
+                                    <div class="mt-3 p-3 bg-light rounded">
+                                        <h6 class="text-muted mb-2"><i class="bi bi-info-circle"></i> Info do Professor</h6>
+                                        <small class="text-muted d-block">
+                                            <strong>Criada em:</strong> {{ missao.data_criacao|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    {% endwith %}
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-        </div>
-
-        <!-- Painel Direito: Chat -->
-        <div class="col-lg-8 col-md-7 order-1 order-lg-2">
-            <div class="card h-100 card-no-scale">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Chat da Missão</h5>
-                    {% if missao.status == 'corrigida' %}
-                    <span class="badge bg-warning text-dark">Corrigida</span>
-                    {% endif %}
                 </div>
 
-                <div class="card-body chat-container" style="height: 480px; overflow-y: auto;">
-                    {% if mensagens %}
-                        {% for mensagem in mensagens %}
-                        <div class="chat-message mb-3 {% if mensagem.usuario == request.user %}text-end{% endif %}">
-                            <div class="d-flex {% if mensagem.usuario == request.user %}justify-content-end{% endif %}">
-                                <div class="message-bubble 
-                                    {% if mensagem.tipo == 'entrega' %}bg-success text-white
-                                    {% elif mensagem.tipo == 'correcao' %}bg-warning text-dark
-                                    {% elif mensagem.usuario == request.user %}bg-primary text-white
-                                    {% else %}bg-light{% endif %}" 
-                                     style="max-width: 75%; border-radius: 18px; padding: 12px 16px;">
-                                    
-                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <strong>
-                                            {{ mensagem.usuario.get_nome_exibicao }}
-                                            {% if mensagem.tipo == 'entrega' %}<span class="badge bg-dark ms-2">ENTREGA</span>{% endif %}
-                                            {% if mensagem.tipo == 'correcao' %}<span class="badge bg-dark ms-2">CORREÇÃO</span>{% endif %}
-                                        </strong>
-                                        <small class="text-muted ms-2 opacity-75">{{ mensagem.data_envio|date:"H:i" }}</small>
-                                    </div>
-                                    
-                                    {% if mensagem.texto %}
-                                    <p class="mb-2">{{ mensagem.texto|linebreaks }}</p>
-                                    {% endif %}
-                                    
-                                    {% if mensagem.arquivo %}
-                                    <div class="mt-2">
-                                        <a href="{{ mensagem.arquivo.url }}" target="_blank" 
-                                           class="btn btn-sm {% if mensagem.tipo == 'entrega' or mensagem.tipo == 'correcao' %}btn-light{% else %}btn-outline-primary{% endif %}">
-                                            Baixar Arquivo
-                                        </a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                <!-- ABA 3: CORREÇÕES (APENAS PROFESSOR) -->
+                {% if is_professor_na_sala and entregas_com_dados %}
+                <div class="tab-pane fade" id="correcoes-pane" role="tabpanel">
+                    <div class="card card-no-scale">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Correções Pendentes</h5>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center text-muted py-5">
-                            <p>Nenhuma mensagem ainda. Seja o primeiro a falar!</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Formulário de Envio -->
-                {% if missao.status != 'corrigida' %}
-                <div class="card-footer bg-light">
-                    {% if not is_professor_na_sala %}
-                        {% if not ja_entregou %}
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="row g-2 align-items-end">
-                                    <div class="col-md-8 col-12">
-                                        <textarea class="form-control" name="texto" rows="2" 
-                                                  placeholder="Escreva sua resposta ou dúvida..." required></textarea>
-                                    </div>
-                                    <div class="col-md-4 col-12">
-                                        <div class="d-grid gap-2 d-md-flex">
-                                            <button type="submit" class="btn btn-primary flex-grow-1">
-                                                Comentar
-                                            </button>
-                                            <button type="submit" name="entregar" class="btn btn-success flex-grow-1">
-                                                Entregar
-                                            </button>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {% for item in entregas_com_dados %}
+                                {% with aluno=item.aluno entrega=item.entrega %}
+                                <div class="col-12 col-md-6">
+                                    <div class="card border-warning shadow-sm">
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-2">{{ aluno.get_nome_exibicao }}</h6>
+                                            
+                                            {% if entrega.texto %}
+                                            <p class="small text-muted mb-2">
+                                                <i class="bi bi-chat-left-text"></i> {{ entrega.texto|truncatewords:20 }}
+                                            </p>
+                                            {% endif %}
+                                            
+                                            <div class="d-grid gap-2">
+                                                {% if entrega.arquivo %}
+                                                <a href="{{ entrega.arquivo.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                    <i class="bi bi-download"></i> Ver Arquivo
+                                                </a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-warning btn-sm" 
+                                                        data-bs-toggle="modal" data-bs-target="#correcaoModal{{ aluno.id }}">
+                                                    <i class="bi bi-pencil"></i> Corrigir
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-2">
-                                    <input type="file" class="form-control form-control-sm" name="arquivo" 
-                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
-                                    <small class="text-muted d-block mt-1">Use "Entregar Missão" apenas quando terminar tudo.</small>
-                                </div>
-                            </form>
-                        {% else %}
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="row g-2">
-                                    <div class="col-10">
-                                        <textarea class="form-control" name="texto" rows="2" 
-                                                  placeholder="Adicionar comentário..." required></textarea>
+
+                                <!-- Modal de Correção -->
+                                <div class="modal fade" id="correcaoModal{{ aluno.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-warning text-dark">
+                                                <h5 class="modal-title">Corrigir - {{ aluno.get_nome_exibicao }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="aluno_id" value="{{ aluno.id }}">
+                                                <div class="modal-body">
+                                                    <p><strong>Aluno:</strong> {{ aluno.get_nome_exibicao }}</p>
+                                                    
+                                                    {% if entrega.texto %}
+                                                    <div class="mb-3">
+                                                        <strong>Resposta escrita:</strong>
+                                                        <div class="p-3 bg-light rounded mt-2 small">{{ entrega.texto|linebreaks }}</div>
+                                                    </div>
+                                                    {% endif %}
+
+                                                    {% if entrega.arquivo %}
+                                                    <p>
+                                                        <strong>Arquivo anexado:</strong><br>
+                                                        <a href="{{ entrega.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                            <i class="bi bi-download"></i> Baixar
+                                                        </a>
+                                                    </p>
+                                                    {% endif %}
+
+                                                    <div class="mt-4">
+                                                        <label class="form-label fw-bold">
+                                                            Pontuação (0 a {{ missao.pontos }}):
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <input type="number" name="pontos_atingidos" class="form-control text-center" 
+                                                                   min="0" max="{{ missao.pontos }}" value="0" required>
+                                                            <span class="input-group-text">/ {{ missao.pontos }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" name="corrigir" class="btn btn-success btn-sm">
+                                                        <i class="bi bi-check-circle"></i> Salvar
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                    <div class="col-2 d-flex gap-1">
-                                        <button type="submit" class="btn btn-primary h-100 flex-grow-1">Enviar</button>
-                                    </div>
                                 </div>
-                                <div class="mt-2">
-                                    <input type="file" class="form-control form-control-sm" name="arquivo">
-                                </div>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="row g-2">
-                                <div class="col-10">
-                                    <textarea class="form-control" name="texto" rows="2" 
-                                              placeholder="Feedback ou comentário para os alunos..." required></textarea>
-                                </div>
-                                <div class="col-2 d-flex gap-1">
-                                    <button type="submit" class="btn btn-primary h-100 flex-grow-1">Enviar</button>
-                                </div>
+                                {% endwith %}
+                                {% endfor %}
                             </div>
-                            <div class="mt-2">
-                                <input type="file" class="form-control form-control-sm" name="arquivo">
-                            </div>
-                        </form>
-                    {% endif %}
-                </div>
-                {% else %}
-                <div class="card-footer text-center text-muted py-4">
-                    Esta missão já foi corrigida. O chat está fechado.
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -334,13 +355,18 @@
 .chat-container::-webkit-scrollbar-track { background: transparent; }
 .chat-container::-webkit-scrollbar-thumb { background: #6c757d; border-radius: 3px; }
 .message-bubble { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.nav-tabs { border-bottom: 2px solid #444; }
+.nav-tabs .nav-link.active { border-bottom: 3px solid #FFC107; color: #FFC107; }
+.nav-tabs .nav-link { color: #999; transition: all 0.3s; }
+.nav-tabs .nav-link:hover { color: #FFC107; }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chat = document.querySelector('.chat-container');
-    if (chat) chat.scrollTop = chat.scrollHeight;
-
+    if (chat) {
+        setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
+    }
 });
 </script>
 {% endblock %}
