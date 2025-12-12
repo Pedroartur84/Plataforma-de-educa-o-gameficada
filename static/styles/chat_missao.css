@@ -6,7 +6,7 @@
    ============================================ */
 
 .chat-container {
-    background: #0e0e0e;
+    background: var(--color-dark-bg);
     background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
     background-size: 450px;
     background-repeat: repeat;
@@ -30,8 +30,8 @@
 }
 
 .message-bubble.bg-primary {
-    background-color: #FFC107;
-    color: #000;
+    background-color: var(--color-primary);
+    color: var(--color-accent);
 }
 
 .message-bubble.bg-success {
@@ -39,13 +39,13 @@
 }
 
 .message-bubble.bg-warning {
-    background-color: #ffc107;
-    color: #000;
+    background-color: var(--color-primary);
+    color: var(--color-accent);
 }
 
 .message-bubble.bg-light {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
 }
 
 /* ============================================
@@ -56,12 +56,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0;
-    border-bottom: 2px solid #444;
+    border-bottom: 2px solid var(--color-dark-border);
 }
 
 .nav-tabs .nav-link {
     padding: 0.75rem 1rem;
-    color: #999;
+    color: var(--color-dark-text-muted);
     border: none;
     border-bottom: 3px solid transparent;
     transition: all 0.3s ease;
@@ -70,13 +70,13 @@
 }
 
 .nav-tabs .nav-link:hover {
-    color: #FFC107;
+    color: var(--color-primary);
     border-bottom-color: rgba(255, 193, 7, 0.3);
 }
 
 .nav-tabs .nav-link.active {
-    color: #FFC107;
-    border-bottom-color: #FFC107;
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
     background-color: transparent;
 }
 
@@ -85,15 +85,15 @@
    ============================================ */
 
 .card-no-scale {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+    border: 1px solid var(--color-dark-border);
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
     box-shadow: none;
     transition: all 0.3s;
 }
 
 .card-no-scale .card-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-dark-border);
 }
 
 .card-no-scale .card-body {
@@ -106,21 +106,21 @@
 
 .form-control,
 .form-control-sm {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    border-color: #444;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-dark-border);
 }
 
 .form-control:focus,
 .form-control-sm:focus {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    border-color: #FFC107;
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-text);
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
 }
 
 .form-control::placeholder {
-    color: #666;
+    color: var(--color-dark-text-muted);
 }
 
 /* ============================================
@@ -133,14 +133,14 @@
 }
 
 .btn-primary {
-    background-color: #FFC107;
-    border-color: #FFC107;
-    color: #000;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-accent);
 }
 
 .btn-primary:hover {
-    background-color: #e6b800;
-    border-color: #e6b800;
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
 }
 
 .btn-success {
@@ -154,9 +154,9 @@
 }
 
 .btn-warning {
-    background-color: #FFC107;
-    border-color: #FFC107;
-    color: #000;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-accent);
 }
 
 /* ============================================
@@ -187,12 +187,13 @@
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 193, 7, 0.5);
+    background: var(--color-primary-dark);
+    opacity: 0.5;
     border-radius: 4px;
 }
 
 .chat-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 193, 7, 0.7);
+    opacity: 0.7;
 }
 
 /* ============================================
