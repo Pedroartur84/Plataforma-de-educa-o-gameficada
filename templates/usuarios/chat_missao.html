@@ -54,7 +54,7 @@
 
     <div class="row">
         <!-- Painel Esquerdo: Descrição e Status -->
-        <div class="col-lg-4 mb-4">
+        <div class="col-lg-4 col-md-5 mb-4 order-2 order-lg-1">
             <!-- Descrição da Missão -->
             <div class="card card-no-scale mb-4">
                 <div class="card-header bg-warning text-dark">
@@ -202,7 +202,7 @@
         </div>
 
         <!-- Painel Direito: Chat -->
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-md-7 order-1 order-lg-2">
             <div class="card h-100 card-no-scale">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Chat da Missão</h5>
@@ -263,23 +263,25 @@
                             <form method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="row g-2 align-items-end">
-                                    <div class="col-md-8">
-                                        <textarea class="form-control" name="texto" rows="3" 
+                                    <div class="col-md-8 col-12">
+                                        <textarea class="form-control" name="texto" rows="2" 
                                                   placeholder="Escreva sua resposta ou dúvida..." required></textarea>
                                     </div>
-                                    <div class="col-md-4">
-                                        <button type="submit" class="btn btn-primary w-100 mb-1">
-                                            Comentar
-                                        </button>
-                                        <button type="submit" name="entregar" class="btn btn-success w-100">
-                                            Entregar Missão
-                                        </button>
+                                    <div class="col-md-4 col-12">
+                                        <div class="d-grid gap-2 d-md-flex">
+                                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                                Comentar
+                                            </button>
+                                            <button type="submit" name="entregar" class="btn btn-success flex-grow-1">
+                                                Entregar
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mt-2">
-                                    <input type="file" class="form-control" name="arquivo" 
+                                    <input type="file" class="form-control form-control-sm" name="arquivo" 
                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
-                                    <small class="text-muted">Use "Entregar Missão" apenas quando terminar tudo.</small>
+                                    <small class="text-muted d-block mt-1">Use "Entregar Missão" apenas quando terminar tudo.</small>
                                 </div>
                             </form>
                         {% else %}
@@ -290,12 +292,12 @@
                                         <textarea class="form-control" name="texto" rows="2" 
                                                   placeholder="Adicionar comentário..." required></textarea>
                                     </div>
-                                    <div class="col-2">
-                                        <button type="submit" class="btn btn-primary h-100">Enviar</button>
+                                    <div class="col-2 d-flex gap-1">
+                                        <button type="submit" class="btn btn-primary h-100 flex-grow-1">Enviar</button>
                                     </div>
                                 </div>
                                 <div class="mt-2">
-                                    <input type="file" class="form-control" name="arquivo">
+                                    <input type="file" class="form-control form-control-sm" name="arquivo">
                                 </div>
                             </form>
                         {% endif %}
@@ -307,12 +309,12 @@
                                     <textarea class="form-control" name="texto" rows="2" 
                                               placeholder="Feedback ou comentário para os alunos..." required></textarea>
                                 </div>
-                                <div class="col-2">
-                                    <button type="submit" class="btn btn-primary h-100">Enviar</button>
+                                <div class="col-2 d-flex gap-1">
+                                    <button type="submit" class="btn btn-primary h-100 flex-grow-1">Enviar</button>
                                 </div>
                             </div>
                             <div class="mt-2">
-                                <input type="file" class="form-control" name="arquivo">
+                                <input type="file" class="form-control form-control-sm" name="arquivo">
                             </div>
                         </form>
                     {% endif %}

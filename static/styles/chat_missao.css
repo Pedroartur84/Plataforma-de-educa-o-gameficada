@@ -18,6 +18,15 @@
     flex-direction: column;
 }
 
+/* Responsive para Mobile */
+@media (max-width: 768px) {
+    .chat-wrapper {
+        height: calc(100vh - 100px);
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
 /* Header da missão */
 .chat-header {
     background: linear-gradient(135deg, var(--color-primary), #e6a800);
@@ -29,6 +38,19 @@
 .chat-header h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
 .chat-header p { margin: 0.4rem 0 0; opacity: 0.95; }
 .chat-header .badges { margin-top: 0.8rem; display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+
+/* Responsive Header */
+@media (max-width: 768px) {
+    .chat-header {
+        padding: 1rem 1rem;
+    }
+    .chat-header h2 {
+        font-size: 1.2rem;
+    }
+    .chat-header .badges {
+        gap: 0.5rem;
+    }
+}
 
 /* Área de mensagens */
 .chat-messages {
@@ -54,6 +76,23 @@
     border-radius: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.4);
     line-height: 1.45;
+}
+
+/* Responsive Bubble Width */
+@media (max-width: 768px) {
+    .bubble {
+        max-width: 90%;
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .bubble {
+        max-width: 95%;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+    }
 }
 .message.me .bubble {
     background: var(--color-primary);
@@ -91,16 +130,53 @@
     background: var(--color-dark-card-light);
     border-top: 1px solid var(--color-dark-border);
 }
+
 .input-area { display: flex; align-items: flex-end; gap: 0.8rem; }
 .input-area textarea { flex: 1; resize: none; min-height: 52px; max-height: 130px; }
 .btn-attach, .btn-send {
     width: 48px; height: 48px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem;
+    flex-shrink: 0;
 }
+
 .btn-send { background: var(--color-primary); color: black; border: none; }
 .btn-send:hover { background: #e6b800; transform: scale(1.1); }
 .btn-attach { background: #444; color: #ccc; }
+
+/* Responsive Input */
+@media (max-width: 768px) {
+    .chat-input {
+        padding: 0.75rem;
+    }
+    .input-area {
+        gap: 0.5rem;
+    }
+    .input-area textarea {
+        min-height: 44px;
+        max-height: 100px;
+        font-size: 1rem;
+    }
+    .btn-attach, .btn-send {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-input {
+        padding: 0.5rem;
+    }
+    .input-area {
+        gap: 0.4rem;
+    }
+    .btn-attach, .btn-send {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+}
 
 /* Correção do professor */
 .correction-box {
@@ -129,4 +205,19 @@
 .chat-messages::-webkit-scrollbar-thumb {
     background: rgba(255, 193, 7, 0.5);
     border-radius: 4px;
+}
+
+/* Melhorias responsivas gerais */
+@media (max-width: 768px) {
+    .card-no-scale {
+        box-shadow: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Oculta painel lateral em telas muito pequenas */
+@media (max-width: 992px) {
+    .row > .col-lg-4 {
+        margin-bottom: 2rem;
+    }
 }

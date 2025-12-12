@@ -135,13 +135,13 @@
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Chat Geral</h5>
                 </div>
-                <div class="card-body bg-dark text-white p-3 d-flex flex-column" style="height:420px;">
-                    <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2" style="border:1px solid rgba(255,255,255,0.05); border-radius:6px; background:#0b0b0b;"></div>
+                <div class="card-body bg-dark text-white p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
+                    <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.05); background:#0b0b0b; min-height: 0;"></div>
 
-                    <form class="d-flex gap-2" onsubmit="return false;">
+                    <form class="d-flex gap-2 flex-column flex-md-row" onsubmit="return false;">
                         {% csrf_token %}
-                        <textarea id="sala-chat-input" class="form-control input-estilo bg-dark text-white" rows="2" placeholder="Escreva uma mensagem..."></textarea>
-                        <button id="sala-chat-send" class="btn btn-warning text-dark">Enviar</button>
+                        <textarea id="sala-chat-input" class="form-control input-estilo bg-dark text-white flex-grow-1" rows="2" placeholder="Escreva uma mensagem..."></textarea>
+                        <button id="sala-chat-send" class="btn btn-warning text-dark btn-sm align-self-end" style="min-width: 80px;">Enviar</button>
                     </form>
                 </div>
             </div>
