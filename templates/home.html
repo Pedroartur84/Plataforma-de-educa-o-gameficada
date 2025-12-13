@@ -9,7 +9,19 @@
         <div class="home-content">
             <img src="{% static 'img/web_hi_res_512-Photoroom.png' %}" class="logo-main mb-4" alt="Player Logo"/>
             <h1 class="display-5 fw-bold mb-3">Player</h1>
-            <p class="lead mb-5">Transforme seu aprendizado em uma <span class="text-accent">aventura épica</span>!</p>
+            <p class="lead mb-4">Transforme seu aprendizado em uma <span class="text-accent">aventura épica</span>!</p>
+            
+            <div class="cta-section mb-5">
+                <h3 class="h4 mb-4">Pronto para começar?</h3>
+                <div class="buttons-container">
+                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-responsive btn-sm">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login
+                    </a>
+                    <a href="{% url 'usuarios:cadastro' %}" class="btn btn-primary btn-responsive btn-sm">
+                        <i class="bi bi-person-plus me-2"></i> Cadastre-se
+                    </a>
+                </div>
+            </div>
             
             <div class="project-description mb-5 p-4 rounded-4">
                 <h2 class="h3 mb-4">Objetivo do Projeto</h2>
@@ -46,17 +58,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="cta-section mt-5">
-                <h3 class="h4 mb-4">Pronto para começar?</h3>
-                <div class="buttons-container">
-                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login
-                    </a>
-                    <a href="{% url 'usuarios:cadastro' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-person-plus me-2"></i> Cadastre-se
-                    </a>
-                </div>
         </div>
     </div>
 </main>
