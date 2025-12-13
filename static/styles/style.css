@@ -616,13 +616,6 @@ div.text-muted {
     width: 100%;
 }
 
-/* Grupo responsivo alternativo */
-.btn-group-responsive {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-}
-
 /* ===== RESPONSIVIDADE PARA BOTÕES ===== */
 
 /* Mobile (até 768px) - Empilhamento vertical */
@@ -732,29 +725,6 @@ div.text-muted {
     }
 }
 
-/* Loading states para operações assíncronas */
-.btn-loading {
-    position: relative;
-    color: transparent;
-    pointer-events: none;
-}
-
-.btn-loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* ===== SEÇÃO CTA MELHORADA ===== */
 
 .cta-section {
@@ -806,17 +776,6 @@ div.text-muted {
 
 /* ===== UTILITÁRIOS COMPLEMENTARES ===== */
 
-/* Botões de largura total apenas em mobile */
-.btn-full-mobile {
-    width: auto;
-}
-
-@media (max-width: 768px) {
-    .btn-full-mobile {
-        width: 100%;
-    }
-}
-
 /* Grid de botões para layouts complexos */
 @media (max-width: 768px) {
     .buttons-container.grid-buttons {
@@ -862,9 +821,6 @@ div.text-muted {
 /* ===== UTILITÁRIOS PARA LAYOUT ===== */
 
 /* Garantir que containers não quebrem */
-.min-width-0 {
-    min-width: 0;
-}
 
 /* ===== MELHORIAS GERAIS DE RESPONSIVIDADE ===== */
 
