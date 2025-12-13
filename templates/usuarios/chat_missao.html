@@ -64,120 +64,63 @@
                 
                 <!-- ABA 1: CHAT -->
                 <div class="tab-pane fade show active" id="chat-pane" role="tabpanel">
-                    <div class="card card-no-scale border-0">
-                        <div class="card-body d-flex flex-column p-0" style="height: calc(100vh - 240px); max-height: 600px;">
+                    <div class="card card-no-scale">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Chat da Missão</h5>
+                        </div>
+                        <div class="card-body bg-dark text-white p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
                             <!-- Área de Mensagens -->
-                            <div class="chat-container flex-grow-1 overflow-y-auto p-3 border-bottom mb-0" style="min-height: 300px;">
-                                {% if mensagens %}
-                                    {% for mensagem in mensagens %}
-                                    <div class="chat-message mb-3 {% if mensagem.usuario == request.user %}text-end{% endif %}">
-                                        <div class="d-flex {% if mensagem.usuario == request.user %}justify-content-end{% endif %}">
-                                            <div class="message-bubble 
-                                                {% if mensagem.tipo == 'entrega' %}bg-success text-white
-                                                {% elif mensagem.tipo == 'correcao' %}bg-warning text-dark
-                                                {% elif mensagem.usuario == request.user %}bg-primary text-white
-                                                {% else %}bg-light text-dark{% endif %}" 
-                                                 style="border-radius: 18px; padding: 10px 14px;">
-                                                
-                                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                                                    <strong class="small">
-                                                        {{ mensagem.usuario.get_nome_exibicao }}
-                                                        {% if mensagem.tipo == 'entrega' %}<span class="badge bg-dark ms-1">ENTREGA</span>{% endif %}
-                                                        {% if mensagem.tipo == 'correcao' %}<span class="badge bg-dark ms-1">CORREÇÃO</span>{% endif %}
-                                                    </strong>
-                                                    <small class="text-muted opacity-75">{{ mensagem.data_envio|date:"H:i" }}</small>
-                                                </div>
-                                                
-                                                {% if mensagem.texto %}
-                                                <p class="mb-2 small">{{ mensagem.texto|linebreaks }}</p>
-                                                {% endif %}
-                                                
-                                                {% if mensagem.arquivo %}
-                                                <div class="mt-2">
-                                                    <a href="{{ mensagem.arquivo.url }}" target="_blank" 
-                                                       class="btn btn-sm {% if mensagem.tipo == 'entrega' or mensagem.tipo == 'correcao' %}btn-light{% else %}btn-outline-primary{% endif %}">
-                                                        <i class="bi bi-download"></i> Arquivo
-                                                    </a>
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center text-muted py-5">
-                                        <i class="bi bi-chat-dots fs-4 opacity-50"></i>
-                                        <p class="mt-2">Nenhuma mensagem ainda</p>
-                                    </div>
-                                {% endif %}
+                            <div class="chat-container flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.05); background:#0b0b0b; min-height: 0;" id="missao-chat-messages">
+                                <!-- Mensagens carregadas via JS -->
                             </div>
 
                             <!-- Formulário de Envio -->
                             {% if missao.status != 'corrigida' %}
-                            <div class="p-3 bg-light border-top">
-                                {% if not is_professor_na_sala %}
-                                    {% if not ja_entregou %}
-                                        <form method="post" enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <div class="mb-2">
-                                                <textarea class="form-control form-control-sm" name="texto" rows="2" 
-                                                          placeholder="Escreva sua resposta..." required></textarea>
+                            {% if not is_professor_na_sala %}
+                                {% if not ja_entregou %}
+                                    <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
+                                        {% csrf_token %}
+                                        <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
+                                                  placeholder="Escreva sua resposta..." required></textarea>
+                                        <div class="d-flex gap-2 flex-column">
+                                            <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo" 
+                                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-chat-left"></i> Comentar
+                                                </button>
+                                                <button type="submit" name="entregar" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-check-circle"></i> Entregar
+                                                </button>
                                             </div>
-                                            <div class="row g-2 mb-2">
-                                                <div class="col-12">
-                                                    <input type="file" class="form-control form-control-sm" name="arquivo" 
-                                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
-                                                </div>
-                                            </div>
-                                            <div class="row g-2">
-                                                <div class="col-6">
-                                                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                                                        <i class="bi bi-chat-left"></i> Comentar
-                                                    </button>
-                                                </div>
-                                                <div class="col-6">
-                                                    <button type="submit" name="entregar" class="btn btn-success btn-sm w-100">
-                                                        <i class="bi bi-check-circle"></i> Entregar
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <small class="text-muted d-block mt-2">Use "Entregar" quando terminar.</small>
-                                        </form>
-                                    {% else %}
-                                        <form method="post" enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <div class="mb-2">
-                                                <textarea class="form-control form-control-sm" name="texto" rows="2" 
-                                                          placeholder="Adicionar comentário..." required></textarea>
-                                            </div>
-                                            <div class="row g-2 mb-2">
-                                                <div class="col-12">
-                                                    <input type="file" class="form-control form-control-sm" name="arquivo">
-                                                </div>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
+                                        {% csrf_token %}
+                                        <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
+                                                  placeholder="Adicionar comentário..." required></textarea>
+                                        <div class="d-flex gap-2 flex-column">
+                                            <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo">
+                                            <button type="submit" class="btn btn-primary btn-sm">
                                                 <i class="bi bi-send"></i> Enviar
                                             </button>
-                                        </form>
-                                    {% endif %}
-                                {% else %}
-                                    <form method="post" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <div class="mb-2">
-                                            <textarea class="form-control form-control-sm" name="texto" rows="2" 
-                                                      placeholder="Feedback para os alunos..." required></textarea>
                                         </div>
-                                        <div class="row g-2 mb-2">
-                                            <div class="col-12">
-                                                <input type="file" class="form-control form-control-sm" name="arquivo">
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                                            <i class="bi bi-send"></i> Enviar
-                                        </button>
                                     </form>
                                 {% endif %}
-                            </div>
+                            {% else %}
+                                <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
+                                    {% csrf_token %}
+                                    <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
+                                              placeholder="Feedback para os alunos..." required></textarea>
+                                    <div class="d-flex gap-2 flex-column">
+                                        <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-send"></i> Enviar
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
                             {% else %}
                             <div class="text-center text-muted py-3">
                                 <small><i class="bi bi-lock"></i> Missão corrigida - Chat encerrado</small>
@@ -369,4 +312,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<script>
+    const MISSAO_CHAT_MESSAGES_URL = "{% url 'usuarios:missao_messages' missao.id %}";
+    const CURRENT_USER_ID = {{ request.user.id }};
+</script>
+<script src="{% static 'js/chat_missao.js' %}"></script>
 {% endblock %}

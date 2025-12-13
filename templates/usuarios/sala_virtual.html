@@ -159,9 +159,9 @@
                         {% for item in ranking_sala %}
                         <li class="list-group-item bg-dark p-3 p-sm-4 border-bottom border-secondary
                                 {% if item.aluno == request.user %}border-start border-warning border-5 bg-warning bg-opacity-10{% endif %}">
-                            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                            <div class="d-flex flex-column flex-sm-row align-items-center gap-2 gap-sm-3">
                                 <!-- Posição/Troféu -->
-                                <div class="text-center flex-shrink-0" style="min-width: 50px;">
+                                <div class="text-center flex-shrink-0" style="min-width: 60px;">
                                     {% if item.posicao == 1 %}
                                         <i class="bi bi-trophy-fill text-warning" style="font-size: 1.75rem;"></i>
                                         <div class="text-warning fw-bold small mt-1">1º</div>
@@ -177,7 +177,7 @@
                                 </div>
 
                                 <!-- Informações do aluno (flex-grow para ocupar espaço) -->
-                                <div class="flex-grow-1 min-w-0">
+                                <div class="flex-grow-1 min-w-0 text-center text-sm-start">
                                     <h6 class="mb-1 fw-bold text-white text-truncate">
                                         {{ item.aluno.get_nome_exibicao }}
                                         {% if item.aluno == request.user %}
@@ -190,7 +190,7 @@
                                 </div>
 
                                 <!-- Pontos (sempre visível) -->
-                                <div class="text-end flex-shrink-0">
+                                <div class="text-center text-sm-end flex-shrink-0">
                                     <div class="text-warning fw-bold" style="font-size: 1.25rem;">{{ item.pontos_sala }}</div>
                                     <small class="text-white-50 d-block">pts</small>
                                 </div>

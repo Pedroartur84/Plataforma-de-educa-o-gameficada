@@ -16,6 +16,7 @@ urlpatterns = [
     path('sala/<int:sala_id>/messages/', views.sala_messages, name='sala_messages'),
     path('detalhe-sala/<int:sala_id>/', views.detalhe_sala, name='detalhe_sala'),  # Nova view para detalhes da sala
     path('chat-missao/<int:missao_id>/', views.chat_missao, name='chat_missao'),  # Nova view para chat e missõess
+    path('missao/<int:missao_id>/messages/', views.missao_messages, name='missao_messages'),
     path('postar-missao/<int:sala_id>/', views.postar_missao, name='postar_missao'),
     path('missoes/', views.missoes, name='missoes'),  # Nova view para listar missões do usuário
     path('ranking/', views.ranking, name='ranking'),  # Nova view para o ranking global

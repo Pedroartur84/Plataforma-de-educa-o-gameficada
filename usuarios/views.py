@@ -408,3 +408,37 @@ def chat_missao(request, missao_id):
     }
 
     return render(request, 'usuarios/chat_missao.html', context)
+
+
+@login_required
+def missao_messages(request, missao_id):
+    """API simples para obter mensagens do chat da missão.
+
+    GET: retorna JSON com as últimas mensagens (até 100)
+    """
+    missao = get_object_or_404(Missao, id=missao_id)
+
+    # Verificar se usuário participa da sala da missão
+    participacao = ParticipacaoSala.objects.filter(usuario=request.user, sala=missao.sala).first()
+    if not participacao:
+        return JsonResponse({'error': 'Acesso negado à missão.'}, status=403)
+
+    if request.method == 'GET':
+        msgs = MensagemMissao.objects.filter(missao=missao).order_by('-data_envio')[:100]
+        msgs = reversed(list(msgs))
+        data = [
+            {
+                'id': m.id,
+                'usuario_id': m.usuario.id,
+                'usuario_nome': m.usuario.get_nome_exibicao(),
+                'texto': m.texto,
+                'arquivo': m.arquivo.url if m.arquivo else None,
+                'tipo': m.tipo,
+                'data_envio': m.data_envio.isoformat(),
+            }
+            for m in msgs
+        ]
+        return JsonResponse(data, safe=False)
+
+    else:
+        return JsonResponse({'error': 'Método não permitido.'}, status=405)
