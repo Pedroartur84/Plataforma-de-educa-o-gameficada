@@ -36,11 +36,6 @@
                             <a class="nav-link" href="{% url 'usuarios:login' %}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
                         </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <button id="theme-toggle" class="nav-link" aria-label="Alternar tema" aria-pressed="false">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
                 </ul>
 
                 <form class="d-flex mt-2" role="search" method="GET" action="{% url 'cursos:lista_cursos' %}">
