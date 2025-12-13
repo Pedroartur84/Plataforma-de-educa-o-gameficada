@@ -7,6 +7,20 @@ import string
 
 
 # ==============================
+# MODELOS DISPONÍVEIS NESTE ARQUIVO
+# ==============================
+# - Usuario: Modelo de usuário customizado com tipos (aluno, professor, admin)
+# - Sala: Representa uma sala de aula virtual criada por usuários
+# - ParticipacaoSala: Define a participação de um usuário em uma sala (professor ou aluno)
+# - Missao: Missões criadas pelos professores em uma sala
+# - AnexoMissao: Anexos associados às missões
+# - MensagemMissao: Mensagens no chat específico da missão (comentários, entregas, correções)
+# - correcaoMissao: Registros de correção das missões pelos professores
+# - ChatMessage: Mensagens gerais do chat da sala virtual
+# - CustomUserManager: Manager customizado para criação de usuários
+
+
+# ==============================
 # MANAGER E USUÁRIO CUSTOMIZADO
 # ==============================
 class CustomUserManager(BaseUserManager):
