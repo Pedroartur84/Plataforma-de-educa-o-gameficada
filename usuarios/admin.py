@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from usuarios.models import Usuario
+from usuarios.models import Usuario, Sala, Missao, AnexoMissao, MensagemMissao, correcaoMissao, ChatMessage
 
 # Register your models here.
 
@@ -38,4 +38,12 @@ class UsuarioAdminConfig(UserAdmin):
     
     # registar o modelo com a configuração personalizada
 admin.site.register(Usuario, UsuarioAdminConfig)
+
+# Registrar outros modelos
+admin.site.register(Sala)
+admin.site.register(Missao)
+admin.site.register(AnexoMissao)
+admin.site.register(MensagemMissao)
+admin.site.register(correcaoMissao)
+admin.site.register(ChatMessage)
 

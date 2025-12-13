@@ -142,6 +142,23 @@ class Missao(models.Model):
 
 
 # ==============================
+# ANEXO DA MISSÃO
+# ==============================
+class AnexoMissao(models.Model):
+    missao = models.ForeignKey(Missao, on_delete=models.CASCADE, related_name='anexos')
+    arquivo = models.FileField(upload_to='anexos_missoes/')
+    nome = models.CharField(max_length=255, blank=True, null=True)
+    data_upload = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nome or self.arquivo.name
+
+    class Meta:
+        verbose_name = 'Anexo da Missão'
+        verbose_name_plural = 'Anexos das Missões'
+
+
+# ==============================
 # MENSAGEM NO CHAT DA MISSÃO
 # ==============================
 class MensagemMissao(models.Model):

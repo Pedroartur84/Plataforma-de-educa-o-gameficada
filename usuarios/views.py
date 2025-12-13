@@ -397,6 +397,23 @@ def chat_missao(request, missao_id):
 
             return redirect('usuarios:chat_missao', missao_id=missao_id)
 
+        # 4. Professor anexando arquivo à missão
+        elif 'anexar_arquivo' in request.POST and is_professor_na_sala:
+            arquivo = request.FILES.get('anexo_arquivo')
+            nome = request.POST.get('anexo_nome', '').strip()
+            
+            if arquivo:
+                AnexoMissao.objects.create(
+                    missao=missao,
+                    arquivo=arquivo,
+                    nome=nome if nome else None
+                )
+                messages.success(request, 'Arquivo anexado com sucesso!')
+            else:
+                messages.error(request, 'Selecione um arquivo para anexar.')
+            
+            return redirect('usuarios:chat_missao', missao_id=missao_id)
+
     # === CONTEXT PARA O TEMPLATE ===
     context = {
         'missao': missao,

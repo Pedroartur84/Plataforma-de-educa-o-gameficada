@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from usuarios import views
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'core' #para que os nomes das rotas agrupadas sejam reconhecidas e posam ser usadas
 
@@ -27,3 +29,7 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls', namespace='usuarios')), #incluir as urls de ususarios, prefixo usuarios
     path('cursos/', include('cursos.urls', 'cursos')), #incluir as urls de cursos, prefixo cursos
 ]
+
+# Servir arquivos de mídia durante o desenvolvimento
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

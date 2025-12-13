@@ -185,6 +185,25 @@
                                         <small class="text-muted d-block">
                                             <strong>Criada em:</strong> {{ missao.data_criacao|date:"d/m/Y H:i" }}
                                         </small>
+                                        
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#anexoModal">
+                                                <i class="bi bi-paperclip"></i> Anexar Arquivo
+                                            </button>
+                                        </div>
+                                        
+                                        {% if missao.anexos.all %}
+                                        <div class="mt-3">
+                                            <h6 class="text-muted mb-2"><i class="bi bi-paperclip"></i> Anexos da Missão</h6>
+                                            <div class="d-flex flex-wrap gap-2 flex-column flex-sm-row">
+                                                {% for anexo in missao.anexos.all %}
+                                                <a href="{{ anexo.arquivo.url }}" class="btn btn-sm btn-outline-primary w-100 w-sm-auto" target="_blank">
+                                                    <i class="bi bi-download"></i> {{ anexo.nome|default:anexo.arquivo.name }}
+                                                </a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     {% endif %}
                                 </div>
@@ -284,6 +303,46 @@
                                 {% endwith %}
                                 {% endfor %}
                             </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Modal para Anexar Arquivo -->
+                {% if is_professor_na_sala %}
+                <div class="modal fade" id="anexoModal" tabindex="-1" aria-labelledby="anexoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+                        <div class="modal-content bg-dark text-white border-warning">
+                            <div class="modal-header bg-warning text-dark border-warning">
+                                <h5 class="modal-title fw-bold" id="anexoModalLabel">
+                                    <i class="bi bi-paperclip"></i> Anexar Arquivo à Missão
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="anexoArquivo" class="form-label text-white fw-bold">Arquivo</label>
+                                        <input type="file" class="form-control input-estilo bg-dark text-white" id="anexoArquivo" name="anexo_arquivo" 
+                                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip,.ppt,.pptx,.xls,.xlsx" required>
+                                        <div class="form-text text-muted">Tipos aceitos: PDF, DOC, DOCX, JPG, PNG, ZIP, PPT, PPTX, XLS, XLSX</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="anexoNome" class="form-label text-white fw-bold">Nome do Arquivo (opcional)</label>
+                                        <input type="text" class="form-control input-estilo bg-dark text-white" id="anexoNome" name="anexo_nome" 
+                                               placeholder="Ex: Conteúdo da Aula 1">
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-warning">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </button>
+                                    <button type="submit" name="anexar_arquivo" class="btn btn-success btn-sm">
+                                        <i class="bi bi-upload"></i> Anexar
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
