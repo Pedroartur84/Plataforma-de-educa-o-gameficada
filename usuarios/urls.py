@@ -22,4 +22,6 @@ urlpatterns = [
     path('ranking/', views.ranking, name='ranking'),  # Nova view para o ranking global
     path('configuracoes/', views.configuracoes, name='configuracoes'),  # Nova view para configurações do usuário
     path('painel-adm/', views.painel_adm, name='painel_adm'),  # Nova view para admin
+    path('perfil/', editar_perfil, name='perfil'),  # Editar perfil
+    path('ver-perfil/', ver_perfil, name='ver_perfil'),  # Ver perfil com títulos
 ]

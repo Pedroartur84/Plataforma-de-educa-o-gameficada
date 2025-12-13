@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm
+from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm, PerfilForm
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -459,3 +459,26 @@ def missao_messages(request, missao_id):
 
     else:
         return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
+
+@login_required
+def editar_perfil(request):
+    """Permite ao usuário editar seu perfil (nome e foto)."""
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('usuarios:perfil')
+    else:
+        form = PerfilForm(instance=request.user)
+    return render(request, 'usuarios/perfil.html', {'form': form})
+
+
+@login_required
+def ver_perfil(request):
+    """Exibe o perfil do usuário com títulos globais."""
+    return render(request, 'usuarios/perfil.html', {
+        'usuario': request.user,
+        'titulos_globais': request.user.titulos_globais.all(),
+    })

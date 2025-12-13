@@ -29,6 +29,11 @@
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'usuarios:perfil' %}"><i class="bi bi-person"></i> Meu Perfil</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'usuarios:logout' %}"><i class="bi bi-box-arrow-right"></i> Sair</a>
                         </li>
                     {% else %}

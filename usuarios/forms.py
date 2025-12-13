@@ -146,3 +146,14 @@ class CorrecaoMissaoForm(forms.Form):
         label='pontos atribuidos (0-10)',
         widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'max': 10, 'required': True})
     )
+
+
+class PerfilForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['first_name', 'last_name', 'foto']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'foto': forms.FileInput(attrs={'class': 'form-control'}),
+        }

@@ -4,6 +4,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import random
 import string
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # ==============================
@@ -54,6 +56,8 @@ class Usuario(AbstractUser):
     username = None  # Removido
     email = models.EmailField(unique=True, verbose_name='E-mail')
     pontos_totais = models.IntegerField(default=0, verbose_name="Pontos Totais")
+    foto = models.ImageField(upload_to='perfis/', blank=True, null=True, verbose_name="Foto de Perfil")
+    titulos_globais = models.ManyToManyField('Titulo', blank=True, related_name='usuarios_com_titulo', limit_choices_to={'tipo': 'global'})
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['tipo_usuario']
@@ -69,9 +73,46 @@ class Usuario(AbstractUser):
         nome = self.email.split('@')[0]
         return nome.replace('.', ' ').replace('_', ' ').title()
 
+    def verificar_titulos_globais(self):
+        """Verifica e concede títulos globais baseados nos pontos totais e missões completadas."""
+        titulos_possiveis = Titulo.objects.filter(tipo='global')
+        for titulo in titulos_possiveis:
+            if (self.pontos_totais >= titulo.pontos_necessarios and
+                self.missoes_completadas_globais() >= titulo.missoes_necessarias and
+                titulo not in self.titulos_globais.all()):
+                self.titulos_globais.add(titulo)
+
+    def missoes_completadas_globais(self):
+        """Conta missões completadas em todas as salas."""
+        return correcaoMissao.objects.filter(aluno=self, pontos_atingidos__gt=0).count()
+
     class Meta:
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
+
+
+# ==============================
+# TÍTULO (recompensas automáticas)
+# ==============================
+class Titulo(models.Model):
+    TIPO_CHOICES = [
+        ('global', 'Global'),
+        ('sala', 'Sala'),
+    ]
+
+    nome = models.CharField(max_length=100, verbose_name="Nome do Título")
+    descricao = models.TextField(verbose_name="Descrição")
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='global', verbose_name="Tipo")
+    pontos_necessarios = models.IntegerField(default=0, verbose_name="Pontos Necessários")
+    missoes_necessarias = models.IntegerField(default=0, verbose_name="Missões Completadas Necessárias")
+    icone = models.ImageField(upload_to='titulos/', blank=True, null=True, verbose_name="Ícone do Título")
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Título'
+        verbose_name_plural = 'Títulos'
 
 
 # ==============================
@@ -119,6 +160,7 @@ class ParticipacaoSala(models.Model):
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='participantes')
     tipo_na_sala = models.CharField(max_length=10, choices=TIPO_CHOICES, default='aluno')
     data_entrada = models.DateTimeField(auto_now_add=True)
+    titulos_sala = models.ManyToManyField(Titulo, blank=True, related_name='participacoes_com_titulo', limit_choices_to={'tipo': 'sala'})
 
     class Meta:
         unique_together = ('usuario', 'sala')
@@ -127,6 +169,25 @@ class ParticipacaoSala(models.Model):
 
     def __str__(self):
         return f"{self.usuario.get_nome_exibicao()} → {self.sala} ({self.get_tipo_na_sala_display()})"
+
+    def verificar_titulos_sala(self):
+        """Verifica e concede títulos específicos da sala."""
+        titulos_possiveis = Titulo.objects.filter(tipo='sala')
+        pontos_na_sala = self.calcular_pontos_na_sala()
+        missoes_completadas_sala = self.missoes_completadas_na_sala()
+        for titulo in titulos_possiveis:
+            if (pontos_na_sala >= titulo.pontos_necessarios and
+                missoes_completadas_sala >= titulo.missoes_necessarias and
+                titulo not in self.titulos_sala.all()):
+                self.titulos_sala.add(titulo)
+
+    def calcular_pontos_na_sala(self):
+        """Calcula pontos ganhos nesta sala."""
+        return correcaoMissao.objects.filter(aluno=self.usuario, missao__sala=self.sala).aggregate(models.Sum('pontos_atingidos'))['pontos_atingidos__sum'] or 0
+
+    def missoes_completadas_na_sala(self):
+        """Conta missões completadas nesta sala."""
+        return correcaoMissao.objects.filter(aluno=self.usuario, missao__sala=self.sala, pontos_atingidos__gt=0).count()
 
 
 # ==============================
@@ -229,3 +290,23 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.usuario.get_nome_exibicao()} @ {self.sala.nome}: {self.texto[:30]}"
+
+
+# ==============================
+# SIGNALS PARA CONCESSÃO AUTOMÁTICA DE TÍTULOS
+# ==============================
+@receiver(post_save, sender=correcaoMissao)
+def conceder_titulos_apos_correcao(sender, instance, **kwargs):
+    """Após corrigir uma missão, verifica se o aluno ganhou títulos."""
+    aluno = instance.aluno
+    sala = instance.missao.sala
+
+    # Verificar títulos globais
+    aluno.verificar_titulos_globais()
+
+    # Verificar títulos da sala
+    try:
+        participacao = ParticipacaoSala.objects.get(usuario=aluno, sala=sala)
+        participacao.verificar_titulos_sala()
+    except ParticipacaoSala.DoesNotExist:
+        pass
