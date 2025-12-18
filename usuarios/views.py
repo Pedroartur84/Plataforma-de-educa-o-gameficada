@@ -474,11 +474,8 @@ def missao_messages(request, missao_id):
 
 
 @login_required
-def editar_perfil(request):
-    """
-    View unificada para visualizar e editar perfil.
-    Combina visualização de informações, estatísticas e edição.
-    """
+def perfil(request):
+    """View unificada para exibir e editar perfil."""
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
@@ -490,72 +487,15 @@ def editar_perfil(request):
     else:
         form = PerfilForm(instance=request.user)
     
-    # TÍTULOS GLOBAIS
-    titulos_globais = request.user.titulos_globais.all()
-    
-    # ESTATÍSTICAS GERAIS
-    # Total de missões completadas (com correção)
-    total_missoes = correcaoMissao.objects.filter(
-        aluno=request.user,
-        pontos_atingidos__gt=0
-    ).count()
-    
-    # Total de salas que participa
-    salas_usuario = ParticipacaoSala.objects.filter(
-        usuario=request.user
-    ).select_related('sala')
-    total_salas = salas_usuario.count()
-    
-    # RANKING GLOBAL
-    # Pega todos os usuários ordenados por pontos
-    todos_usuarios = Usuario.objects.all().order_by('-pontos_totais')
-    posicao_ranking = 1
-    for i, usuario in enumerate(todos_usuarios, 1):
-        if usuario.id == request.user.id:
-            posicao_ranking = i
-            break
-    
-    # PRÓXIMO TÍTULO (caso não tenha conquistado todos)
-    proximo_titulo = None
-    progresso_pontos = 0
-    progresso_missoes = 0
-    
-    # Pega todos os títulos globais disponíveis
-    todos_titulos = Titulo.objects.filter(tipo='global').order_by('pontos_necessarios')
-    
-    # Encontra o próximo título que ainda não foi conquistado
-    for titulo in todos_titulos:
-        if titulo not in titulos_globais:
-            proximo_titulo = titulo
-            # Calcula progresso
-            if titulo.pontos_necessarios > 0:
-                progresso_pontos = min(100, int((request.user.pontos_totais / titulo.pontos_necessarios) * 100))
-            if titulo.missoes_necessarias > 0:
-                progresso_missoes = min(100, int((total_missoes / titulo.missoes_necessarias) * 100))
-            break
+    # Verificar e conceder títulos globais automaticamente
+    request.user.verificar_titulos_globais()
     
     context = {
         'form': form,
-        'titulos_globais': titulos_globais,
-        'total_missoes': total_missoes,
-        'total_salas': total_salas,
-        'posicao_ranking': posicao_ranking,
-        'salas_usuario': salas_usuario,
-        'proximo_titulo': proximo_titulo,
-        'progresso_pontos': progresso_pontos,
-        'progresso_missoes': progresso_missoes,
+        'usuario': request.user,
+        'titulos_globais': request.user.titulos_globais.all(),
     }
-    
     return render(request, 'usuarios/perfil.html', context)
-
-
-@login_required
-def ver_perfil(request):
-    """
-    Redireciona para editar_perfil (view unificada)
-    Mantém compatibilidade com URLs antigas
-    """
-    return redirect('usuarios:perfil')
 
 
 @login_required

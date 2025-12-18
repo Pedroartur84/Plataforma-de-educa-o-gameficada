@@ -153,15 +153,40 @@ class PerfilForm(forms.ModelForm):
     Formulário para edição de perfil do usuário.
     Permite alterar nome, sobrenome e foto.
     """
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label='Nome',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Seu primeiro nome'
+        })
+    )
+    
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label='sobrenome',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Seu sobrenome'
+        })
+    )
+    
     
     class Meta:
         model = Usuario
         fields = ['first_name', 'last_name', 'foto']
         labels = {
-            'first_name': 'Nome',
-            'last_name': 'Sobrenome',
+            'foto': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+        }),
+        }
+        labels = {
             'foto': 'Foto de Perfil',
         }
+        
         widgets = {
             'first_name': forms.TextInput(attrs={
                 'class': 'form-control input-estilo bg-dark text-white',
