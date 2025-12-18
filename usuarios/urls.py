@@ -24,4 +24,10 @@ urlpatterns = [
     path('painel-adm/', views.painel_adm, name='painel_adm'),  # Nova view para admin
     path('perfil/', editar_perfil, name='perfil'),  # Editar perfil
     path('ver-perfil/', ver_perfil, name='ver_perfil'),  # Ver perfil com títulos
+    
+        # referente a funcionalidade de titulos
+    path('titulos/', views.listar_titulos, name='listar_titulos'),
+    path('criar-titulo-global/', views.criar_titulo_global, name='criar_titulo_global'),
+    path('criar-titulo-sala/<int:sala_id>/', views.criar_titulo_sala, name='criar_titulo_sala'),
+    path('excluir-titulo/<int:titulo_id>/', views.excluir_titulo, name='excluir_titulo'),
 ]

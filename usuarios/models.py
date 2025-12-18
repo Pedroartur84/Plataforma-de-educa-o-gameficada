@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import random
 import string
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 
@@ -296,17 +296,92 @@ class ChatMessage(models.Model):
 # SIGNALS PARA CONCESSÃO AUTOMÁTICA DE TÍTULOS
 # ==============================
 @receiver(post_save, sender=correcaoMissao)
-def conceder_titulos_apos_correcao(sender, instance, **kwargs):
-    """Após corrigir uma missão, verifica se o aluno ganhou títulos."""
+def conceder_titulos_apos_correcao(sender, instance, created, **kwargs):
+    """
+    Após corrigir uma missão, verifica se o aluno ganhou títulos.
+    Verifica tanto títulos globais quanto títulos da sala.
+    """
+    if not created:
+        return  # Só executar em criação, não em update
+    
     aluno = instance.aluno
     sala = instance.missao.sala
 
-    # Verificar títulos globais
-    aluno.verificar_titulos_globais()
+    # VERIFICAR TÍTULOS GLOBAIS
+    titulos_globais = Titulo.objects.filter(tipo='global')
+    for titulo in titulos_globais:
+        # Verificar se já possui
+        if titulo in aluno.titulos_globais.all():
+            continue
+        
+        # Verificar requisitos
+        missoes_completadas = aluno.missoes_completadas_globais()
+        if aluno.pontos_totais >= titulo.pontos_necessarios and \
+           missoes_completadas >= titulo.missoes_necessarias:
+            aluno.titulos_globais.add(titulo)
+            print(f"✨ {aluno.get_nome_exibicao()} conquistou o título global: {titulo.nome}")
 
-    # Verificar títulos da sala
+    # VERIFICAR TÍTULOS DA SALA
     try:
         participacao = ParticipacaoSala.objects.get(usuario=aluno, sala=sala)
-        participacao.verificar_titulos_sala()
+        titulos_sala = Titulo.objects.filter(tipo='sala')
+        
+        for titulo in titulos_sala:
+            # Verificar se já possui
+            if titulo in participacao.titulos_sala.all():
+                continue
+            
+            # Verificar requisitos
+            pontos_na_sala = participacao.calcular_pontos_na_sala()
+            missoes_na_sala = participacao.missoes_completadas_na_sala()
+            
+            if pontos_na_sala >= titulo.pontos_necessarios and \
+               missoes_na_sala >= titulo.missoes_necessarias:
+                participacao.titulos_sala.add(titulo)
+                print(f"🏆 {aluno.get_nome_exibicao()} conquistou o título da sala '{sala.nome}': {titulo.nome}")
+    
     except ParticipacaoSala.DoesNotExist:
         pass
+
+
+@receiver(post_save, sender=Titulo)
+def verificar_titulos_retroativos(sender, instance, created, **kwargs):
+    """
+    Quando um novo título é criado, verifica se algum usuário 
+    já atende os requisitos e concede o título automaticamente.
+    """
+    if not created:
+        return
+    
+    if instance.tipo == 'global':
+        # Verificar todos os usuários
+        usuarios = Usuario.objects.all()
+        novos_titulos = 0
+        
+        for usuario in usuarios:
+            missoes_completadas = usuario.missoes_completadas_globais()
+            
+            if usuario.pontos_totais >= instance.pontos_necessarios and \
+               missoes_completadas >= instance.missoes_necessarias:
+                usuario.titulos_globais.add(instance)
+                novos_titulos += 1
+        
+        if novos_titulos > 0:
+            print(f"📢 {novos_titulos} usuário(s) conquistaram o título '{instance.nome}' retroativamente!")
+    
+    else:  # titulo de sala
+        # Verificar todas as participações em salas
+        participacoes = ParticipacaoSala.objects.filter(tipo_na_sala='aluno')
+        novos_titulos = 0
+        
+        for participacao in participacoes:
+            pontos_na_sala = participacao.calcular_pontos_na_sala()
+            missoes_na_sala = participacao.missoes_completadas_na_sala()
+            
+            if pontos_na_sala >= instance.pontos_necessarios and \
+               missoes_na_sala >= instance.missoes_necessarias:
+                participacao.titulos_sala.add(instance)
+                novos_titulos += 1
+        
+        if novos_titulos > 0:
+            print(f"📢 {novos_titulos} aluno(s) conquistaram o título de sala '{instance.nome}' retroativamente!")

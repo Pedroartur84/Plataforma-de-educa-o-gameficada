@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm, PerfilForm
 from .models import *
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count, Sum
 from django.http import JsonResponse, HttpResponseBadRequest
 import json
 
@@ -136,7 +136,15 @@ def painel_adm(request):
     if not request.user.is_superuser:
         messages.error(request, "Você não tem permissão para acessar o Painel ADM.")
         return redirect('usuarios:pag_principal')
-    return render(request, 'usuarios/painel_adm.html')
+    
+    # Buscar todos os títulos globais
+    titulos_globais = Titulo.objects.filter(tipo='global').order_by('pontos_necessarios')
+    
+    context = {
+        'titulos_globais': titulos_globais,
+    }
+    
+    return render(request, 'usuarios/painel_adm.html', context)
 
 @login_required
 def sala_virtual(request, sala_id):
@@ -161,7 +169,6 @@ def sala_virtual(request, sala_id):
         missoes_entregues = 0
 
         for missao in missoes_da_sala:
-            # verifiacar se o aluno foi corrigido na missão
             correcao = correcaoMissao.objects.filter(missao=missao, aluno=aluno).first()
             if correcao:
                 pontos_na_sala += correcao.pontos_atingidos or 0
@@ -179,6 +186,9 @@ def sala_virtual(request, sala_id):
     for i, item in enumerate(ranking_sala, 1):
         item['posicao'] = i
 
+    # TÍTULOS DA SALA
+    titulos_sala = Titulo.objects.filter(tipo='sala')
+
     # Verificar se usuário é professor nesta sala
     is_professor_na_sala = participacao.tipo_na_sala == 'professor'
 
@@ -188,6 +198,7 @@ def sala_virtual(request, sala_id):
         'ranking_sala': ranking_sala,
         'is_professor_na_sala': is_professor_na_sala,
         'minha_participacao': participacao,
+        'titulos_sala': titulos_sala,
     }
     return render(request, 'usuarios/sala_virtual.html', context)
 
@@ -461,24 +472,346 @@ def missao_messages(request, missao_id):
         return JsonResponse({'error': 'Método não permitido.'}, status=405)
 
 
+
 @login_required
 def editar_perfil(request):
-    """Permite ao usuário editar seu perfil (nome e foto)."""
+    """
+    View unificada para visualizar e editar perfil.
+    Combina visualização de informações, estatísticas e edição.
+    """
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
             return redirect('usuarios:perfil')
+        else:
+            messages.error(request, 'Erro ao atualizar perfil. Verifique os dados.')
     else:
         form = PerfilForm(instance=request.user)
-    return render(request, 'usuarios/perfil.html', {'form': form})
+    
+    # TÍTULOS GLOBAIS
+    titulos_globais = request.user.titulos_globais.all()
+    
+    # ESTATÍSTICAS GERAIS
+    # Total de missões completadas (com correção)
+    total_missoes = correcaoMissao.objects.filter(
+        aluno=request.user,
+        pontos_atingidos__gt=0
+    ).count()
+    
+    # Total de salas que participa
+    salas_usuario = ParticipacaoSala.objects.filter(
+        usuario=request.user
+    ).select_related('sala')
+    total_salas = salas_usuario.count()
+    
+    # RANKING GLOBAL
+    # Pega todos os usuários ordenados por pontos
+    todos_usuarios = Usuario.objects.all().order_by('-pontos_totais')
+    posicao_ranking = 1
+    for i, usuario in enumerate(todos_usuarios, 1):
+        if usuario.id == request.user.id:
+            posicao_ranking = i
+            break
+    
+    # PRÓXIMO TÍTULO (caso não tenha conquistado todos)
+    proximo_titulo = None
+    progresso_pontos = 0
+    progresso_missoes = 0
+    
+    # Pega todos os títulos globais disponíveis
+    todos_titulos = Titulo.objects.filter(tipo='global').order_by('pontos_necessarios')
+    
+    # Encontra o próximo título que ainda não foi conquistado
+    for titulo in todos_titulos:
+        if titulo not in titulos_globais:
+            proximo_titulo = titulo
+            # Calcula progresso
+            if titulo.pontos_necessarios > 0:
+                progresso_pontos = min(100, int((request.user.pontos_totais / titulo.pontos_necessarios) * 100))
+            if titulo.missoes_necessarias > 0:
+                progresso_missoes = min(100, int((total_missoes / titulo.missoes_necessarias) * 100))
+            break
+    
+    context = {
+        'form': form,
+        'titulos_globais': titulos_globais,
+        'total_missoes': total_missoes,
+        'total_salas': total_salas,
+        'posicao_ranking': posicao_ranking,
+        'salas_usuario': salas_usuario,
+        'proximo_titulo': proximo_titulo,
+        'progresso_pontos': progresso_pontos,
+        'progresso_missoes': progresso_missoes,
+    }
+    
+    return render(request, 'usuarios/perfil.html', context)
 
 
 @login_required
 def ver_perfil(request):
-    """Exibe o perfil do usuário com títulos globais."""
-    return render(request, 'usuarios/perfil.html', {
-        'usuario': request.user,
-        'titulos_globais': request.user.titulos_globais.all(),
-    })
+    """
+    Redireciona para editar_perfil (view unificada)
+    Mantém compatibilidade com URLs antigas
+    """
+    return redirect('usuarios:perfil')
+
+
+@login_required
+def listar_titulos(request):
+    """
+    Lista todos os títulos disponíveis (globais e de salas).
+    Mostra quais o usuário já conquistou e o progresso dos restantes.
+    """
+    # TÍTULOS GLOBAIS
+    titulos_globais = Titulo.objects.filter(tipo='global').order_by('pontos_necessarios')
+    
+    titulos_globais_info = []
+    for titulo in titulos_globais:
+        conquistado = titulo in request.user.titulos_globais.all()
+        
+        # Calcular progresso
+        progresso_pontos = 0
+        progresso_missoes = 0
+        
+        if not conquistado:
+            if titulo.pontos_necessarios > 0:
+                progresso_pontos = min(100, int((request.user.pontos_totais / titulo.pontos_necessarios) * 100))
+            
+            missoes_completadas = request.user.missoes_completadas_globais()
+            if titulo.missoes_necessarias > 0:
+                progresso_missoes = min(100, int((missoes_completadas / titulo.missoes_necessarias) * 100))
+        
+        titulos_globais_info.append({
+            'titulo': titulo,
+            'conquistado': conquistado,
+            'progresso_pontos': progresso_pontos,
+            'progresso_missoes': progresso_missoes,
+            'missoes_completadas': request.user.missoes_completadas_globais(),
+        })
+    
+    # TÍTULOS DE SALAS
+    participacoes = ParticipacaoSala.objects.filter(usuario=request.user).select_related('sala')
+    
+    titulos_salas_info = []
+    for participacao in participacoes:
+        titulos_sala = Titulo.objects.filter(tipo='sala')
+        
+        for titulo in titulos_sala:
+            conquistado = titulo in participacao.titulos_sala.all()
+            pontos_na_sala = participacao.calcular_pontos_na_sala()
+            missoes_na_sala = participacao.missoes_completadas_na_sala()
+            
+            progresso_pontos = 0
+            progresso_missoes = 0
+            
+            if not conquistado:
+                if titulo.pontos_necessarios > 0:
+                    progresso_pontos = min(100, int((pontos_na_sala / titulo.pontos_necessarios) * 100))
+                if titulo.missoes_necessarias > 0:
+                    progresso_missoes = min(100, int((missoes_na_sala / titulo.missoes_necessarias) * 100))
+            
+            titulos_salas_info.append({
+                'titulo': titulo,
+                'sala': participacao.sala,
+                'conquistado': conquistado,
+                'progresso_pontos': progresso_pontos,
+                'progresso_missoes': progresso_missoes,
+                'pontos_na_sala': pontos_na_sala,
+                'missoes_na_sala': missoes_na_sala,
+            })
+    
+    context = {
+        'titulos_globais_info': titulos_globais_info,
+        'titulos_salas_info': titulos_salas_info,
+    }
+    
+    return render(request, 'usuarios/titulos.html', context)
+
+
+@login_required
+def criar_titulo_sala(request, sala_id):
+    """
+    Permite que professores criem títulos específicos para suas salas.
+    Apenas professores da sala podem criar títulos.
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+    
+    # Verificar se usuário é professor nesta sala
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user, 
+        sala=sala, 
+        tipo_na_sala='professor'
+    ).first()
+    
+    if not participacao:
+        messages.error(request, 'Apenas professores desta sala podem criar títulos.')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    if request.method == 'POST':
+        nome = request.POST.get('nome', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        pontos_necessarios = request.POST.get('pontos_necessarios', 0)
+        missoes_necessarias = request.POST.get('missoes_necessarias', 0)
+        icone = request.FILES.get('icone')
+        
+        # Validações
+        if not nome or not descricao:
+            messages.error(request, 'Nome e descrição são obrigatórios.')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
+        
+        try:
+            pontos_necessarios = int(pontos_necessarios)
+            missoes_necessarias = int(missoes_necessarias)
+            
+            if pontos_necessarios < 0 or missoes_necessarias < 0:
+                raise ValueError("Valores não podem ser negativos")
+            
+            if pontos_necessarios == 0 and missoes_necessarias == 0:
+                messages.error(request, 'O título deve ter pelo menos um requisito (pontos ou missões).')
+                return redirect('usuarios:sala_virtual', sala_id=sala_id)
+                
+        except ValueError:
+            messages.error(request, 'Valores de pontos e missões devem ser números válidos.')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
+        
+        # Criar título
+        titulo = Titulo.objects.create(
+            nome=nome,
+            descricao=descricao,
+            tipo='sala',
+            pontos_necessarios=pontos_necessarios,
+            missoes_necessarias=missoes_necessarias,
+            icone=icone
+        )
+        
+        messages.success(request, f'Título "{titulo.nome}" criado com sucesso!')
+        
+        # Verificar se algum aluno já merece este título
+        alunos_sala = ParticipacaoSala.objects.filter(sala=sala, tipo_na_sala='aluno')
+        novos_titulos = 0
+        
+        for part in alunos_sala:
+            pontos = part.calcular_pontos_na_sala()
+            missoes = part.missoes_completadas_na_sala()
+            
+            if pontos >= titulo.pontos_necessarios and missoes >= titulo.missoes_necessarias:
+                part.titulos_sala.add(titulo)
+                novos_titulos += 1
+        
+        if novos_titulos > 0:
+            messages.info(request, f'{novos_titulos} aluno(s) conquistaram este título automaticamente!')
+        
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    return redirect('usuarios:sala_virtual', sala_id=sala_id)
+
+
+@login_required
+def criar_titulo_global(request):
+    """
+    Permite que admins criem títulos globais.
+    Apenas superusuários podem criar títulos globais.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'Apenas administradores podem criar títulos globais.')
+        return redirect('usuarios:pag_principal')
+    
+    if request.method == 'POST':
+        nome = request.POST.get('nome', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        pontos_necessarios = request.POST.get('pontos_necessarios', 0)
+        missoes_necessarias = request.POST.get('missoes_necessarias', 0)
+        icone = request.FILES.get('icone')
+        
+        # Validações
+        if not nome or not descricao:
+            messages.error(request, 'Nome e descrição são obrigatórios.')
+            return redirect('usuarios:painel_adm')
+        
+        try:
+            pontos_necessarios = int(pontos_necessarios)
+            missoes_necessarias = int(missoes_necessarias)
+            
+            if pontos_necessarios < 0 or missoes_necessarias < 0:
+                raise ValueError("Valores não podem ser negativos")
+            
+            if pontos_necessarios == 0 and missoes_necessarias == 0:
+                messages.error(request, 'O título deve ter pelo menos um requisito.')
+                return redirect('usuarios:painel_adm')
+                
+        except ValueError:
+            messages.error(request, 'Valores de pontos e missões devem ser números válidos.')
+            return redirect('usuarios:painel_adm')
+        
+        # Criar título
+        titulo = Titulo.objects.create(
+            nome=nome,
+            descricao=descricao,
+            tipo='global',
+            pontos_necessarios=pontos_necessarios,
+            missoes_necessarias=missoes_necessarias,
+            icone=icone
+        )
+        
+        messages.success(request, f'Título global "{titulo.nome}" criado com sucesso!')
+        
+        # Verificar todos os usuários
+        usuarios = Usuario.objects.all()
+        novos_titulos = 0
+        
+        for usuario in usuarios:
+            if usuario.pontos_totais >= titulo.pontos_necessarios and \
+               usuario.missoes_completadas_globais() >= titulo.missoes_necessarias:
+                usuario.titulos_globais.add(titulo)
+                novos_titulos += 1
+        
+        if novos_titulos > 0:
+            messages.info(request, f'{novos_titulos} usuário(s) conquistaram este título!')
+        
+        return redirect('usuarios:painel_adm')
+    
+    return redirect('usuarios:painel_adm')
+
+
+@login_required
+def excluir_titulo(request, titulo_id):
+    """
+    Permite excluir um título.
+    - Admins podem excluir títulos globais
+    - Professores podem excluir títulos de suas salas
+    """
+    titulo = get_object_or_404(Titulo, id=titulo_id)
+    
+    # Verificar permissões
+    pode_excluir = False
+    redirect_url = 'usuarios:pag_principal'
+    
+    if titulo.tipo == 'global':
+        if request.user.is_superuser:
+            pode_excluir = True
+            redirect_url = 'usuarios:painel_adm'
+    else:  # titulo de sala
+        # Verificar se é professor em alguma sala que usa este título
+        # (na prática, títulos de sala não são vinculados a salas específicas no modelo atual,
+        # então qualquer professor pode criar/excluir - você pode querer ajustar isso)
+        participacoes_prof = ParticipacaoSala.objects.filter(
+            usuario=request.user,
+            tipo_na_sala='professor'
+        )
+        if participacoes_prof.exists():
+            pode_excluir = True
+            # Pegar primeira sala do professor
+            redirect_url = f"usuarios:sala_virtual", participacoes_prof.first().sala.id
+    
+    if not pode_excluir:
+        messages.error(request, 'Você não tem permissão para excluir este título.')
+        return redirect('usuarios:pag_principal')
+    
+    if request.method == 'POST':
+        nome_titulo = titulo.nome
+        titulo.delete()
+        messages.success(request, f'Título "{nome_titulo}" excluído com sucesso.')
+    
+    return redirect(redirect_url)

@@ -4,8 +4,202 @@
 {% block title %}Painel ADM - Player{% endblock %}
 
 {% block content %}
-<main class="content container" style="margin-top: calc(var(--space-lg) + 4rem);">
-    <h2 class="text-accent">Painel Administrativo</h2>
-    <p>Bem-vindo ao painel ADM. Gerencie usuários e salas aqui em breve!</p>
-</main>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-warning mb-0"><i class="bi bi-gear"></i> Painel Administrativo</h1>
+        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- ABAS -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos" type="button">
+                <i class="bi bi-trophy"></i> Títulos Globais
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button">
+                <i class="bi bi-people"></i> Usuários
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button">
+                <i class="bi bi-graph-up"></i> Estatísticas
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- TÍTULOS GLOBAIS -->
+        <div class="tab-pane fade show active" id="titulos" role="tabpanel">
+            <div class="card card-no-scale mb-4">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-trophy"></i> Gerenciar Títulos Globais</h5>
+                    <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#criarTituloModal">
+                        <i class="bi bi-plus-circle"></i> Criar Título
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if titulos_globais %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Descrição</th>
+                                        <th class="text-center">Pontos</th>
+                                        <th class="text-center">Missões</th>
+                                        <th class="text-center">Conquistado por</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for titulo in titulos_globais %}
+                                    <tr>
+                                        <td>
+                                            {% if titulo.icone %}
+                                                <img src="{{ titulo.icone.url }}" alt="{{ titulo.nome }}" style="width: 30px; height: 30px; object-fit: contain;" class="me-2">
+                                            {% else %}
+                                                <i class="bi bi-trophy text-warning me-2"></i>
+                                            {% endif %}
+                                            <strong>{{ titulo.nome }}</strong>
+                                        </td>
+                                        <td class="small">{{ titulo.descricao|truncatewords:15 }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark">{{ titulo.pontos_necessarios }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary">{{ titulo.missoes_necessarias }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success">{{ titulo.usuarios_com_titulo.count }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <form method="post" action="{% url 'usuarios:excluir_titulo' titulo.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('Tem certeza que deseja excluir este título?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-trophy fs-1 d-block mb-3 opacity-50"></i>
+                            <h5>Nenhum título global criado</h5>
+                            <p>Crie o primeiro título para motivar os estudantes!</p>
+                            <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#criarTituloModal">
+                                <i class="bi bi-plus-circle"></i> Criar Primeiro Título
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- USUÁRIOS -->
+        <div class="tab-pane fade" id="usuarios" role="tabpanel">
+            <div class="card card-no-scale">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Estatísticas de Usuários</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Em desenvolvimento...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTATÍSTICAS -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="card card-no-scale">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Estatísticas Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Em desenvolvimento...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CRIAR TÍTULO GLOBAL -->
+<div class="modal fade" id="criarTituloModal" tabindex="-1" aria-labelledby="criarTituloModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="criarTituloModalLabel">
+                    <i class="bi bi-trophy"></i> Criar Título Global
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'usuarios:criar_titulo_global' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label text-white fw-bold">Nome do Título</label>
+                        <input type="text" class="form-control input-estilo bg-dark text-white" 
+                               id="nome" name="nome" required maxlength="100"
+                               placeholder="Ex: Mestre do Conhecimento">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label text-white fw-bold">Descrição</label>
+                        <textarea class="form-control input-estilo bg-dark text-white" 
+                                  id="descricao" name="descricao" rows="3" required
+                                  placeholder="Descreva o que o usuário precisa fazer..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="pontos_necessarios" class="form-label text-white fw-bold">Pontos Necessários</label>
+                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                       id="pontos_necessarios" name="pontos_necessarios" 
+                                       min="0" value="100">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="missoes_necessarias" class="form-label text-white fw-bold">Missões Necessárias</label>
+                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                       id="missoes_necessarias" name="missoes_necessarias" 
+                                       min="0" value="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="icone" class="form-label text-white fw-bold">Ícone (Opcional)</label>
+                        <input type="file" class="form-control input-estilo bg-dark text-white" 
+                               id="icone" name="icone" accept="image/*">
+                        <div class="form-text text-white-50 small">
+                            Recomendado: PNG transparente 256x256px
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info bg-info bg-opacity-10 border-info">
+                        <small>
+                            <i class="bi bi-info-circle"></i> 
+                            O título será concedido automaticamente aos usuários que atenderem os requisitos.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer border-warning">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm">
+                        <i class="bi bi-check-circle"></i> Criar Título
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

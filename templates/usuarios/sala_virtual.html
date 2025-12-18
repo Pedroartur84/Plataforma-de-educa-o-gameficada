@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load titulo_tags %}
 {% load static %}
 
 {% block title %}Sala Virtual - {{ sala.nome }}{% endblock %}
@@ -60,6 +61,11 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="ranking-tab" data-bs-toggle="tab" data-bs-target="#ranking" type="button">
                 <i class="bi bi-trophy"></i> Ranking
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos" type="button">
+                <i class="bi bi-award"></i> Títulos
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -176,7 +182,7 @@
                                     {% endif %}
                                 </div>
 
-                                <!-- Informações do aluno (flex-grow para ocupar espaço) -->
+                                <!-- Informações do aluno -->
                                 <div class="flex-grow-1 min-w-0 text-center text-sm-start">
                                     <h6 class="mb-1 fw-bold text-white text-truncate">
                                         {{ item.aluno.get_nome_exibicao }}
@@ -189,7 +195,7 @@
                                     </small>
                                 </div>
 
-                                <!-- Pontos (sempre visível) -->
+                                <!-- Pontos -->
                                 <div class="text-center text-sm-end flex-shrink-0">
                                     <div class="text-warning fw-bold" style="font-size: 1.25rem;">{{ item.pontos_sala }}</div>
                                     <small class="text-white-50 d-block">pts</small>
@@ -204,6 +210,85 @@
                         <h5 class="mt-3 fw-bold">O ranking está vazio!</h5>
                         <p class="mb-0">Complete missões para aparecer no ranking.</p>
                     </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- TÍTULOS -->
+        <div class="tab-pane fade" id="titulos" role="tabpanel">
+            <div class="card card-no-scale">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0"><i class="bi bi-award"></i> Títulos da Sala</h5>
+                    {% if is_professor_na_sala %}
+                    <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#criarTituloSalaModal">
+                        <i class="bi bi-plus-circle"></i> Criar Título
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if titulos_sala %}
+                        <div class="row g-3">
+                            {% for titulo in titulos_sala %}
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card border-secondary h-100">
+                                    <div class="card-body text-center">
+                                        {% if titulo.icone %}
+                                            <img src="{{ titulo.icone.url }}" alt="{{ titulo.nome }}" 
+                                                 style="width: 60px; height: 60px; object-fit: contain;" class="mb-3">
+                                        {% else %}
+                                            <i class="bi bi-award-fill text-warning mb-3" style="font-size: 3rem;"></i>
+                                        {% endif %}
+                                        
+                                        <h6 class="card-title">{{ titulo.nome }}</h6>
+                                        <p class="card-text small text-muted">{{ titulo.descricao }}</p>
+                                        
+                                        <hr>
+                                        
+                                        <div class="d-flex justify-content-center gap-3 small">
+                                            <div>
+                                                <i class="bi bi-star text-warning"></i>
+                                                <strong>{{ titulo.pontos_necessarios }}</strong> pts
+                                            </div>
+                                            <div>
+                                                <i class="bi bi-check2-circle text-primary"></i>
+                                                <strong>{{ titulo.missoes_necessarias }}</strong> missões
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                Conquistado por <strong>{{ titulo|conquistas_na_sala:sala }}</strong> aluno(s)
+                                            </small>
+                                        </div>
+
+                                        {% if is_professor_na_sala %}
+                                        <form method="post" action="{% url 'usuarios:excluir_titulo' titulo.id %}" class="mt-3">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100" 
+                                                    onclick="return confirm('Tem certeza que deseja excluir este título?')">
+                                                <i class="bi bi-trash"></i> Excluir
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-award fs-1 d-block mb-3 opacity-50"></i>
+                            <h5>Nenhum título criado para esta sala</h5>
+                            {% if is_professor_na_sala %}
+                                <p>Crie títulos para motivar seus alunos!</p>
+                                <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#criarTituloSalaModal">
+                                    <i class="bi bi-plus-circle"></i> Criar Primeiro Título
+                                </button>
+                            {% else %}
+                                <p>Aguarde o professor criar títulos para esta sala.</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -273,6 +358,85 @@
                     <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
                         <i class="fas fa-paper-plane"></i> Postar Missão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CRIAR TÍTULO DA SALA -->
+<div class="modal fade" id="criarTituloSalaModal" tabindex="-1" aria-labelledby="criarTituloSalaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="criarTituloSalaModalLabel">
+                    <i class="bi bi-award"></i> Criar Título da Sala
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'usuarios:criar_titulo_sala' sala.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info bg-info bg-opacity-10 border-info mb-3">
+                        <small>
+                            <i class="bi bi-info-circle"></i> 
+                            Este título será específico para <strong>{{ sala.nome }}</strong>
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nome_sala" class="form-label text-white fw-bold">Nome do Título</label>
+                        <input type="text" class="form-control input-estilo bg-dark text-white" 
+                               id="nome_sala" name="nome" required maxlength="100"
+                               placeholder="Ex: Aluno Destaque">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descricao_sala" class="form-label text-white fw-bold">Descrição</label>
+                        <textarea class="form-control input-estilo bg-dark text-white" 
+                                  id="descricao_sala" name="descricao" rows="3" required
+                                  placeholder="Descreva o que o aluno precisa fazer..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="pontos_sala" class="form-label text-white fw-bold">Pontos na Sala</label>
+                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                       id="pontos_sala" name="pontos_necessarios" 
+                                       min="0" value="50">
+                                <div class="form-text text-white-50 small">
+                                    Pontos nesta sala
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="missoes_sala" class="form-label text-white fw-bold">Missões na Sala</label>
+                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                       id="missoes_sala" name="missoes_necessarias" 
+                                       min="0" value="3">
+                                <div class="form-text text-white-50 small">
+                                    Missões nesta sala
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="icone_sala" class="form-label text-white fw-bold">Ícone (Opcional)</label>
+                        <input type="file" class="form-control input-estilo bg-dark text-white" 
+                               id="icone_sala" name="icone" accept="image/*">
+                        <div class="form-text text-white-50 small">
+                            Recomendado: PNG transparente 256x256px
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-warning">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm">
+                        <i class="bi bi-check-circle"></i> Criar Título
                     </button>
                 </div>
             </form>

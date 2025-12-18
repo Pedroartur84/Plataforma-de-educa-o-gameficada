@@ -149,11 +149,65 @@ class CorrecaoMissaoForm(forms.Form):
 
 
 class PerfilForm(forms.ModelForm):
+    """
+    Formulário para edição de perfil do usuário.
+    Permite alterar nome, sobrenome e foto.
+    """
+    
     class Meta:
         model = Usuario
         fields = ['first_name', 'last_name', 'foto']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'foto': forms.FileInput(attrs={'class': 'form-control'}),
+        labels = {
+            'first_name': 'Nome',
+            'last_name': 'Sobrenome',
+            'foto': 'Foto de Perfil',
         }
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control input-estilo bg-dark text-white',
+                'placeholder': 'Seu nome',
+                'maxlength': 150,
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control input-estilo bg-dark text-white',
+                'placeholder': 'Seu sobrenome',
+                'maxlength': 150,
+            }),
+            'foto': forms.FileInput(attrs={
+                'class': 'form-control input-estilo bg-dark text-white',
+                'accept': 'image/jpeg,image/png,image/jpg',
+            }),
+        }
+    
+    def clean_foto(self):
+        """
+        Valida o arquivo de foto enviado.
+        Limita tamanho e formatos aceitos.
+        """
+        foto = self.cleaned_data.get('foto')
+        
+        if foto:
+            # Verifica tamanho (5MB máximo)
+            if foto.size > 5 * 1024 * 1024:  # 5MB em bytes
+                raise forms.ValidationError(
+                    'A foto deve ter no máximo 5MB.'
+                )
+            
+            # Verifica tipo de arquivo
+            valid_types = ['image/jpeg', 'image/jpg', 'image/png']
+            if foto.content_type not in valid_types:
+                raise forms.ValidationError(
+                    'Formato inválido. Use JPG ou PNG.'
+                )
+        
+        return foto
+    
+    def clean_first_name(self):
+        """Remove espaços extras do nome"""
+        first_name = self.cleaned_data.get('first_name', '')
+        return first_name.strip()
+    
+    def clean_last_name(self):
+        """Remove espaços extras do sobrenome"""
+        last_name = self.cleaned_data.get('last_name', '')
+        return last_name.strip()
