@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ conteudo.titulo }} - Player{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <!-- Breadcrumb e Navegação -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cursos:lista_trilhas' %}" class="text-warning">
+                    <i class="bi bi-map"></i> Trilhas
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="text-warning">
+                    {{ trilha.nome }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active">{{ conteudo.titulo }}</li>
+        </ol>
+    </nav>
+
+    <!-- Barra de Progresso no Módulo -->
+    <div class="card card-no-scale mb-4 border-warning">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">
+                    <i class="bi bi-book"></i> {{ modulo.titulo }}
+                </h6>
+                <span class="badge bg-warning text-dark">
+                    {{ posicao_atual }} / {{ total_conteudos }}
+                </span>
+            </div>
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-warning" 
+                     style="width: {{ posicao_atual|floatformat:0 }}00 / {{ total_conteudos }}%;"
+                     role="progressbar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Principal do Conteúdo -->
+    <div class="card card-no-scale mb-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                {% if conteudo.tipo == 'video' %}
+                    <i class="bi bi-play-circle-fill"></i>
+                {% elif conteudo.tipo == 'arquivo' %}
+                    <i class="bi bi-file-earmark"></i>
+                {% elif conteudo.tipo == 'link' %}
+                    <i class="bi bi-link-45deg"></i>
+                {% else %}
+                    <i class="bi bi-file-text"></i>
+                {% endif %}
+                {{ conteudo.titulo }}
+            </h4>
+            
+            {% if visualizacao.completo %}
+                <span class="badge bg-success">
+                    <i class="bi bi-check-circle-fill"></i> Completo
+                </span>
+            {% else %}
+                <span class="badge bg-secondary">
+                    <i class="bi bi-circle"></i> Em Progresso
+                </span>
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            
+            <!-- TIPO: TEXTO -->
+            {% if conteudo.tipo == 'texto' %}
+                <div class="conteudo-texto">
+                    {{ conteudo.conteudo|linebreaks }}
+                </div>
+            {% endif %}
+
+            <!-- TIPO: VÍDEO -->
+            {% if conteudo.tipo == 'video' %}
+                <div class="ratio ratio-16x9 mb-3">
+                    {% if 'youtube.com' in conteudo.link or 'youtu.be' in conteudo.link %}
+                        <!-- Embed YouTube -->
+                        {% if 'watch?v=' in conteudo.link %}
+                            {% with video_id=conteudo.link|slice:"-11:" %}
+                                <iframe src="https://www.youtube.com/embed/{{ video_id }}" 
+                                        allowfullscreen></iframe>
+                            {% endwith %}
+                        {% elif 'youtu.be/' in conteudo.link %}
+                            {% with video_id=conteudo.link|slice:"-11:" %}
+                                <iframe src="https://www.youtube.com/embed/{{ video_id }}" 
+                                        allowfullscreen></iframe>
+                            {% endwith %}
+                        {% else %}
+                            <iframe src="{{ conteudo.link }}" allowfullscreen></iframe>
+                        {% endif %}
+                    {% elif conteudo.arquivo %}
+                        <!-- Vídeo local -->
+                        <video controls class="w-100">
+                            <source src="{{ conteudo.arquivo.url }}" type="video/mp4">
+                            Seu navegador não suporta vídeo HTML5.
+                        </video>
+                    {% else %}
+                        <!-- Link genérico -->
+                        <iframe src="{{ conteudo.link }}" allowfullscreen></iframe>
+                    {% endif %}
+                </div>
+                
+                {% if conteudo.conteudo %}
+                    <div class="mt-4 conteudo-texto">
+                        <h6 class="text-warning">Descrição:</h6>
+                        {{ conteudo.conteudo|linebreaks }}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- TIPO: ARQUIVO -->
+            {% if conteudo.tipo == 'arquivo' %}
+                <div class="text-center py-4">
+                    <i class="bi bi-file-earmark-pdf display-1 text-warning"></i>
+                    <h5 class="mt-3">{{ conteudo.titulo }}</h5>
+                    
+                    {% if conteudo.arquivo %}
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <a href="{{ conteudo.arquivo.url }}" 
+                               target="_blank" 
+                               class="btn btn-warning text-dark">
+                                <i class="bi bi-eye"></i> Visualizar
+                            </a>
+                            <a href="{{ conteudo.arquivo.url }}" 
+                               download 
+                               class="btn btn-outline-warning">
+                                <i class="bi bi-download"></i> Baixar
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    {% if conteudo.conteudo %}
+                        <div class="mt-4 conteudo-texto text-start">
+                            <h6 class="text-warning">Sobre o arquivo:</h6>
+                            {{ conteudo.conteudo|linebreaks }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- TIPO: LINK -->
+            {% if conteudo.tipo == 'link' %}
+                <div class="text-center py-4">
+                    <i class="bi bi-link-45deg display-1 text-warning"></i>
+                    <h5 class="mt-3">Link Externo</h5>
+                    
+                    {% if conteudo.conteudo %}
+                        <p class="text-muted">{{ conteudo.conteudo }}</p>
+                    {% endif %}
+                    
+                    <a href="{{ conteudo.link }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-warning text-dark mt-3">
+                        <i class="bi bi-box-arrow-up-right"></i> Abrir Link
+                    </a>
+                    
+                    <p class="text-muted small mt-3">
+                        <i class="bi bi-info-circle"></i> O link abrirá em uma nova aba
+                    </p>
+                </div>
+            {% endif %}
+
+            <!-- Duração Estimada -->
+            {% if conteudo.duracao_estimada > 0 %}
+                <div class="alert alert-info bg-info bg-opacity-10 border-info mt-4">
+                    <i class="bi bi-clock"></i> 
+                    <strong>Tempo estimado:</strong> {{ conteudo.duracao_estimada }} minutos
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="d-flex gap-2 justify-content-between flex-wrap mb-4">
+        <!-- Navegação -->
+        <div class="d-flex gap-2">
+            {% if anterior %}
+                <a href="{% url 'cursos:visualizar_conteudo' anterior.id %}" 
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Anterior
+                </a>
+            {% else %}
+                <button class="btn btn-outline-secondary" disabled>
+                    <i class="bi bi-arrow-left"></i> Anterior
+                </button>
+            {% endif %}
+
+            {% if proximo %}
+                <a href="{% url 'cursos:visualizar_conteudo' proximo.id %}" 
+                   class="btn btn-outline-secondary">
+                    Próximo <i class="bi bi-arrow-right"></i>
+                </a>
+            {% else %}
+                <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" 
+                   class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Finalizar Módulo
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Marcar Completo -->
+        <div>
+            {% if not visualizacao.completo %}
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="marcar_completo" 
+                            class="btn btn-warning text-dark">
+                        <i class="bi bi-check-circle"></i> Marcar como Completo
+                    </button>
+                </form>
+            {% else %}
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="marcar_incompleto" 
+                            class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-clockwise"></i> Refazer
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Lista de Outros Conteúdos do Módulo -->
+    <div class="card card-no-scale">
+        <div class="card-header bg-dark text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-list-ul"></i> Conteúdos do Módulo: {{ modulo.titulo }}
+            </h6>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for item in conteudos_modulo %}
+                <a href="{% url 'cursos:visualizar_conteudo' item.id %}" 
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                          {% if item.id == conteudo.id %}active{% endif %}
+                          {% if item.esta_completo_para user %}list-group-item-success{% endif %}">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if item.esta_completo_para user %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% elif item.foi_visualizado_por user %}
+                            <i class="bi bi-eye-fill text-primary"></i>
+                        {% else %}
+                            <i class="bi bi-circle text-muted"></i>
+                        {% endif %}
+                        
+                        <span>{{ item.titulo }}</span>
+                        
+                        {% if item.tipo == 'video' %}
+                            <span class="badge bg-danger"><i class="bi bi-play-fill"></i></span>
+                        {% elif item.tipo == 'arquivo' %}
+                            <span class="badge bg-info"><i class="bi bi-file-earmark"></i></span>
+                        {% elif item.tipo == 'link' %}
+                            <span class="badge bg-primary"><i class="bi bi-link-45deg"></i></span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if item.id == conteudo.id %}
+                        <span class="badge bg-warning text-dark">Atual</span>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.conteudo-texto {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-dark-text);
+}
+
+.conteudo-texto h1,
+.conteudo-texto h2,
+.conteudo-texto h3 {
+    color: var(--color-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.conteudo-texto p {
+    margin-bottom: 1rem;
+}
+
+.conteudo-texto ul,
+.conteudo-texto ol {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.list-group-item.active {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-left: 4px solid var(--color-primary);
+    color: var(--color-dark-text);
+}
+
+@media (max-width: 768px) {
+    .conteudo-texto {
+        font-size: 1rem;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+    }
+}
+</style>
+{% endblock %}
