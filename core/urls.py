@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from usuarios import views
+from usuarios import views as usuarios_views
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -26,6 +26,8 @@ app_name = 'core' #para que os nomes das rotas agrupadas sejam reconhecidas e po
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'), #pagina inicial
+    path('manifest.json', views.manifest, name='manifest'),
+    path('sw.js', views.service_worker, name='service_worker'),
     path('usuarios/', include('usuarios.urls', namespace='usuarios')), #incluir as urls de ususarios, prefixo usuarios
     path('cursos/', include('cursos.urls', 'cursos')), #incluir as urls de cursos, prefixo cursos
 ]

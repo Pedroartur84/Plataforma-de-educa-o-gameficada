@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     
     # Suas apps
-    'core',
+    'core.apps.CoreConfig',
     'usuarios',
     'cursos',
 ]
