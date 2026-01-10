@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, Q, Prefetch
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from usuarios.models import Sala, ParticipacaoSala, Missao
 from .models import (
     Trilha, Modulo, ConteudoModulo, VisualizacaoConteudo,
@@ -269,18 +269,23 @@ def criar_trilha(request, sala_id):
     Formulário via modal no template.
     """
     sala = get_object_or_404(Sala, id=sala_id)
-    
-    # Verificar se é professor
-    participacao = ParticipacaoSala.objects.filter(
+
+    # Apenas aceitar POSTs (criação via formulário na sala virtual)
+    if request.method != 'POST':
+        return HttpResponseForbidden('Esta ação só é permitida dentro do contexto de uma sala específica.')
+
+    # Verificar se é professor ATUALMENTE
+    is_professor = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=sala,
         tipo_na_sala='professor'
-    ).first()
-    
-    if not participacao:
-        messages.error(request, 'Apenas professores podem criar trilhas.')
+    ).exists()
+
+    if not is_professor:
+        messages.error(request, 'Apenas professores desta sala podem criar trilhas.')
         return redirect('usuarios:sala_virtual', sala_id=sala_id)
-    
+
+    # Processar criação
     if request.method == 'POST':
         nome = request.POST.get('nome', '').strip()
         descricao = request.POST.get('descricao', '').strip()
@@ -289,7 +294,7 @@ def criar_trilha(request, sala_id):
         
         if not nome:
             messages.error(request, 'O nome da trilha é obrigatório.')
-            return redirect('cursos:lista_trilhas')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
         
         # Criar trilha
         ordem_atual = Trilha.objects.filter(sala=sala).count()
@@ -314,18 +319,22 @@ def criar_trilha(request, sala_id):
 def criar_modulo(request, trilha_id):
     """Permite professor criar um módulo em uma trilha"""
     trilha = get_object_or_404(Trilha, id=trilha_id)
-    
-    # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
+
+    # Apenas aceitar POSTs
+    if request.method != 'POST':
+        return HttpResponseForbidden('Esta ação só é permitida dentro do contexto de uma sala específica.')
+
+    # Verificar permissão (professor ativo)
+    is_professor = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=trilha.sala,
         tipo_na_sala='professor'
-    ).first()
-    
-    if not participacao:
-        messages.error(request, 'Apenas professores podem criar módulos.')
+    ).exists()
+
+    if not is_professor:
+        messages.error(request, 'Você não é mais professor nesta sala. A trilha está em modo somente leitura.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
-    
+
     if request.method == 'POST':
         titulo = request.POST.get('titulo', '').strip()
         descricao = request.POST.get('descricao', '').strip()
@@ -354,18 +363,22 @@ def adicionar_conteudo(request, modulo_id):
     """Permite professor adicionar conteúdo a um módulo"""
     modulo = get_object_or_404(Modulo, id=modulo_id)
     trilha = modulo.trilha
-    
-    # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
+
+    # Apenas aceitar POSTs
+    if request.method != 'POST':
+        return HttpResponseForbidden('Esta ação só é permitida dentro do contexto de uma sala específica.')
+
+    # Verificar permissão (professor ativo)
+    is_professor = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=trilha.sala,
         tipo_na_sala='professor'
-    ).first()
-    
-    if not participacao:
-        messages.error(request, 'Apenas professores podem adicionar conteúdo.')
+    ).exists()
+
+    if not is_professor:
+        messages.error(request, 'Você não é mais professor nesta sala. A trilha está em modo somente leitura.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
-    
+
     if request.method == 'POST':
         titulo = request.POST.get('titulo', '').strip()
         tipo = request.POST.get('tipo')
@@ -402,21 +415,24 @@ def excluir_conteudo(request, conteudo_id):
     """Permite professor excluir um conteúdo"""
     conteudo = get_object_or_404(ConteudoModulo, id=conteudo_id)
     trilha = conteudo.modulo.trilha
-    
-    # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
+    # Apenas aceitar POSTs
+    if request.method != 'POST':
+        return HttpResponseForbidden('Esta ação só é permitida dentro do contexto de uma sala específica.')
+
+    # Verificar permissão (professor ativo)
+    is_professor = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=trilha.sala,
         tipo_na_sala='professor'
-    ).first()
-    
-    if not participacao:
-        messages.error(request, 'Apenas professores podem excluir conteúdo.')
+    ).exists()
+
+    if not is_professor:
+        messages.error(request, 'Você não é mais professor nesta sala. A trilha está em modo somente leitura.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
-    
+
     if request.method == 'POST':
         titulo = conteudo.titulo
         conteudo.delete()
         messages.success(request, f'Conteúdo "{titulo}" excluído.')
-    
+
     return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)

@@ -20,6 +20,9 @@
                 <button type="button" class="btn btn-warning text-dark fw-bold btn-responsive btn-sm" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
                     <i class="fas fa-plus"></i> Postar Missão
                 </button>
+                <button type="button" class="btn btn-outline-warning text-dark fw-bold btn-responsive btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#criarTrilhaModal">
+                    <i class="bi bi-diagram-3"></i> Criar nova trilha
+                </button>
                 {% endif %}
                 <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary btn-responsive btn-sm">
                     <i class="fas fa-home"></i> Voltar
@@ -437,6 +440,56 @@
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm">
                         <i class="bi bi-check-circle"></i> Criar Título
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if is_professor_na_sala %}
+<!-- MODAL CRIAR TRILHA (exclusivo da sala_virtual) -->
+<div class="modal fade" id="criarTrilhaModal" tabindex="-1" aria-labelledby="criarTrilhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="criarTrilhaModalLabel">
+                    <i class="bi bi-diagram-3"></i> Criar Nova Trilha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'cursos:criar_trilha' sala.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Nome da Trilha</label>
+                        <input type="text" name="nome" class="form-control input-estilo bg-dark text-white" required maxlength="200">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Descrição</label>
+                        <textarea name="descricao" class="form-control input-estilo bg-dark text-white" rows="4"></textarea>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label text-white fw-bold">Pontos Necessários</label>
+                            <input type="number" name="pontos_necessarios" class="form-control input-estilo bg-dark text-white" value="0" min="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-white fw-bold">Trilha Anterior (opcional)</label>
+                            <select name="trilha_anterior" class="form-select input-estilo bg-dark text-white">
+                                <option value="">-- Nenhuma --</option>
+                                {% for t in trilhas_sala %}
+                                    <option value="{{ t.id }}">{{ t.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-warning">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm">
+                        <i class="bi bi-check-circle"></i> Criar Trilha
                     </button>
                 </div>
             </form>

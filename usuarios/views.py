@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import LoginForm, CadastroForm, SalaForm, MissaoForm, MensagemMissaoForm, CorrecaoMissaoForm, PerfilForm
 from .models import *
+from cursos.models import Trilha
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -192,6 +193,9 @@ def sala_virtual(request, sala_id):
     # Verificar se usuário é professor nesta sala
     is_professor_na_sala = participacao.tipo_na_sala == 'professor'
 
+    # TRILHAS DA SALA (apenas para o contexto local)
+    trilhas_sala = Trilha.objects.filter(sala=sala).order_by('ordem')
+
     context = {
         'sala': sala,
         'missoes': missoes_da_sala,
@@ -199,6 +203,7 @@ def sala_virtual(request, sala_id):
         'is_professor_na_sala': is_professor_na_sala,
         'minha_participacao': participacao,
         'titulos_sala': titulos_sala,
+        'trilhas_sala': trilhas_sala,
     }
     return render(request, 'usuarios/sala_virtual.html', context)
 
