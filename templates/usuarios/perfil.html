@@ -4,163 +4,88 @@
 {% block title %}Meu Perfil - Player{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            
-            <!-- Cabeçalho do Perfil -->
-            <div class="card card-no-scale mb-4 border-warning">
-                <div class="card-body text-center py-4">
-                    {% if usuario.foto %}
-                        <img src="{{ usuario.foto.url }}" alt="Foto de Perfil" 
-                             class="rounded-circle mb-3" 
-                             style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--color-primary);">
-                    {% else %}
-                        <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-3" 
-                             style="width: 120px; height: 120px; font-size: 3rem; border: 4px solid var(--color-primary);">
-                            <i class="bi bi-person"></i>
-                        </div>
-                    {% endif %}
-                    
-                    <h2 class="text-warning mb-1">{{ usuario.get_nome_exibicao }}</h2>
-                    <p class="text-muted mb-2">{{ usuario.email }}</p>
-                    <span class="badge 
-                        {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark
-                        {% elif usuario.tipo_usuario == 'admin' %}bg-danger
-                        {% else %}bg-primary{% endif %} px-3 py-2">
-                        {{ usuario.get_tipo_usuario_display }}
-                    </span>
+<main class="container py-4">
+    <div class="mx-auto" style="max-width:980px;">
+        <section class="card mb-4 border-warning text-center p-3">
+            <div class="d-flex flex-column align-items-center gap-2">
+                {% if usuario.foto %}
+                    <img src="{{ usuario.foto.url }}" alt="Foto de Perfil" class="rounded-circle avatar-110">
+                {% else %}
+                    <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center avatar-110 avatar-placeholder"><i class="bi bi-person"></i></div>
+                {% endif %}
+                <h3 class="h5 text-warning mb-0">{{ usuario.get_nome_exibicao }}</h3>
+                <div class="small text-muted">{{ usuario.email }}</div>
+                <span class="badge {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark{% elif usuario.tipo_usuario == 'admin' %}bg-danger{% else %}bg-primary{% endif %} mt-2">{{ usuario.get_tipo_usuario_display }}</span>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-pencil"></i> Editar Perfil</h6></div>
+                    <div class="card-body">
+                        {% if messages %}{% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show small" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                        {% endfor %}{% endif %}
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Nome</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sobrenome</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Foto de Perfil</label>
+                                {{ form.foto }}
+                                {% if form.foto.errors %}<div class="text-danger small mt-1">{{ form.foto.errors }}</div>{% endif %}
+                                <div class="small text-muted mt-1">Formatos: JPG, PNG, GIF (máx. 5MB)</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-warning text-dark">Salvar Alterações</button>
+                                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">Voltar</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-4">
-                
-                <!-- Coluna Esquerda: Editar Perfil -->
-                <div class="col-12 col-md-6">
-                    <div class="card card-no-scale h-100">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-pencil"></i> Editar Perfil</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if messages %}
-                                {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Nome</label>
-                                    {{ form.first_name }}
-                                    {% if form.first_name.errors %}
-                                        <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
-                                    {% endif %}
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
-                                    {{ form.last_name }}
-                                    {% if form.last_name.errors %}
-                                        <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
-                                    {% endif %}
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="{{ form.foto.id_for_label }}" class="form-label">Foto de Perfil</label>
-                                    {{ form.foto }}
-                                    {% if form.foto.errors %}
-                                        <div class="text-danger small mt-1">{{ form.foto.errors }}</div>
-                                    {% endif %}
-                                    <small class="text-muted d-block mt-1">
-                                        Formatos aceitos: JPG, PNG, GIF (máx. 5MB)
-                                    </small>
-                                </div>
-
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-warning text-dark">
-                                        <i class="bi bi-check-circle"></i> Salvar Alterações
-                                    </button>
-                                    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">
-                                        <i class="bi bi-arrow-left"></i> Voltar
-                                    </a>
-                                </div>
-                            </form>
+            <div class="col-12 col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-graph-up"></i> Estatísticas</h6></div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-around text-center small">
+                            <div><div class="h4 text-warning mb-0">{{ usuario.pontos_totais }}</div><small class="text-muted">Pontos</small></div>
+                            <div><div class="h4 text-warning mb-0">{{ usuario.missoes_completadas_globais }}</div><small class="text-muted">Missões</small></div>
+                            <div><div class="h4 text-warning mb-0">{{ titulos_globais.count }}</div><small class="text-muted">Títulos</small></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Coluna Direita: Estatísticas e Títulos -->
-                <div class="col-12 col-md-6">
-                    
-                    <!-- Estatísticas -->
-                    <div class="card card-no-scale mb-4">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Estatísticas</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-around text-center">
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ usuario.pontos_totais }}</div>
-                                    <small class="text-muted">Pontos Totais</small>
-                                </div>
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ usuario.missoes_completadas_globais }}</div>
-                                    <small class="text-muted">Missões Completas</small>
-                                </div>
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ titulos_globais.count }}</div>
-                                    <small class="text-muted">Títulos</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Títulos Globais -->
-                    <div class="card card-no-scale">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-award"></i> Títulos Globais</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if titulos_globais %}
-                                <div class="list-group list-group-flush">
-                                    {% for titulo in titulos_globais %}
-                                    <div class="list-group-item bg-dark border-secondary">
-                                        <div class="d-flex align-items-center gap-3">
-                                            {% if titulo.icone %}
-                                                <img src="{{ titulo.icone.url }}" alt="{{ titulo.nome }}" 
-                                                     class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                                            {% else %}
-                                                <div class="bg-warning text-dark rounded d-flex align-items-center justify-content-center" 
-                                                     style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                                    <i class="bi bi-trophy"></i>
-                                                </div>
-                                            {% endif %}
-                                            <div class="flex-grow-1">
-                                                <h6 class="mb-1 text-warning">{{ titulo.nome }}</h6>
-                                                <p class="mb-0 small text-muted">{{ titulo.descricao }}</p>
-                                            </div>
-                                        </div>
+                <div class="card">
+                    <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-award"></i> Títulos Globais</h6></div>
+                    <div class="card-body">
+                        {% if titulos_globais %}
+                            <div class="list-group list-group-flush small">
+                                {% for titulo in titulos_globais %}
+                                    <div class="list-group-item bg-dark border-secondary d-flex gap-3 align-items-center">
+                                        {% if titulo.icone %}<img src="{{ titulo.icone.url }}" alt="{{ titulo.nome }}" class="rounded img-icon-50">{% else %}<div class="bg-warning text-dark rounded d-flex align-items-center justify-content-center placeholder-icon-50"></div>{% endif %}
+                                        <div class="flex-grow-1"><div class="text-warning small mb-0">{{ titulo.nome }}</div><div class="small text-muted">{{ titulo.descricao }}</div></div>
                                     </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="text-center py-4 text-muted">
-                                    <i class="bi bi-award fs-1 opacity-50"></i>
-                                    <p class="mt-3 mb-0">Você ainda não conquistou títulos globais.</p>
-                                    <small>Complete missões para ganhar títulos!</small>
-                                </div>
-                            {% endif %}
-                        </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center small text-muted py-3"><i class="bi bi-award fs-3 opacity-50 d-block mb-2"></i> Você ainda não conquistou títulos globais.</div>
+                        {% endif %}
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}

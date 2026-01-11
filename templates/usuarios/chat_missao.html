@@ -4,377 +4,163 @@
 {% block title %}Missão - {{ missao.titulo }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3">
-    <!-- CABEÇALHO SIMPLIFICADO -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="flex-grow-1">
-                    <h1 class="h4 h-md-3 text-warning fw-bold mb-2">{{ missao.titulo }}</h1>
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <span class="badge bg-warning text-dark">{{ missao.pontos }} pts</span>
-                        <span class="badge 
-                            {% if missao.status == 'corrigida' %}bg-warning text-dark
-                            {% elif missao.status == 'concluida' %}bg-primary
-                            {% else %}bg-secondary{% endif %}">
-                            {{ missao.get_status_display }}
-                        </span>
-                        <small class="text-muted">{{ missao.sala.nome }}</small>
-                    </div>
-                </div>
-                <div>
-                    <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-arrow-left"></i> <span class="d-none d-md-inline">Voltar</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+<main class="container-fluid py-3">
+  <header class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
+    <div>
+      <h3 class="h5 text-warning fw-bold mb-1">{{ missao.titulo }}</h3>
+      <div class="d-flex flex-wrap gap-2 align-items-center small">
+        <span class="badge bg-warning text-dark">{{ missao.pontos }} pts</span>
+        <span class="badge {% if missao.status == 'corrigida' %}bg-warning text-dark{% elif missao.status == 'concluida' %}bg-primary{% else %}bg-secondary{% endif %}">{{ missao.get_status_display }}</span>
+        <span class="text-muted">{{ missao.sala.nome }}</span>
+      </div>
     </div>
+    <div class="mt-2 mt-md-0">
+      <a href="{% url 'usuarios:sala_virtual' missao.sala.id %}" class="btn btn-sm btn-primary" aria-label="Voltar à sala"><i class="fas fa-arrow-left"></i> <span class="d-none d-md-inline">Voltar</span></a>
+    </div>
+  </header>
 
-    <!-- CONTEÚDO PRINCIPAL COM ABAS -->
-    <div class="row">
-        <div class="col-12">
-            <ul class="nav nav-tabs nav-fill mb-3" id="missaoTabs" role="tablist">
-                <!-- Aba do Chat (padrão em mobile) -->
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat-pane" type="button" role="tab">
-                        <i class="bi bi-chat-dots"></i> <span class="d-none d-md-inline">Chat</span>
-                    </button>
-                </li>
-                
-                <!-- Aba de Informações -->
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
-                        <i class="bi bi-info-circle"></i> <span class="d-none d-md-inline">Informações</span>
-                    </button>
-                </li>
+  <div>
+    <ul class="nav nav-tabs nav-fill mb-3" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat-pane" type="button" role="tab"><i class="bi bi-chat-dots"></i> <span class="d-none d-md-inline">Chat</span></button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab"><i class="bi bi-info-circle"></i> <span class="d-none d-md-inline">Informações</span></button>
+      </li>
+      {% if is_professor_na_sala and entregas_com_dados %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="correcoes-tab" data-bs-toggle="tab" data-bs-target="#correcoes-pane" type="button" role="tab"><i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Corrigir</span></button>
+      </li>
+      {% endif %}
+    </ul>
 
-                <!-- Aba de Correções (apenas professor) -->
-                {% if is_professor_na_sala and entregas_com_dados %}
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="correcoes-tab" data-bs-toggle="tab" data-bs-target="#correcoes-pane" type="button" role="tab">
-                        <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Corrigir</span>
-                    </button>
-                </li>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="chat-pane" role="tabpanel">
+        <div class="card">
+          <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-chat-dots"></i> Chat da Missão</h6></div>
+          <div class="card-body bg-dark text-white p-2 d-flex flex-column chat-max">
+            <div id="missao-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2 rounded chat-messages"></div>
+
+            {% if missao.status != 'corrigida' %}
+              <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
+                {% csrf_token %}
+                <textarea class="form-control bg-dark text-white flex-grow-1" name="texto" rows="2" placeholder="Escreva sua resposta..." required></textarea>
+                <div class="d-flex gap-2 flex-column">
+                  <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm"> <i class="bi bi-chat-left"></i> Comentar</button>
+                    <button type="submit" name="entregar" class="btn btn-success btn-sm"> <i class="bi bi-check-circle"></i> Entregar</button>
+                  </div>
+                </div>
+              </form>
+            {% else %}
+              <div class="text-center text-muted py-3"><small><i class="bi bi-lock"></i> Missão corrigida - Chat encerrado</small></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="info-pane" role="tabpanel">
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-file-text"></i> Descrição</h6></div>
+              <div class="card-body">
+                <p class="small">{{ missao.descricao|linebreaks }}</p>
+                {% if missao.data_limite %}
+                  <div class="alert alert-warning mt-2 small"> <i class="bi bi-calendar-event"></i> <strong>Data limite:</strong> {{ missao.data_limite|date:"d/m/Y H:i" }}</div>
                 {% endif %}
-            </ul>
+              </div>
+            </div>
+          </div>
 
-            <!-- CONTEÚDO DAS ABAS -->
-            <div class="tab-content" id="missaoTabContent">
-                
-                <!-- ABA 1: CHAT -->
-                <div class="tab-pane fade show active" id="chat-pane" role="tabpanel">
-                    <div class="card card-no-scale">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Chat da Missão</h5>
-                        </div>
-                        <div class="card-body bg-dark text-white p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
-                            <!-- Área de Mensagens -->
-                            <div class="chat-container flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.05); background:#0b0b0b; min-height: 0;" id="missao-chat-messages">
-                                <!-- Mensagens carregadas via JS -->
-                            </div>
-
-                            <!-- Formulário de Envio -->
-                            {% if missao.status != 'corrigida' %}
-                            {% if not is_professor_na_sala %}
-                                {% if not ja_entregou %}
-                                    <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
-                                        {% csrf_token %}
-                                        <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
-                                                  placeholder="Escreva sua resposta..." required></textarea>
-                                        <div class="d-flex gap-2 flex-column">
-                                            <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo" 
-                                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
-                                            <div class="d-flex gap-2">
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="bi bi-chat-left"></i> Comentar
-                                                </button>
-                                                <button type="submit" name="entregar" class="btn btn-success btn-sm">
-                                                    <i class="bi bi-check-circle"></i> Entregar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                {% else %}
-                                    <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
-                                        {% csrf_token %}
-                                        <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
-                                                  placeholder="Adicionar comentário..." required></textarea>
-                                        <div class="d-flex gap-2 flex-column">
-                                            <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo">
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="bi bi-send"></i> Enviar
-                                            </button>
-                                        </div>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                <form method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-column flex-md-row">
-                                    {% csrf_token %}
-                                    <textarea class="form-control input-estilo bg-dark text-white flex-grow-1" name="texto" rows="2" 
-                                              placeholder="Feedback para os alunos..." required></textarea>
-                                    <div class="d-flex gap-2 flex-column">
-                                        <input type="file" class="form-control form-control-sm bg-dark text-white" name="arquivo">
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="bi bi-send"></i> Enviar
-                                        </button>
-                                    </div>
-                                </form>
-                            {% endif %}
-                            {% else %}
-                            <div class="text-center text-muted py-3">
-                                <small><i class="bi bi-lock"></i> Missão corrigida - Chat encerrado</small>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 2: INFORMAÇÕES -->
-                <div class="tab-pane fade" id="info-pane" role="tabpanel">
-                    <div class="row g-3">
-                        <!-- Descrição da Missão -->
-                        <div class="col-12 col-lg-6">
-                            <div class="card card-no-scale h-100">
-                                <div class="card-header bg-warning text-dark">
-                                    <h5 class="mb-0"><i class="bi bi-file-text"></i> Descrição</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p>{{ missao.descricao|linebreaks }}</p>
-                                    
-                                    {% if missao.data_limite %}
-                                    <div class="alert alert-warning mt-3 bg-warning bg-opacity-10 border-warning mb-0">
-                                        <small>
-                                            <i class="bi bi-calendar-event"></i> <strong>Data limite:</strong> {{ missao.data_limite|date:"d/m/Y H:i" }}
-                                        </small>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Status do Usuário -->
-                        <div class="col-12 col-lg-6">
-                            <div class="card card-no-scale h-100">
-                                <div class="card-header bg-dark text-white">
-                                    <h5 class="mb-0"><i class="bi bi-person-check"></i> Seu Status</h5>
-                                </div>
-                                <div class="card-body">
-                                    {% if not is_professor_na_sala %}
-                                        {% if ja_entregou %}
-                                            <div class="alert alert-success mb-0">
-                                                <i class="bi bi-check-circle"></i> <strong>Entregue!</strong>
-                                                <p class="mb-0 small mt-1">Aguardando correção do professor.</p>
-                                            </div>
-                                        {% else %}
-                                            <div class="alert alert-warning bg-warning bg-opacity-10 mb-0">
-                                                <i class="bi bi-exclamation-circle"></i> <strong>Pendente</strong>
-                                                <p class="mb-0 small mt-1">Você ainda não entregou esta missão.</p>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div class="alert alert-info bg-info bg-opacity-10 mb-0">
-                                            <i class="bi bi-mortarboard"></i> <strong>Modo Professor</strong>
-                                            <p class="mb-0 small mt-1">Você pode corrigir as entregas dos alunos na aba "Corrigir".</p>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if is_professor_na_sala %}
-                                    <div class="mt-3 p-3 bg-light rounded">
-                                        <h6 class="text-muted mb-2"><i class="bi bi-info-circle"></i> Info do Professor</h6>
-                                        <small class="text-muted d-block">
-                                            <strong>Criada em:</strong> {{ missao.data_criacao|date:"d/m/Y H:i" }}
-                                        </small>
-                                        
-                                        <div class="mt-2">
-                                            <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#anexoModal">
-                                                <i class="bi bi-paperclip"></i> Anexar Arquivo
-                                            </button>
-                                        </div>
-                                        
-                                        {% if missao.anexos.all %}
-                                        <div class="mt-3">
-                                            <h6 class="text-muted mb-2"><i class="bi bi-paperclip"></i> Anexos da Missão</h6>
-                                            <div class="d-flex flex-wrap gap-2 flex-column flex-sm-row">
-                                                {% for anexo in missao.anexos.all %}
-                                                <a href="{{ anexo.arquivo.url }}" class="btn btn-sm btn-outline-primary w-100 w-sm-auto" target="_blank">
-                                                    <i class="bi bi-download"></i> {{ anexo.nome|default:anexo.arquivo.name }}
-                                                </a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 3: CORREÇÕES (APENAS PROFESSOR) -->
-                {% if is_professor_na_sala and entregas_com_dados %}
-                <div class="tab-pane fade" id="correcoes-pane" role="tabpanel">
-                    <div class="card card-no-scale">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Correções Pendentes</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                {% for item in entregas_com_dados %}
-                                {% with aluno=item.aluno entrega=item.entrega %}
-                                <div class="col-12 col-md-6">
-                                    <div class="card border-warning shadow-sm">
-                                        <div class="card-body">
-                                            <h6 class="card-title mb-2">{{ aluno.get_nome_exibicao }}</h6>
-                                            
-                                            {% if entrega.texto %}
-                                            <p class="small text-muted mb-2">
-                                                <i class="bi bi-chat-left-text"></i> {{ entrega.texto|truncatewords:20 }}
-                                            </p>
-                                            {% endif %}
-                                            
-                                            <div class="d-grid gap-2">
-                                                {% if entrega.arquivo %}
-                                                <a href="{{ entrega.arquivo.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                    <i class="bi bi-download"></i> Ver Arquivo
-                                                </a>
-                                                {% endif %}
-                                                <button type="button" class="btn btn-warning btn-sm" 
-                                                        data-bs-toggle="modal" data-bs-target="#correcaoModal{{ aluno.id }}">
-                                                    <i class="bi bi-pencil"></i> Corrigir
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal de Correção -->
-                                <div class="modal fade" id="correcaoModal{{ aluno.id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-warning text-dark">
-                                                <h5 class="modal-title">Corrigir - {{ aluno.get_nome_exibicao }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <form method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="aluno_id" value="{{ aluno.id }}">
-                                                <div class="modal-body">
-                                                    <p><strong>Aluno:</strong> {{ aluno.get_nome_exibicao }}</p>
-                                                    
-                                                    {% if entrega.texto %}
-                                                    <div class="mb-3">
-                                                        <strong>Resposta escrita:</strong>
-                                                        <div class="p-3 bg-light rounded mt-2 small">{{ entrega.texto|linebreaks }}</div>
-                                                    </div>
-                                                    {% endif %}
-
-                                                    {% if entrega.arquivo %}
-                                                    <p>
-                                                        <strong>Arquivo anexado:</strong><br>
-                                                        <a href="{{ entrega.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-                                                            <i class="bi bi-download"></i> Baixar
-                                                        </a>
-                                                    </p>
-                                                    {% endif %}
-
-                                                    <div class="mt-4">
-                                                        <label class="form-label fw-bold">
-                                                            Pontuação (0 a {{ missao.pontos }}):
-                                                        </label>
-                                                        <div class="input-group">
-                                                            <input type="number" name="pontos_atingidos" class="form-control text-center" 
-                                                                   min="0" max="{{ missao.pontos }}" value="0" required>
-                                                            <span class="input-group-text">/ {{ missao.pontos }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" name="corrigir" class="btn btn-success btn-sm">
-                                                        <i class="bi bi-check-circle"></i> Salvar
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endwith %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div class="col-12 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header bg-dark text-white"><h6 class="mb-0"><i class="bi bi-person-check"></i> Seu Status</h6></div>
+              <div class="card-body">
+                {% if not is_professor_na_sala %}
+                  {% if ja_entregou %}
+                    <div class="alert alert-success small mb-0"> <i class="bi bi-check-circle"></i> <strong>Entregue!</strong> <div class="small text-muted">Aguardando correção.</div></div>
+                  {% else %}
+                    <div class="alert alert-warning small mb-0"> <i class="bi bi-exclamation-circle"></i> <strong>Pendente</strong> <div class="small text-muted">Você ainda não entregou esta missão.</div></div>
+                  {% endif %}
+                {% else %}
+                  <div class="alert alert-info small mb-0"> <i class="bi bi-mortarboard"></i> <strong>Modo Professor</strong> <div class="small text-muted">Corrija entregas na aba "Corrigir".</div></div>
                 {% endif %}
-                
-                <!-- Modal para Anexar Arquivo -->
+
                 {% if is_professor_na_sala %}
-                <div class="modal fade" id="anexoModal" tabindex="-1" aria-labelledby="anexoModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
-                        <div class="modal-content bg-dark text-white border-warning">
-                            <div class="modal-header bg-warning text-dark border-warning">
-                                <h5 class="modal-title fw-bold" id="anexoModalLabel">
-                                    <i class="bi bi-paperclip"></i> Anexar Arquivo à Missão
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="anexoArquivo" class="form-label text-white fw-bold">Arquivo</label>
-                                        <input type="file" class="form-control input-estilo bg-dark text-white" id="anexoArquivo" name="anexo_arquivo" 
-                                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip,.ppt,.pptx,.xls,.xlsx" required>
-                                        <div class="form-text text-muted">Tipos aceitos: PDF, DOC, DOCX, JPG, PNG, ZIP, PPT, PPTX, XLS, XLSX</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="anexoNome" class="form-label text-white fw-bold">Nome do Arquivo (opcional)</label>
-                                        <input type="text" class="form-control input-estilo bg-dark text-white" id="anexoNome" name="anexo_nome" 
-                                               placeholder="Ex: Conteúdo da Aula 1">
-                                    </div>
-                                </div>
-                                <div class="modal-footer border-warning">
-                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-                                        <i class="bi bi-x-circle"></i> Cancelar
-                                    </button>
-                                    <button type="submit" name="anexar_arquivo" class="btn btn-success btn-sm">
-                                        <i class="bi bi-upload"></i> Anexar
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                  <div class="mt-3 small">
+                    <div class="mb-2 text-muted"><strong>Criada em:</strong> {{ missao.data_criacao|date:"d/m/Y H:i" }}</div>
+                    <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#anexoModal"><i class="bi bi-paperclip"></i> Anexar Arquivo</button>
+                    {% if missao.anexos.all %}
+                      <div class="mt-2 d-flex flex-wrap gap-2">
+                        {% for anexo in missao.anexos.all %}
+                          <a href="{{ anexo.arquivo.url }}" class="btn btn-sm btn-outline-primary" target="_blank"> <i class="bi bi-download"></i> {{ anexo.nome|default:anexo.arquivo.name }}</a>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
                 {% endif %}
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      {% if is_professor_na_sala and entregas_com_dados %}
+      <div class="tab-pane fade" id="correcoes-pane" role="tabpanel">
+        <div class="row g-3">
+          {% for item in entregas_com_dados %}{% with aluno=item.aluno entrega=item.entrega %}
+            <div class="col-12 col-md-6">
+              <div class="card border-warning">
+                <div class="card-body small">
+                  <h6 class="mb-2">{{ aluno.get_nome_exibicao }}</h6>
+                  {% if entrega.texto %}<p class="text-muted small mb-2"><i class="bi bi-chat-left-text"></i> {{ entrega.texto|truncatewords:20 }}</p>{% endif %}
+                  <div class="d-grid gap-2">
+                    {% if entrega.arquivo %}<a href="{{ entrega.arquivo.url }}" class="btn btn-sm btn-outline-primary" target="_blank"><i class="bi bi-download"></i> Ver Arquivo</a>{% endif %}
+                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#correcaoModal{{ aluno.id }}"> <i class="bi bi-pencil"></i> Corrigir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal de Correção -->
+            <div class="modal fade" id="correcaoModal{{ aluno.id }}" tabindex="-1">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header bg-warning text-dark"><h5 class="modal-title">Corrigir - {{ aluno.get_nome_exibicao }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                  <form method="post">{% csrf_token %}<input type="hidden" name="aluno_id" value="{{ aluno.id }}">
+                    <div class="modal-body small">
+                      {% if entrega.texto %}<div class="mb-3"><strong>Resposta escrita:</strong><div class="p-3 bg-light rounded mt-2 small">{{ entrega.texto|linebreaks }}</div></div>{% endif %}
+                      {% if entrega.arquivo %}<p><strong>Arquivo anexado:</strong><br><a href="{{ entrega.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2"><i class="bi bi-download"></i> Baixar</a></p>{% endif %}
+                      <div class="mt-3"><label class="form-label fw-bold">Pontuação (0 a {{ missao.pontos }}):</label><div class="input-group"><input type="number" name="pontos_atingidos" class="form-control text-center" min="0" max="{{ missao.pontos }}" value="0" required><span class="input-group-text">/ {{ missao.pontos }}</span></div></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button><button type="submit" name="corrigir" class="btn btn-success btn-sm">Salvar</button></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endwith %}{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
     </div>
-</div>
+  </div>
+</main>
 
 <style>
-.chat-container::-webkit-scrollbar { width: 6px; }
-.chat-container::-webkit-scrollbar-track { background: transparent; }
-.chat-container::-webkit-scrollbar-thumb { background: #6c757d; border-radius: 3px; }
-.message-bubble { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.nav-tabs { border-bottom: 2px solid #444; }
-.nav-tabs .nav-link.active { border-bottom: 3px solid #FFC107; color: #FFC107; }
-.nav-tabs .nav-link { color: #999; transition: all 0.3s; }
-.nav-tabs .nav-link:hover { color: #FFC107; }
+  .chat-container::-webkit-scrollbar{width:6px}
+  .chat-container::-webkit-scrollbar-thumb{background:#6c757d;border-radius:3px}
+  .nav-tabs .nav-link.active{border-bottom:3px solid #FFC107;color:#FFC107}
+<style>
+  .chat-messages::-webkit-scrollbar{width:6px}
+  .chat-messages::-webkit-scrollbar-thumb{background:#6c757d;border-radius:3px}
+  .nav-tabs .nav-link.active{border-bottom:3px solid #FFC107;color:#FFC107}
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const chat = document.querySelector('.chat-container');
-    if (chat) {
-        setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
-    }
-});
-</script>
+<script>document.addEventListener('DOMContentLoaded',function(){const el=document.querySelector('#missao-chat-messages'); if(el){setTimeout(()=>el.scrollTop=el.scrollHeight,100);}})</script>
 
-<script>
-    const MISSAO_CHAT_MESSAGES_URL = "{% url 'usuarios:missao_messages' missao.id %}";
-    const CURRENT_USER_ID = {{ request.user.id }};
-</script>
+<script>const MISSAO_CHAT_MESSAGES_URL = "{% url 'usuarios:missao_messages' missao.id %}"; const CURRENT_USER_ID = {{ request.user.id }};</script>
 <script src="{% static 'js/chat_missao.js' %}"></script>
 {% endblock %}

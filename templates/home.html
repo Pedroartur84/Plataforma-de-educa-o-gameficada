@@ -4,61 +4,39 @@
 {% block title %}Player - Aprendizado Gamificado{% endblock %}
 
 {% block content %}
-<main class="flex-grow-1 py-5">
+<main class="py-5"> 
     <div class="container text-center">
-        <div class="home-content">
-            <img src="{% static 'img/logo.png' %}" class="logo-main mb-4" alt="Player Logo"/>
-            <h1 class="display-5 fw-bold mb-3"><img src="{% static 'img/logo.png' %}" alt="Player" style="height:48px; vertical-align:middle;"> </h1>
-            <p class="lead mb-4">Transforme seu aprendizado em uma <span class="text-accent">aventura épica</span>!</p>
-            
-            <div class="cta-section mb-5">
-                <h3 class="h4 mb-4">Pronto para começar?</h3>
-                <div class="buttons-container">
-                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login
-                    </a>
-                    <a href="{% url 'usuarios:cadastro' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-person-plus me-2"></i> Cadastre-se
-                    </a>
-                </div>
-            </div>
-            
-            <div class="project-description mb-5 p-4 rounded-4">
-                <h2 class="h3 mb-4">Objetivo do Projeto</h2>
-                <p class="mb-4">
-                    O Player é uma aplicação de estudos gamificada que transforma o processo de aprendizagem 
-                    em uma jornada emocionante. Através de elementos de jogos como missões, recompensas, 
-                    níveis e rankings, motivamos os estudantes a alcançarem seus objetivos educacionais 
-                    de forma divertida e engajadora.
-                </p>
-                
-                <div class="features-grid mt-5">
-                    <div class="feature-item">
-                        <div class="feature-icon bg-azul">
-                            <i class="bi bi-trophy"></i>
-                        </div>
-                        <h3 class="h4 mt-3">Missões</h3>
-                        <p class="text-muted mt-2">Complete desafios educacionais</p>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon bg-laranja">
-                            <i class="bi bi-star"></i>
-                        </div>
-                        <h3 class="h4 mt-3">Recompensas</h3>
-                        <p class="text-muted mt-2">Ganhe pontos e conquistas</p>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon bg-azul">
-                            <i class="bi bi-graph-up"></i>
-                        </div>
-                        <h3 class="h4 mt-3">Progresso</h3>
-                        <p class="text-muted mt-2">Acompanhe sua evolução</p>
-                    </div>
-                </div>
-            </div>
+        <img src="{% static 'img/logo.png' %}" class="logo-main mb-3" alt="Player Logo"/>
+        <h1 class="h4 fw-bold mb-2 visually-hidden">Player</h1>
+        <p class="lead small mb-3">Transforme seu aprendizado em uma <span class="text-accent">aventura épica</span>!</p>
+
+        <div class="d-grid gap-2 d-sm-flex justify-content-center mb-4">
+            <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-lg px-4"> <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login</a>
+            <a href="{% url 'usuarios:cadastro' %}" class="btn btn-outline-primary btn-lg px-4"> <i class="bi bi-person-plus me-2"></i> Cadastre-se</a>
         </div>
+
+        <section class="bg-light p-3 rounded-3">
+            <h2 class="h6 mb-2">Objetivo do Projeto</h2>
+            <p class="small text-muted mb-3">O Player é uma aplicação de estudos gamificada que transforma o processo de aprendizagem em uma jornada emocionante.</p>
+
+            <div class="row row-cols-1 row-cols-sm-3 g-3">
+                <div class="col text-center">
+                    <div class="mb-1"><i class="bi bi-trophy text-warning fs-3"></i></div>
+                    <div class="fw-bold small">Missões</div>
+                    <div class="small text-muted">Complete desafios educacionais</div>
+                </div>
+                <div class="col text-center">
+                    <div class="mb-1"><i class="bi bi-star text-warning fs-3"></i></div>
+                    <div class="fw-bold small">Recompensas</div>
+                    <div class="small text-muted">Ganhe pontos e conquistas</div>
+                </div>
+                <div class="col text-center">
+                    <div class="mb-1"><i class="bi bi-graph-up text-warning fs-3"></i></div>
+                    <div class="fw-bold small">Progresso</div>
+                    <div class="small text-muted">Acompanhe sua evolução</div>
+                </div>
+            </div>
+        </section>
     </div>
 </main>
 {% endblock %}

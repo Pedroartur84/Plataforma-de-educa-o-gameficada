@@ -4,55 +4,43 @@
 {% block title %}Criar Sala - Player{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
+<main class="container py-4">
+    <div class="row g-3">
         <div class="col-12 col-md-8">
-            <div class="card card-no-scale">
-                <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card">
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
                     <h5 class="mb-0">Criar Nova Sala</h5>
                     <small class="text-muted">Configure a sala e defina o papel inicial</small>
                 </div>
                 <form method="post" class="card-body">
                     {% csrf_token %}
-
                     <div class="mb-3">
                         <label for="id_nome" class="form-label">Nome da Sala</label>
                         {{ form.nome }}
-                        {% if form.nome.errors %}
-                        <div class="text-danger small">{{ form.nome.errors }}</div>
-                        {% endif %}
+                        {% if form.nome.errors %}<div class="text-danger small">{{ form.nome.errors }}</div>{% endif %}
                     </div>
 
                     <div class="mb-3">
                         <label for="id_descricao" class="form-label">Descrição</label>
                         {{ form.descricao }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger small">{{ form.descricao.errors }}</div>
-                        {% endif %}
+                        {% if form.descricao.errors %}<div class="text-danger small">{{ form.descricao.errors }}</div>{% endif %}
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Papel na sala</label>
+                    <fieldset class="mb-3">
+                        <legend class="form-label mb-2">Papel na sala</legend>
                         <div class="d-flex gap-3 flex-column flex-sm-row">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="tipo_na_sala" value="professor" id="professor" required>
-                                <label class="form-check-label" for="professor">
-                                    <strong>Professor</strong>
-                                    <div class="text-muted small">Criar missões e corrigir atividades</div>
-                                </label>
+                                <label class="form-check-label" for="professor"><strong>Professor</strong><div class="text-muted small">Criar missões e corrigir atividades</div></label>
                             </div>
-
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="tipo_na_sala" value="aluno" id="aluno" required>
-                                <label class="form-check-label" for="aluno">
-                                    <strong>Aluno</strong>
-                                    <div class="text-muted small">Participar das missões e atividades</div>
-                                </label>
+                                <label class="form-check-label" for="aluno"><strong>Aluno</strong><div class="text-muted small">Participar das missões</div></label>
                             </div>
                         </div>
-                    </div>
+                    </fieldset>
 
-                    <div class="d-flex gap-2 mt-4">
+                    <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Criar Sala</button>
                         <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-secondary">Voltar</a>
                     </div>
@@ -60,23 +48,20 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-4 mt-3 mt-md-0">
-            <div class="card card-no-scale">
-                <div class="card-header">
-                    <h6 class="mb-0">Dicas rápidas</h6>
-                </div>
-                <div class="card-body">
-                    <p class="small text-muted">Use um nome claro e objetivo para a sala. Professores têm permissões adicionais para criar e corrigir missões.</p>
-                    <ul class="small">
-                        <li>O nome será visível para todos os participantes.</li>
-                        <li>Você pode alterar o papel posteriormente nas configurações da sala.</li>
-                        <li>Adicione uma descrição que explique o propósito da sala.</li>
+        <aside class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">Dicas rápidas</h6></div>
+                <div class="card-body small text-muted">
+                    <p>Use um nome claro e objetivo. Professores têm permissões para criar e corrigir missões.</p>
+                    <ul class="small mb-2">
+                        <li>Nome visível para todos os participantes.</li>
+                        <li>Altere o papel nas configurações da sala.</li>
+                        <li>Adicione uma descrição clara do propósito.</li>
                     </ul>
-                    <hr>
-                    <p class="small text-muted">Atente-se à privacidade e às regras da sua turma ao criar salas abertas.</p>
+                    <div class="small">Atente-se à privacidade e às regras da turma.</div>
                 </div>
             </div>
-        </div>
+        </aside>
     </div>
-</div>
+</main>
 {% endblock %}
