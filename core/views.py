@@ -2,92 +2,235 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.conf import settings
 import os
+import re
+import mimetypes
+import json
+import logging
+from pathlib import Path
+import shutil
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
     return render(request, 'home.html')
 
 
-def manifest(request):
-    """Retorna o manifest.json. Prioriza arquivos em `static/pwa-icons`, senão usa `fotos_para_app`.
+def _find_icon_sources():
+    """Retorna uma lista de (dir_path, url_prefix) candidatos em ordem de prioridade."""
+    base = settings.BASE_DIR
+    base_url = ''
+    if hasattr(settings, 'STATIC_URL') and settings.STATIC_URL:
+        base_url = settings.STATIC_URL
+    else:
+        base_url = '/static/'
+    if not base_url.endswith('/'):
+        base_url = base_url + '/'
 
-    Observação: execute `python manage.py copy_pwa_icons` para copiar PNGs para `static/pwa-icons`.
+    candidates = []
+    # prioridade: static/pwa-icons
+    candidates.append((os.path.join(base, 'static', 'pwa-icons'), f"{base_url}pwa-icons/"))
+    # fallback: static/img
+    candidates.append((os.path.join(base, 'static', 'img'), f"{base_url}img/"))
+    # fallback: fotos_para_app (legacy)
+    candidates.append((os.path.join(base, 'fotos_para_app'), f"{base_url}fotos_para_app/"))
+    return candidates
+
+
+def manifest(request):
+    """Gera dinamicamente o `manifest.json` priorizando `static/pwa-icons`.
+
+    - Detecta arquivos .png/.jpg/.jpeg
+    - Reconhece `maskable` no nome e adiciona `purpose: "maskable"`
+    - Preenche `sizes` a partir do nome do arquivo (ex: 192x192)
+    - Adiciona campos modernos: scope, orientation, screenshots se presentes
     """
     base_url = request.build_absolute_uri('/')[:-1]
     icons = []
-    # Preferir ícones copiados para static/img
-    static_icons_dir = os.path.join(settings.BASE_DIR, 'static', 'img')
-    source_dir = None
-    if os.path.isdir(static_icons_dir):
-        source_dir = static_icons_dir
-        url_base = (settings.STATIC_URL or '/static/')
-        if not url_base.endswith('/'):
-            url_base = url_base + '/'
-        url_prefix = f"{base_url}{url_base}img/"
-    else:
-        source_dir = os.path.join(settings.BASE_DIR, 'fotos_para_app')
-        url_prefix = f"{base_url}/pwa-icon/"
+    screenshots = []
 
-    try:
-        for fname in os.listdir(source_dir):
-            if fname.lower().endswith('.png'):
-                icons.append({
-                    "src": f"{url_prefix}{fname}",
-                    "type": "image/png",
-                    "sizes": fname.replace('.png', '')
-                })
-    except FileNotFoundError:
-        icons = []
+    found = False
+    candidates = _find_icon_sources()
+    for dir_path, url_prefix in candidates:
+        if os.path.isdir(dir_path):
+            try:
+                for fname in sorted(os.listdir(dir_path)):
+                    if not fname.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                        continue
+                    found = True
+                    low = fname.lower()
+                    sizes_match = re.search(r"(\d+x\d+)", low)
+                    sizes = sizes_match.group(1) if sizes_match else "any"
+                    purpose = 'maskable' if 'maskable' in low else 'any'
+                    mime, _ = mimetypes.guess_type(fname)
+                    if not mime:
+                        mime = 'image/png'
+                    src = f"{base_url}{url_prefix}{fname}"
+                    icon_entry = {
+                        'src': src,
+                        'type': mime,
+                        'sizes': sizes,
+                    }
+                    if purpose != 'any':
+                        icon_entry['purpose'] = purpose
+                    icons.append(icon_entry)
+                # procurar screenshots em subpasta screenshots/
+                screenshots_dir = os.path.join(dir_path, 'screenshots')
+                if os.path.isdir(screenshots_dir):
+                    for sname in sorted(os.listdir(screenshots_dir)):
+                        if sname.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                            smime, _ = mimetypes.guess_type(sname)
+                            ssizes = re.search(r"(\d+x\d+)", sname.lower())
+                            screenshots.append({
+                                'src': f"{base_url}{url_prefix}screenshots/{sname}",
+                                'type': smime or 'image/png',
+                                'sizes': ssizes.group(1) if ssizes else 'any'
+                            })
+            except FileNotFoundError:
+                continue
+        if found:
+            break
 
     data = {
-        "name": "Plataforma de Educação",
-        "short_name": "Plataforma",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#1A1A1A",
-        "theme_color": "#FFC107",
-        "icons": icons,
+        'name': getattr(settings, 'PWA_APP_NAME', 'Plataforma de Educação'),
+        'short_name': getattr(settings, 'PWA_SHORT_NAME', 'Plataforma'),
+        'start_url': getattr(settings, 'PWA_START_URL', '/'),
+        'scope': getattr(settings, 'PWA_SCOPE', '/'),
+        'display': getattr(settings, 'PWA_DISPLAY', 'standalone'),
+        'background_color': getattr(settings, 'PWA_BACKGROUND_COLOR', '#1A1A1A'),
+        'theme_color': getattr(settings, 'PWA_THEME_COLOR', '#FFC107'),
+        'orientation': getattr(settings, 'PWA_ORIENTATION', 'portrait'),
+        'prefer_related_applications': False,
+        'related_applications': [],
+        'icons': icons,
     }
+    if screenshots:
+        data['screenshots'] = screenshots
+
     return JsonResponse(data)
 
 
 def service_worker(request):
-    """Retorna o JavaScript do service worker."""
-    sw_js = (
-        "const CACHE_NAME = 'plataforma-pwa-v1';\n"
-        "const OFFLINE_URLS = ['/','/static/styles/style.css'];\n"
+    """Retorna um service worker básico porém robusto em JS.
 
-        "self.addEventListener('install', event => {\n"
-        "  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(OFFLINE_URLS)));\n"
-        "  self.skipWaiting();\n"
-        "});\n"
+    - Precache de rotas principais
+    - Cache-first para assets estáticos
+    - Network-first para APIs
+    - Fallback para /offline/
+    """
+    # construir lista de precache (URLs relativos)
+    base_url = ''
+    sw_precache = [
+        '/',
+        '/offline/',
+        '/manifest.json',
+        '/static/js/pwa-register.js',
+    ]
 
-        "self.addEventListener('activate', event => {\n"
-        "  event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(key => {\n"
-        "    if (key !== CACHE_NAME) return caches.delete(key);\n"
-        "  }))));\n"
-        "  self.clients.claim();\n"
-        "});\n"
+    # incluir ícones pwa no precache (se existirem)
+    candidates = _find_icon_sources()
+    for dir_path, url_prefix in candidates:
+        if os.path.isdir(dir_path):
+            for fname in sorted(os.listdir(dir_path)):
+                if fname.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                    sw_precache.append(f"{url_prefix}{fname}")
+            # screenshots
+            screenshots_dir = os.path.join(dir_path, 'screenshots')
+            if os.path.isdir(screenshots_dir):
+                for sname in sorted(os.listdir(screenshots_dir)):
+                    if sname.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                        sw_precache.append(f"{url_prefix}screenshots/{sname}")
+            break
 
-        "self.addEventListener('fetch', event => {\n"
-        "  if (event.request.method !== 'GET') return;\n"
-        "  event.respondWith(caches.match(event.request).then(resp => {\n"
-        "    return resp || fetch(event.request).then(fetchResp => {\n"
-        "      return caches.open(CACHE_NAME).then(cache => {\n"
-        "        try { cache.put(event.request, fetchResp.clone()); } catch(e) {}\n"
-        "        return fetchResp;\n"
-        "      });\n"
-        "    }).catch(() => caches.match('/'))\n"
-        "  }));\n"
-        "});\n"
-    )
+    # garantir URLs únicas
+    sw_precache = list(dict.fromkeys(sw_precache))
+
+    sw_js = f"""const CACHE_PREFIX = 'plataforma-pwa-';
+const CACHE_VERSION = 'v1';
+const PRECACHE = {json.dumps(sw_precache)};
+const RUNTIME = CACHE_PREFIX + CACHE_VERSION + '-runtime';
+
+self.addEventListener('install', event => {{
+  event.waitUntil(
+    caches.open(CACHE_PREFIX + CACHE_VERSION).then(cache => cache.addAll(PRECACHE))
+  );
+  self.skipWaiting();
+}});
+
+self.addEventListener('activate', event => {{
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => !k.startsWith(CACHE_PREFIX + CACHE_VERSION)).map(k => caches.delete(k))
+    ))
+  );
+  self.clients.claim();
+}});
+
+self.addEventListener('fetch', event => {{
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Network-first for API calls
+  if (url.pathname.includes('/api/') || url.pathname.includes('sala_messages') || url.pathname.includes('missao_messages')) {{
+    event.respondWith(
+      fetch(event.request).then(resp => {{
+        const copy = resp.clone();
+        caches.open(RUNTIME).then(cache => cache.put(event.request, copy));
+        return resp;
+      }}).catch(() => caches.match(event.request))
+    );
+    return;
+  }}
+
+  // Navigation - try network, fallback to offline page
+  if (event.request.mode === 'navigate') {{
+    event.respondWith(
+      fetch(event.request).then(resp => {{
+        caches.open(RUNTIME).then(cache => cache.put(event.request, resp.clone()));
+        return resp;
+      }}).catch(() => caches.match('/offline/'))
+    );
+    return;
+  }}
+
+  // Cache-first for static assets (css, js, images)
+  if (url.pathname.startsWith('/static/') || url.pathname.match(/\.(?:png|jpg|jpeg|gif|svg|css|js|webp)$/)) {{
+    event.respondWith(
+      caches.match(event.request).then(cached => cached || fetch(event.request).then(resp => {{
+        caches.open(RUNTIME).then(cache => cache.put(event.request, resp.clone()));
+        return resp;
+      }}).catch(() => caches.match('/offline/')))
+    );
+    return;
+  }}
+
+  // Default: network-first
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+}});
+
+self.addEventListener('message', event => {{
+  if (event.data && event.data.type === 'SKIP_WAITING') {{
+    self.skipWaiting();
+  }}
+}});
+"""
+
     return HttpResponse(sw_js, content_type='application/javascript')
 
 
 def pwa_icon(request, name):
-    icons_dir = os.path.join(settings.BASE_DIR, 'fotos_para_app')
+    """Serve ícones priorizando `static/pwa-icons`, depois `static/img`, depois `fotos_para_app`."""
     safe_name = os.path.basename(name)
-    path = os.path.join(icons_dir, safe_name)
-    if not os.path.exists(path):
-        raise Http404()
-    return FileResponse(open(path, 'rb'), content_type='image/png')
+    candidates = [
+        os.path.join(settings.BASE_DIR, 'static', 'pwa-icons', safe_name),
+        os.path.join(settings.BASE_DIR, 'static', 'img', safe_name),
+        os.path.join(settings.BASE_DIR, 'fotos_para_app', safe_name),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            mime, _ = mimetypes.guess_type(path)
+            return FileResponse(open(path, 'rb'), content_type=mime or 'application/octet-stream')
+    raise Http404()

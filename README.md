@@ -56,3 +56,28 @@ Grau Técnico - Turma em andamento
 <div align="center">
   <sub>Projeto em desenvolvimento como requisito curricular para obtenção do diploma técnico.</sub>
 </div>
+
+## PWA — Convenção de Ícones
+
+Para a versão PWA deste projeto os ícones devem seguir a convenção abaixo e ficar em `static/pwa-icons/`.
+
+- Nomes obrigatórios iniciais (JPEGs):
+  - `icon-192x192.jpg` (obrigatório)
+  - `icon-512x512.jpg` (obrigatório)
+- Recomendados/úteis:
+  - `icon-384x384.jpg`
+  - `icon-maskable-192x192.jpg` (maskable)
+  - `icon-maskable-512x512.jpg` (maskable)
+
+Observações:
+- O `manifest.json` é gerado dinamicamente pela view e prioriza `static/pwa-icons/`.
+- Inicialmente gere os artefatos em JPEG com a dimensão correta no nome, depois converta para PNG com fundo transparente quando possível.
+- Há um comando de gerenciamento para validar/copiar ícones: execute `python manage.py validate_pwa_icons`.
+- Para obter melhores resultados no Android inclua versões `maskable` com safe area centrada.
+
+Fluxo recomendado (rápido):
+1. Exporte os ícones em JPEG com os nomes acima.
+2. Coloque-os em `fotos_para_app/` ou diretamente em `static/pwa-icons/`.
+3. Rode `python manage.py validate_pwa_icons` — o comando copia/valida e lista os arquivos.
+4. (Opcional) Converta para PNG transparente e adicione versões maskable para maior compatibilidade.
+
