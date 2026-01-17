@@ -343,7 +343,7 @@
 
                 {% if is_professor_na_sala %}
                 <div class="mt-4 text-center">
-                    <a href="{% url 'cursos:criar_trilha' %}" class="btn btn-info">
+                    <a href="{% url 'cursos:criar_trilha' sala_id=sala.id %}" class="btn btn-info">
                         <i class="bi bi-plus-circle"></i> Criar Nova Trilha
                     </a>
                 </div>
