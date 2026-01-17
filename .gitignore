@@ -172,3 +172,13 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Documentação Fase 2 (arquivos locais de referência)
+FASE2_CONCLUSION.md
+IMPLEMENTATION_SUMMARY_FASE2.md
+QUICKSTART_FASE2.md
+README_FASE2.md
+TECHNICAL_DOCUMENTATION_FASE2.md
+TESTING_GUIDE_FASE2.md
+PHASE2_CHECKLIST.md
+PHASE2_FINAL_REPORT.md

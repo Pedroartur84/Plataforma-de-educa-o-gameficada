@@ -256,9 +256,48 @@ body {
     line-height: 1.6;
 }
 
+/* Botões responsivos na home */
+.buttons-container {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-responsive {
+    min-width: 140px;
+    flex: 1;
+    max-width: 200px;
+}
+
 @media (max-width: var(--bp-tablet)) {
     .logo-main {
         --logo-height: 80px;
+    }
+    
+    .buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-responsive {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-main {
+        --logo-height: 60px;
+        margin-bottom: var(--space-md);
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
     }
 }
 
@@ -425,6 +464,31 @@ body {
     .feature-item {
         width: 100%;
         max-width: none;
+        padding: var(--space-md);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .features-grid {
+        gap: var(--space-sm);
+    }
+    
+    .feature-item {
+        padding: var(--space-sm);
+    }
+    
+    .feature-item h3 {
+        font-size: 1.1rem;
+    }
+    
+    .feature-item p {
+        font-size: 0.85rem;
     }
 }
 
@@ -552,13 +616,6 @@ div.text-muted {
     width: 100%;
 }
 
-/* Grupo responsivo alternativo */
-.btn-group-responsive {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-}
-
 /* ===== RESPONSIVIDADE PARA BOTÕES ===== */
 
 /* Mobile (até 768px) - Empilhamento vertical */
@@ -668,29 +725,6 @@ div.text-muted {
     }
 }
 
-/* Loading states para operações assíncronas */
-.btn-loading {
-    position: relative;
-    color: transparent;
-    pointer-events: none;
-}
-
-.btn-loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* ===== SEÇÃO CTA MELHORADA ===== */
 
 .cta-section {
@@ -728,18 +762,19 @@ div.text-muted {
     align-items: center;
 }
 
-/* ===== UTILITÁRIOS COMPLEMENTARES ===== */
-
-/* Botões de largura total apenas em mobile */
-.btn-full-mobile {
-    width: auto;
-}
-
+/* Responsividade para CTA */
 @media (max-width: 768px) {
-    .btn-full-mobile {
-        width: 100%;
+    .cta-section {
+        padding: var(--space-lg);
+        margin: var(--space-md) auto;
+    }
+    
+    .cta-section h3 {
+        margin-bottom: var(--space-md);
     }
 }
+
+/* ===== UTILITÁRIOS COMPLEMENTARES ===== */
 
 /* Grid de botões para layouts complexos */
 @media (max-width: 768px) {
@@ -786,9 +821,6 @@ div.text-muted {
 /* ===== UTILITÁRIOS PARA LAYOUT ===== */
 
 /* Garantir que containers não quebrem */
-.min-width-0 {
-    min-width: 0;
-}
 
 /* ===== MELHORIAS GERAIS DE RESPONSIVIDADE ===== */
 

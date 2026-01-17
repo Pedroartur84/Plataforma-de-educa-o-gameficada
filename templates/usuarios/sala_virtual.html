@@ -322,17 +322,23 @@
                                 </div>
 
                                 <div class="mt-auto">
-                                    <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                    <button type="button" class="btn btn-outline-info btn-sm w-100 mb-2" 
+                                            data-bs-toggle="modal" data-bs-target="#detalheTrilhaModal"
+                                            onclick="carregarDetalheTrilha({{ trilha.id }})">
                                         <i class="bi bi-eye"></i> Ver Detalhes
-                                    </a>
+                                    </button>
                                     
                                     {% if is_professor_na_sala %}
-                                    <a href="{% url 'cursos:editar_trilha' trilha.id %}" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                    <button type="button" class="btn btn-outline-warning btn-sm w-100 mb-2"
+                                            data-bs-toggle="modal" data-bs-target="#editarTrilhaModal"
+                                            onclick="carregarEditarTrilha({{ trilha.id }})">
                                         <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    <a href="{% url 'cursos:excluir_trilha' trilha.id %}" class="btn btn-outline-danger btn-sm w-100">
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                            data-bs-toggle="modal" data-bs-target="#excluirTrilhaModal"
+                                            onclick="confirmarExcluirTrilha({{ trilha.id }}, '{{ trilha.nome }}')">
                                         <i class="bi bi-trash"></i> Excluir
-                                    </a>
+                                    </button>
                                     {% endif %}
                                 </div>
                             </div>
@@ -343,9 +349,9 @@
 
                 {% if is_professor_na_sala %}
                 <div class="mt-4 text-center">
-                    <a href="{% url 'cursos:criar_trilha' sala_id=sala.id %}" class="btn btn-info">
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#criarTrilhaModal">
                         <i class="bi bi-plus-circle"></i> Criar Nova Trilha
-                    </a>
+                    </button>
                 </div>
                 {% endif %}
             {% else %}
@@ -354,9 +360,9 @@
                     <h5>Nenhuma trilha criada para esta sala</h5>
                     {% if is_professor_na_sala %}
                         <p>Crie trilhas para organizar o conteúdo de aprendizado!</p>
-                        <a href="{% url 'cursos:criar_trilha' sala_id=sala.id %}" class="btn btn-info">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#criarTrilhaModal">
                             <i class="bi bi-plus-circle"></i> Criar Primeira Trilha
-                        </a>
+                        </button>
                     {% else %}
                         <p>Aguarde o professor criar trilhas para esta sala.</p>
                     {% endif %}
@@ -533,7 +539,120 @@
         </div>
     </div>
 </div>
-{% endif %}
+
+<!-- MODAL CRIAR TRILHA -->
+<div class="modal fade" id="criarTrilhaModal" tabindex="-1" aria-labelledby="criarTrilhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-info">
+            <div class="modal-header bg-info text-dark border-info">
+                <h5 class="modal-title fw-bold" id="criarTrilhaModalLabel">
+                    <i class="bi bi-diagram-3"></i> Criar Nova Trilha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'cursos:criar_trilha' sala_id=sala.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="trilha_nome" class="form-label text-white fw-bold">Nome da Trilha</label>
+                        <input type="text" class="form-control input-estilo" id="trilha_nome" name="nome" required 
+                               placeholder="Ex: Python Básico">
+                    </div>
+                    <div class="mb-3">
+                        <label for="trilha_descricao" class="form-label text-white fw-bold">Descrição (opcional)</label>
+                        <textarea class="form-control input-estilo" id="trilha_descricao" name="descricao" rows="3" 
+                                  placeholder="O que o aluno vai aprender nessa trilha..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-info gap-2 flex-column flex-sm-row">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info text-dark fw-bold w-100 w-sm-auto">
+                        <i class="bi bi-plus-circle"></i> Criar Trilha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DETALHE TRILHA -->
+<div class="modal fade" id="detalheTrilhaModal" tabindex="-1" aria-labelledby="detalheTrilhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-white border-info">
+            <div class="modal-header bg-info text-dark border-info">
+                <h5 class="modal-title fw-bold" id="detalheTrilhaModalLabel">
+                    <i class="bi bi-diagram-3"></i> Detalhes da Trilha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detalheTrilhaContent">
+                <p class="text-muted">Carregando...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR TRILHA -->
+<div class="modal fade" id="editarTrilhaModal" tabindex="-1" aria-labelledby="editarTrilhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="editarTrilhaModalLabel">
+                    <i class="bi bi-pencil"></i> Editar Trilha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="editarTrilhaForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Nome da Trilha</label>
+                        <input type="text" class="form-control input-estilo" id="editar_trilha_nome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Descrição (opcional)</label>
+                        <textarea class="form-control input-estilo" id="editar_trilha_descricao" name="descricao" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
+                        <i class="bi bi-check-circle"></i> Salvar Mudanças
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXCLUIR TRILHA -->
+<div class="modal fade" id="excluirTrilhaModal" tabindex="-1" aria-labelledby="excluirTrilhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-danger">
+            <div class="modal-header bg-danger text-white border-danger">
+                <h5 class="modal-title fw-bold" id="excluirTrilhaModalLabel">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a trilha <strong id="excluirTrilhaNome"></strong>?</p>
+                <p class="text-muted small">⚠️ Todos os módulos e conteúdos serão removidos permanentemente.</p>
+            </div>
+            <div class="modal-footer border-danger gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" id="excluirTrilhaForm" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Sim, Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Bronze (única cor extra necessária) -->
 <style>
@@ -543,6 +662,89 @@
     const CHAT_MESSAGES_URL = "{% url 'usuarios:sala_messages' sala.id %}";
     const CURRENT_USER_ID = {{ request.user.id }};
     const CURRENT_USER_NAME = "{{ request.user.get_nome_exibicao }}";
+    
+    // Carregar detalhes da trilha via AJAX
+    function carregarDetalheTrilha(trilhaId) {
+        const content = document.getElementById('detalheTrilhaContent');
+        content.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"><span class="visually-hidden">Carregando...</span></div></div>';
+        
+        fetch(`/cursos/trilha/${trilhaId}/`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao carregar');
+            return response.json();
+        })
+        .then(data => {
+            content.innerHTML = `
+                <div class="mb-3">
+                    <h6 class="text-info fw-bold"><i class="bi bi-bookmark-fill"></i> Nome</h6>
+                    <p class="ms-3">${data.nome}</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-info fw-bold"><i class="bi bi-file-text"></i> Descrição</h6>
+                    <p class="ms-3">${data.descricao || '<em class="text-muted">Sem descrição</em>'}</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="text-info fw-bold"><i class="bi bi-graph-up"></i> Seu Progresso</h6>
+                    <div class="progress ms-3" style="height: 20px;">
+                        <div class="progress-bar bg-info" style="width: ${data.progresso}%;" role="progressbar">
+                            ${data.progresso}%
+                        </div>
+                    </div>
+                </div>
+                ${data.pontos_necessarios > 0 ? `
+                <div class="mb-3">
+                    <h6 class="text-warning fw-bold"><i class="bi bi-star-fill"></i> Pontos Necessários</h6>
+                    <p class="ms-3">${data.pontos_necessarios}</p>
+                </div>
+                ` : ''}
+            `;
+        })
+        .catch(error => {
+            content.innerHTML = '<p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Erro ao carregar detalhes</p>';
+            console.error('Erro:', error);
+        });
+    }
+    
+    // Carregar formulário de edição
+    function carregarEditarTrilha(trilhaId) {
+        fetch(`/cursos/trilha/${trilhaId}/`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao carregar');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('editar_trilha_nome').value = data.nome;
+            document.getElementById('editar_trilha_descricao').value = data.descricao || '';
+            
+            const form = document.getElementById('editarTrilhaForm');
+            form.action = `/cursos/trilha/${trilhaId}/editar/`;
+        })
+        .catch(error => {
+            alert('Erro ao carregar dados da trilha');
+            console.error('Erro:', error);
+        });
+    }
+    
+    // Confirmar exclusão
+    function confirmarExcluirTrilha(trilhaId, trilhaNome) {
+        document.getElementById('excluirTrilhaNome').textContent = trilhaNome;
+        
+        const form = document.getElementById('excluirTrilhaForm');
+        form.action = `/cursos/trilha/${trilhaId}/excluir/`;
+        
+        // Reset do formulário para garantir que é enviado corretamente
+        form.method = 'POST';
+    }
 </script>
 <script src="{% static 'js/chat_sala.js' %}"></script>
 {% endblock %}
