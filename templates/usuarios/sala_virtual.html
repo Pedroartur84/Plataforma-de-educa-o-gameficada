@@ -69,6 +69,11 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="trilhas-tab" data-bs-toggle="tab" data-bs-target="#trilhas" type="button">
+                <i class="bi bi-diagram-3"></i> Trilhas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button">
                 <i class="bi bi-info-circle"></i> Informações
             </button>
@@ -294,6 +299,71 @@
             </div>
         </div>
 
+        <!-- TRILHAS -->
+        <div class="tab-pane fade" id="trilhas" role="tabpanel">
+            {% if trilhas %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for trilha in trilhas %}
+                    <div class="col">
+                        <div class="card h-100 border-info shadow-sm card-no-scale">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-info fw-bold">{{ trilha.nome }}</h5>
+                                <p class="card-text text-muted small flex-grow-1">{{ trilha.descricao|truncatewords:18 }}</p>
+                                
+                                <div class="mt-3 mb-3">
+                                    <small class="text-muted d-block mb-2">Progresso:</small>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-info" role="progressbar" 
+                                             style="width: {{ trilha.progresso_usuario }}%"
+                                             aria-valuenow="{{ trilha.progresso_usuario }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ trilha.progresso_usuario }}% concluído</small>
+                                </div>
+
+                                <div class="mt-auto">
+                                    <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                        <i class="bi bi-eye"></i> Ver Detalhes
+                                    </a>
+                                    
+                                    {% if is_professor_na_sala %}
+                                    <a href="{% url 'cursos:editar_trilha' trilha.id %}" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a href="{% url 'cursos:excluir_trilha' trilha.id %}" class="btn btn-outline-danger btn-sm w-100">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if is_professor_na_sala %}
+                <div class="mt-4 text-center">
+                    <a href="{% url 'cursos:criar_trilha' %}" class="btn btn-info">
+                        <i class="bi bi-plus-circle"></i> Criar Nova Trilha
+                    </a>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-diagram-3 fs-1 d-block mb-3 opacity-50"></i>
+                    <h5>Nenhuma trilha criada para esta sala</h5>
+                    {% if is_professor_na_sala %}
+                        <p>Crie trilhas para organizar o conteúdo de aprendizado!</p>
+                        <a href="{% url 'cursos:criar_trilha' sala_id=sala.id %}" class="btn btn-info">
+                            <i class="bi bi-plus-circle"></i> Criar Primeira Trilha
+                        </a>
+                    {% else %}
+                        <p>Aguarde o professor criar trilhas para esta sala.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
         <!-- INFORMAÇÕES -->
         <div class="tab-pane fade" id="info" role="tabpanel">
             <div class="card card-no-scale">
@@ -309,6 +379,26 @@
                             {{ minha_participacao.get_tipo_na_sala_display }}
                         </span>
                     </p>
+                    
+                    <hr>
+                    
+                    <div class="d-flex flex-column gap-2">
+                        {% if minha_participacao.tipo_na_sala == 'professor' %}
+                        <div>
+                            <a href="{% url 'usuarios:deixar_professor' sala.id %}" class="btn btn-outline-warning w-100">
+                                <i class="bi bi-box-arrow-left"></i> Deixar de Ser Professor
+                            </a>
+                            <small class="text-muted d-block mt-2">Você continuará como aluno na sala.</small>
+                        </div>
+                        {% endif %}
+                        
+                        <div>
+                            <a href="{% url 'usuarios:sair_sala' sala.id %}" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-door-left"></i> Sair da Sala
+                            </a>
+                            <small class="text-muted d-block mt-2">Você perderá acesso a todas as atividades desta sala.</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

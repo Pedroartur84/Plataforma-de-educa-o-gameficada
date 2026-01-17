@@ -54,7 +54,7 @@ def marcar_aula_concluida(request, aula_id):
 def lista_trilhas(request):
     """
     Lista todas as trilhas disponíveis nas salas do usuário.
-    Mostra progresso e status de desbloqueio.
+    Mostra progresso visual (% de conteúdos completados).
     """
     # Buscar salas do usuário
     participacoes = ParticipacaoSala.objects.filter(usuario=request.user).select_related('sala')
@@ -63,24 +63,31 @@ def lista_trilhas(request):
     # Buscar trilhas dessas salas
     trilhas = Trilha.objects.filter(
         sala_id__in=salas_ids
-    ).select_related('sala', 'trilha_anterior').prefetch_related(
+    ).select_related('sala', 'professor').prefetch_related(
         Prefetch('modulos', queryset=Modulo.objects.prefetch_related('conteudos'))
     ).order_by('sala__nome', 'ordem')
     
-    # Calcular progresso e status de cada trilha
+    # Calcular progresso de cada trilha
     trilhas_com_progresso = []
     for trilha in trilhas:
         total_conteudos = trilha.total_conteudos()
         conteudos_completos = trilha.conteudos_completos_usuario(request.user)
+        conteudos_visualizados = trilha.conteudos_visualizados_usuario(request.user)
         progresso = trilha.progresso_usuario(request.user)
-        desbloqueada = trilha.esta_desbloqueada_para(request.user)
+        
+        # Verificar se o usuário é o professor desta trilha
+        eh_professor = (
+            trilha.professor == request.user or 
+            request.user.tipo_usuario == 'admin'
+        )
         
         trilhas_com_progresso.append({
             'trilha': trilha,
             'progresso': progresso,
-            'desbloqueada': desbloqueada,
             'total_conteudos': total_conteudos,
             'completos': conteudos_completos,
+            'visualizados': conteudos_visualizados,
+            'eh_professor': eh_professor,
         })
     
     return render(request, 'cursos/lista_trilhas.html', {
@@ -92,10 +99,15 @@ def lista_trilhas(request):
 def detalhe_trilha(request, trilha_id):
     """
     Exibe os módulos e conteúdos de uma trilha específica.
-    Mostra progresso detalhado e permite navegação.
+    Mostra progresso detalhado (% de conteúdos completados).
+    
+    Permissões:
+    - PROFESSOR (da sala): pode editar, reordenar, adicionar conteúdo
+    - ALUNO: visualiza apenas
+    - ADMIN: visualiza apenas (ou pode corrigir se necessário)
     """
     trilha = get_object_or_404(
-        Trilha.objects.select_related('sala', 'trilha_anterior'),
+        Trilha.objects.select_related('sala', 'professor'),
         id=trilha_id
     )
     
@@ -109,18 +121,11 @@ def detalhe_trilha(request, trilha_id):
         messages.error(request, 'Você não tem acesso a esta trilha.')
         return redirect('cursos:lista_trilhas')
     
-    # Verificar se está desbloqueada
-    desbloqueada = trilha.esta_desbloqueada_para(request.user)
-    
-    if not desbloqueada:
-        mensagem_bloqueio = []
-        if trilha.pontos_necessarios > 0:
-            faltam = trilha.pontos_necessarios - request.user.pontos_totais
-            mensagem_bloqueio.append(f'Você precisa de mais {faltam} pontos')
-        if trilha.trilha_anterior:
-            mensagem_bloqueio.append(f'Complete a trilha "{trilha.trilha_anterior.nome}" primeiro')
-        
-        messages.warning(request, ' e '.join(mensagem_bloqueio) + '.')
+    # Verificar se é o professor responsável ou admin
+    eh_professor = (
+        participacao.tipo_na_sala == 'professor' or 
+        request.user.tipo_usuario == 'admin'
+    )
     
     # Buscar módulos com suas informações
     modulos = trilha.modulos.prefetch_related('conteudos', 'missoes').all()
@@ -162,9 +167,8 @@ def detalhe_trilha(request, trilha_id):
     context = {
         'trilha': trilha,
         'modulos_com_progresso': modulos_com_progresso,
-        'desbloqueada': desbloqueada,
         'progresso_geral': progresso_geral,
-        'is_professor': participacao.tipo_na_sala == 'professor',
+        'eh_professor': eh_professor,
         'participacao': participacao,
     }
     
@@ -176,6 +180,8 @@ def visualizar_conteudo(request, conteudo_id):
     """
     Exibe um conteúdo específico e marca como visualizado.
     Permite marcar como completo e navegar para próximo/anterior.
+    
+    NÃO HÁ BLOQUEIOS: qualquer aluno pode visualizar qualquer conteúdo.
     """
     conteudo = get_object_or_404(
         ConteudoModulo.objects.select_related('modulo__trilha__sala'),
@@ -184,7 +190,7 @@ def visualizar_conteudo(request, conteudo_id):
     
     trilha = conteudo.modulo.trilha
     
-    # Verificar acesso
+    # Verificar acesso à sala
     participacao = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=trilha.sala
@@ -193,11 +199,6 @@ def visualizar_conteudo(request, conteudo_id):
     if not participacao:
         messages.error(request, 'Acesso negado.')
         return redirect('cursos:lista_trilhas')
-    
-    # Verificar se a trilha está desbloqueada
-    if not trilha.esta_desbloqueada_para(request.user):
-        messages.error(request, 'Esta trilha está bloqueada para você.')
-        return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
     # Criar ou buscar visualização
     visualizacao, created = VisualizacaoConteudo.objects.get_or_create(
@@ -265,12 +266,13 @@ def visualizar_conteudo(request, conteudo_id):
 @login_required
 def criar_trilha(request, sala_id):
     """
-    Permite professor criar uma nova trilha.
-    Formulário via modal no template.
+    Permite PROFESSOR criar uma nova trilha nessa sala.
+    
+    Permissões: SOMENTE professor dessa sala pode criar
     """
     sala = get_object_or_404(Sala, id=sala_id)
     
-    # Verificar se é professor
+    # Verificar se é professor dessa sala
     participacao = ParticipacaoSala.objects.filter(
         usuario=request.user,
         sala=sala,
@@ -278,18 +280,21 @@ def criar_trilha(request, sala_id):
     ).first()
     
     if not participacao:
-        messages.error(request, 'Apenas professores podem criar trilhas.')
+        messages.error(request, 'Apenas professores podem criar trilhas nesta sala.')
         return redirect('usuarios:sala_virtual', sala_id=sala_id)
     
     if request.method == 'POST':
         nome = request.POST.get('nome', '').strip()
         descricao = request.POST.get('descricao', '').strip()
-        pontos_necessarios = int(request.POST.get('pontos_necessarios', 0))
-        trilha_anterior_id = request.POST.get('trilha_anterior') or None
         
         if not nome:
             messages.error(request, 'O nome da trilha é obrigatório.')
-            return redirect('cursos:lista_trilhas')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
+        
+        # Verificar se já existe trilha com esse nome nessa sala
+        if Trilha.objects.filter(sala=sala, nome=nome).exists():
+            messages.error(request, 'Já existe uma trilha com este nome nesta sala.')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
         
         # Criar trilha
         ordem_atual = Trilha.objects.filter(sala=sala).count()
@@ -298,32 +303,128 @@ def criar_trilha(request, sala_id):
             sala=sala,
             nome=nome,
             descricao=descricao,
-            pontos_necessarios=pontos_necessarios,
-            trilha_anterior_id=trilha_anterior_id,
             ordem=ordem_atual,
-            criador=request.user
+            professor=request.user  # O professor responsável é quem criou
         )
         
         messages.success(request, f'✓ Trilha "{nome}" criada com sucesso!')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
-    return redirect('cursos:lista_trilhas')
+    return redirect('usuarios:sala_virtual', sala_id=sala_id)
+
+
+@login_required
+def editar_trilha(request, trilha_id):
+    """
+    Permite PROFESSOR editar uma trilha.
+    
+    Permissões: SOMENTE professor responsável pela trilha
+    """
+    trilha = get_object_or_404(Trilha, id=trilha_id)
+    
+    # Verificar permissão: é o professor da trilha?
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Você não tem permissão para editar esta trilha.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    if request.method == 'POST':
+        nome = request.POST.get('nome', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        
+        if not nome:
+            messages.error(request, 'O nome da trilha é obrigatório.')
+            return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+        
+        # Verificar se outro já tem esse nome (exceto ele mesmo)
+        if Trilha.objects.filter(sala=trilha.sala, nome=nome).exclude(id=trilha.id).exists():
+            messages.error(request, 'Já existe outra trilha com este nome nesta sala.')
+            return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+        
+        trilha.nome = nome
+        trilha.descricao = descricao
+        trilha.save()
+        
+        messages.success(request, f'✓ Trilha "{nome}" atualizada com sucesso!')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+
+
+@login_required
+def excluir_trilha(request, trilha_id):
+    """
+    Permite PROFESSOR excluir uma trilha (e todos seus módulos/conteúdos).
+    
+    Permissões: SOMENTE professor responsável pela trilha
+    """
+    trilha = get_object_or_404(Trilha, id=trilha_id)
+    sala_id = trilha.sala.id
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Você não tem permissão para excluir esta trilha.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    if request.method == 'POST':
+        nome_trilha = trilha.nome
+        trilha.delete()
+        messages.success(request, f'✓ Trilha "{nome_trilha}" excluída com sucesso!')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    # GET: mostrar confirmação
+    return render(request, 'cursos/confirmar_excluir_trilha.html', {
+        'trilha': trilha,
+    })
+
+
+@login_required
+def reordenar_trilhas(request, sala_id):
+    """
+    Permite PROFESSOR reordenar as trilhas da sala.
+    
+    Recebe JSON com nova ordem via AJAX.
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+    
+    # Verificar se é professor dessa sala
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user,
+        sala=sala,
+        tipo_na_sala='professor'
+    ).first()
+    
+    if not participacao and request.user.tipo_usuario != 'admin':
+        return JsonResponse({'erro': 'Sem permissão'}, status=403)
+    
+    if request.method == 'POST':
+        try:
+            import json
+            dados = json.loads(request.body)
+            nova_ordem = dados.get('ordem', [])
+            
+            # Atualizar ordem das trilhas
+            for idx, trilha_id in enumerate(nova_ordem):
+                Trilha.objects.filter(id=trilha_id, sala=sala).update(ordem=idx)
+            
+            return JsonResponse({'sucesso': True})
+        except Exception as e:
+            return JsonResponse({'erro': str(e)}, status=400)
+    
+    return JsonResponse({'erro': 'Método não permitido'}, status=405)
 
 
 @login_required
 def criar_modulo(request, trilha_id):
-    """Permite professor criar um módulo em uma trilha"""
+    """
+    Permite PROFESSOR criar um módulo em uma trilha.
+    
+    Permissões: SOMENTE professor responsável pela trilha
+    """
     trilha = get_object_or_404(Trilha, id=trilha_id)
     
     # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
-        usuario=request.user,
-        sala=trilha.sala,
-        tipo_na_sala='professor'
-    ).first()
-    
-    if not participacao:
-        messages.error(request, 'Apenas professores podem criar módulos.')
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Apenas o professor desta trilha pode criar módulos.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
     
     if request.method == 'POST':
@@ -350,20 +451,102 @@ def criar_modulo(request, trilha_id):
 
 
 @login_required
-def adicionar_conteudo(request, modulo_id):
-    """Permite professor adicionar conteúdo a um módulo"""
+def editar_modulo(request, modulo_id):
+    """
+    Permite PROFESSOR editar um módulo.
+    """
     modulo = get_object_or_404(Modulo, id=modulo_id)
     trilha = modulo.trilha
     
     # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
-        usuario=request.user,
-        sala=trilha.sala,
-        tipo_na_sala='professor'
-    ).first()
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Sem permissão para editar este módulo.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
     
-    if not participacao:
-        messages.error(request, 'Apenas professores podem adicionar conteúdo.')
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        
+        if not titulo:
+            messages.error(request, 'O título do módulo é obrigatório.')
+            return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+        
+        modulo.titulo = titulo
+        modulo.descricao = descricao
+        modulo.save()
+        
+        messages.success(request, f'✓ Módulo "{titulo}" atualizado!')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+
+
+@login_required
+def excluir_modulo(request, modulo_id):
+    """
+    Permite PROFESSOR excluir um módulo (e seus conteúdos).
+    """
+    modulo = get_object_or_404(Modulo, id=modulo_id)
+    trilha = modulo.trilha
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Sem permissão para excluir este módulo.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    if request.method == 'POST':
+        titulo = modulo.titulo
+        modulo.delete()
+        messages.success(request, f'✓ Módulo "{titulo}" excluído!')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha_id)
+    
+    return render(request, 'cursos/confirmar_excluir_modulo.html', {
+        'modulo': modulo,
+        'trilha': trilha,
+    })
+
+
+@login_required
+def reordenar_modulos(request, trilha_id):
+    """
+    Permite PROFESSOR reordenar módulos da trilha via AJAX.
+    """
+    trilha = get_object_or_404(Trilha, id=trilha_id)
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        return JsonResponse({'erro': 'Sem permissão'}, status=403)
+    
+    if request.method == 'POST':
+        try:
+            import json
+            dados = json.loads(request.body)
+            nova_ordem = dados.get('ordem', [])
+            
+            # Atualizar ordem dos módulos
+            for idx, modulo_id in enumerate(nova_ordem):
+                Modulo.objects.filter(id=modulo_id, trilha=trilha).update(ordem=idx)
+            
+            return JsonResponse({'sucesso': True})
+        except Exception as e:
+            return JsonResponse({'erro': str(e)}, status=400)
+    
+    return JsonResponse({'erro': 'Método não permitido'}, status=405)
+
+
+@login_required
+def adicionar_conteudo(request, modulo_id):
+    """
+    Permite PROFESSOR adicionar conteúdo a um módulo.
+    
+    Permissões: SOMENTE professor responsável pela trilha
+    """
+    modulo = get_object_or_404(Modulo, id=modulo_id)
+    trilha = modulo.trilha
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Apenas o professor desta trilha pode adicionar conteúdo.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
     if request.method == 'POST':
@@ -398,25 +581,99 @@ def adicionar_conteudo(request, modulo_id):
 
 
 @login_required
-def excluir_conteudo(request, conteudo_id):
-    """Permite professor excluir um conteúdo"""
+def editar_conteudo(request, conteudo_id):
+    """
+    Permite PROFESSOR editar um conteúdo.
+    """
     conteudo = get_object_or_404(ConteudoModulo, id=conteudo_id)
     trilha = conteudo.modulo.trilha
     
     # Verificar permissão
-    participacao = ParticipacaoSala.objects.filter(
-        usuario=request.user,
-        sala=trilha.sala,
-        tipo_na_sala='professor'
-    ).first()
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Sem permissão para editar este conteúdo.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
-    if not participacao:
-        messages.error(request, 'Apenas professores podem excluir conteúdo.')
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo', '').strip()
+        tipo = request.POST.get('tipo')
+        conteudo_texto = request.POST.get('conteudo', '').strip()
+        link = request.POST.get('link', '').strip()
+        arquivo = request.FILES.get('arquivo')
+        duracao = int(request.POST.get('duracao_estimada', 0))
+        
+        if not titulo or not tipo:
+            messages.error(request, 'Título e tipo são obrigatórios.')
+            return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
+        
+        conteudo.titulo = titulo
+        conteudo.tipo = tipo
+        conteudo.conteudo = conteudo_texto
+        conteudo.link = link
+        conteudo.duracao_estimada = duracao
+        
+        if arquivo:
+            conteudo.arquivo = arquivo
+        
+        conteudo.save()
+        
+        messages.success(request, f'✓ Conteúdo "{titulo}" atualizado!')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
+    
+    return render(request, 'cursos/editar_conteudo.html', {
+        'conteudo': conteudo,
+        'trilha': trilha,
+    })
+
+
+@login_required
+def excluir_conteudo(request, conteudo_id):
+    """
+    Permite PROFESSOR excluir um conteúdo.
+    """
+    conteudo = get_object_or_404(ConteudoModulo, id=conteudo_id)
+    trilha = conteudo.modulo.trilha
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        messages.error(request, 'Sem permissão para excluir este conteúdo.')
         return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
     if request.method == 'POST':
         titulo = conteudo.titulo
         conteudo.delete()
-        messages.success(request, f'Conteúdo "{titulo}" excluído.')
+        messages.success(request, f'✓ Conteúdo "{titulo}" excluído.')
+        return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
     
-    return redirect('cursos:detalhe_trilha', trilha_id=trilha.id)
+    return render(request, 'cursos/confirmar_excluir_conteudo.html', {
+        'conteudo': conteudo,
+        'trilha': trilha,
+    })
+
+
+@login_required
+def reordenar_conteudos(request, modulo_id):
+    """
+    Permite PROFESSOR reordenar conteúdos do módulo via AJAX.
+    """
+    modulo = get_object_or_404(Modulo, id=modulo_id)
+    trilha = modulo.trilha
+    
+    # Verificar permissão
+    if trilha.professor != request.user and request.user.tipo_usuario != 'admin':
+        return JsonResponse({'erro': 'Sem permissão'}, status=403)
+    
+    if request.method == 'POST':
+        try:
+            import json
+            dados = json.loads(request.body)
+            nova_ordem = dados.get('ordem', [])
+            
+            # Atualizar ordem dos conteúdos
+            for idx, conteudo_id in enumerate(nova_ordem):
+                ConteudoModulo.objects.filter(id=conteudo_id, modulo=modulo).update(ordem=idx)
+            
+            return JsonResponse({'sucesso': True})
+        except Exception as e:
+            return JsonResponse({'erro': str(e)}, status=400)
+    
+    return JsonResponse({'erro': 'Método não permitido'}, status=405)

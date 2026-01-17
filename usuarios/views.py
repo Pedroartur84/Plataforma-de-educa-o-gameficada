@@ -68,24 +68,23 @@ def principal(request):
 def criar_sala(request):
     if request.method == 'POST':
         form = SalaForm(request.POST)
-        tipo_na_sala = request.POST.get('tipo_na_sala')  # rádio button no template
         
-        if form.is_valid() and tipo_na_sala in ['professor', 'aluno']:
+        if form.is_valid():
             sala = form.save(commit=False)
             sala.criador = request.user
             sala.save()
 
-            # Criar participação do usuário na sala
+            # Criar participação do usuário como ALUNO
             ParticipacaoSala.objects.create(
                 usuario=request.user,
                 sala=sala,
-                tipo_na_sala=tipo_na_sala
+                tipo_na_sala='aluno'
             )
             
-            messages.success(request, f"Sala '{sala.nome}' criada! Você entrou como {tipo_na_sala}.")
-            return redirect('usuarios:sala_virtual', sala_id=sala.id)
+            messages.success(request, f"Sala '{sala.nome}' criada! Agora escolha um professor.")
+            return redirect('usuarios:atribuir_professor', sala_id=sala.id)
         else:
-            messages.error(request, 'Por favor, selecione um tipo de participação válido.')
+            messages.error(request, 'Por favor, verifique os dados da sala.')
     else:
         form = SalaForm()
     
@@ -189,6 +188,10 @@ def sala_virtual(request, sala_id):
     # TÍTULOS DA SALA
     titulos_sala = Titulo.objects.filter(tipo='sala')
 
+    # TRILHAS DA SALA
+    from cursos.models import Trilha
+    trilhas_sala = Trilha.objects.filter(sala=sala)
+
     # Verificar se usuário é professor nesta sala
     is_professor_na_sala = participacao.tipo_na_sala == 'professor'
 
@@ -199,8 +202,138 @@ def sala_virtual(request, sala_id):
         'is_professor_na_sala': is_professor_na_sala,
         'minha_participacao': participacao,
         'titulos_sala': titulos_sala,
+        'trilhas': trilhas_sala,
     }
     return render(request, 'usuarios/sala_virtual.html', context)
+
+
+@login_required
+def atribuir_professor(request, sala_id):
+    """
+    Permite que um membro da sala atribua outro membro como professor.
+    Apenas um aluno (criador da sala) pode fazer isso inicialmente.
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+    
+    # Verificar se criador está tentando atribuir professor
+    if sala.criador != request.user:
+        messages.error(request, 'Apenas o criador da sala pode atribuir professor.')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    # Verificar se já há professor nesta sala
+    professor_existente = ParticipacaoSala.objects.filter(
+        sala=sala,
+        tipo_na_sala='professor'
+    ).first()
+    
+    if professor_existente:
+        messages.info(request, f'A sala já tem um professor: {professor_existente.usuario.get_nome_exibicao()}')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    # Buscar todos os alunos da sala
+    alunos_sala = ParticipacaoSala.objects.filter(
+        sala=sala,
+        tipo_na_sala='aluno'
+    ).select_related('usuario')
+    
+    if request.method == 'POST':
+        usuario_id = request.POST.get('professor_id')
+        try:
+            usuario = Usuario.objects.get(id=usuario_id)
+            participacao = ParticipacaoSala.objects.get(usuario=usuario, sala=sala)
+            
+            # Alterar para professor
+            participacao.tipo_na_sala = 'professor'
+            participacao.save()
+            
+            messages.success(request, f'{usuario.get_nome_exibicao()} agora é professor da sala!')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
+        except (Usuario.DoesNotExist, ParticipacaoSala.DoesNotExist):
+            messages.error(request, 'Usuário não encontrado nesta sala.')
+    
+    return render(request, 'usuarios/atribuir_professor.html', {
+        'sala': sala,
+        'alunos': alunos_sala,
+    })
+
+
+@login_required
+def deixar_de_ser_professor(request, sala_id):
+    """
+    Permite que um professor deixe de ser professor e volte a ser aluno.
+    Se for o único professor, não pode deixar (ou vai deixar a sala sem professor).
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+    
+    # Verificar se usuário é professor nesta sala
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user,
+        sala=sala,
+        tipo_na_sala='professor'
+    ).first()
+    
+    if not participacao:
+        messages.error(request, 'Você não é professor desta sala.')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    # Contar quantos professores tem
+    num_professores = ParticipacaoSala.objects.filter(
+        sala=sala,
+        tipo_na_sala='professor'
+    ).count()
+    
+    if num_professores == 1:
+        messages.warning(request, 'Você é o único professor da sala. Designe outro professor primeiro.')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    if request.method == 'POST':
+        participacao.tipo_na_sala = 'aluno'
+        participacao.save()
+        messages.success(request, 'Você deixou de ser professor e voltou a ser aluno.')
+        return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    return render(request, 'usuarios/confirmar_deixar_professor.html', {
+        'sala': sala,
+    })
+
+
+@login_required
+def sair_da_sala(request, sala_id):
+    """
+    Permite que um usuário saia de uma sala.
+    """
+    sala = get_object_or_404(Sala, id=sala_id)
+    
+    # Verificar se usuário participa da sala
+    participacao = ParticipacaoSala.objects.filter(
+        usuario=request.user,
+        sala=sala
+    ).first()
+    
+    if not participacao:
+        messages.error(request, 'Você não participa desta sala.')
+        return redirect('usuarios:pag_principal')
+    
+    # Impedir que saia se é o único professor (criar proteção)
+    if participacao.tipo_na_sala == 'professor':
+        num_professores = ParticipacaoSala.objects.filter(
+            sala=sala,
+            tipo_na_sala='professor'
+        ).count()
+        
+        if num_professores == 1:
+            messages.error(request, 'Você é o único professor da sala. Designe outro professor antes de sair.')
+            return redirect('usuarios:sala_virtual', sala_id=sala_id)
+    
+    if request.method == 'POST':
+        nome_sala = sala.nome
+        participacao.delete()
+        messages.success(request, f'Você saiu da sala "{nome_sala}".')
+        return redirect('usuarios:pag_principal')
+    
+    return render(request, 'usuarios/confirmar_sair_sala.html', {
+        'sala': sala,
+    })
 
 
 @login_required

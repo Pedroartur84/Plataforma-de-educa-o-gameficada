@@ -40,18 +40,18 @@ class ModuloInline(admin.TabularInline):
 
 @admin.register(Trilha)
 class TrilhaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'sala', 'ordem', 'pontos_necessarios', 'total_conteudos', 'criado_em')
-    list_filter = ('sala', 'criado_em')
+    list_display = ('nome', 'sala', 'professor', 'ordem', 'total_conteudos', 'criado_em')
+    list_filter = ('sala', 'professor', 'criado_em')
     search_fields = ('nome', 'sala__nome', 'descricao')
     readonly_fields = ('criado_em', 'atualizado_em')
     
     fieldsets = (
         ('Informações Básicas', {
-            'fields': ('sala', 'nome', 'descricao', 'ordem', 'criador')
+            'fields': ('sala', 'nome', 'descricao', 'ordem')
         }),
-        ('Requisitos de Acesso', {
-            'fields': ('pontos_necessarios', 'trilha_anterior'),
-            'description': 'Defina os requisitos para o aluno acessar esta trilha'
+        ('Responsável', {
+            'fields': ('professor',),
+            'description': 'Professor que gerencia esta trilha'
         }),
         ('Metadados', {
             'fields': ('criado_em', 'atualizado_em'),

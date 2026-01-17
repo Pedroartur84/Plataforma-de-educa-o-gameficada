@@ -19,12 +19,6 @@
             <div class="offcanvas-body">
                 <ul class="navbar-nav flex-wrap flex-grow-1 pe-3">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'usuarios:pag_principal' %}"><i class="bi bi-house-door"></i> Início</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'usuarios:criar_sala' %}"><i class="bi bi-plus-circle"></i> Criar Sala</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'cursos:lista_trilhas' %}"><i class="bi bi-plus-circle"></i> trilhas</a>
                     </li>
                     {% if user.is_authenticated %}

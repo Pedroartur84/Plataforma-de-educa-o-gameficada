@@ -39,38 +39,38 @@ class Progresso(models.Model):
 # ==============================
 class Trilha(models.Model):
     """
-    Sequência estruturada de aprendizado dentro de uma sala.
-    Pode ter requisitos para ser desbloqueada.
+    Caminho pedagógico que o professor desenha para organizar os conteúdos da sala.
+    
+    - Pertence exclusivamente a uma Sala
+    - Criada e gerenciada SOMENTE pelo professor da sala
+    - Funciona como "mapa do caminho" visual - não bloqueia o acesso do aluno
+    - Progresso é apenas informativo (% de conteúdos visualizados/completados)
     """
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='trilhas')
     nome = models.CharField(max_length=200, verbose_name="Nome da Trilha")
-    descricao = models.TextField(verbose_name="Descrição")
+    descricao = models.TextField(verbose_name="Descrição", blank=True)
     ordem = models.IntegerField(default=0, verbose_name="Ordem de Exibição")
     
-    # Requisitos para desbloquear
-    pontos_necessarios = models.IntegerField(
-        default=0, 
-        verbose_name="Pontos Necessários",
-        help_text="Pontos totais que o aluno precisa ter para acessar"
-    )
-    trilha_anterior = models.ForeignKey(
-        'self', 
+    # Controle: quem criou/gerencia esta trilha
+    professor = models.ForeignKey(
+        Usuario, 
+        on_delete=models.SET_NULL, 
         null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL,
-        verbose_name="Trilha Anterior",
-        help_text="Trilha que deve ser completada antes desta"
+        related_name='trilhas_criadas',
+        verbose_name="Professor Responsável",
+        help_text="Professor que criou e gerencia esta trilha"
     )
     
     # Metadata
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
-    criador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         ordering = ['ordem']
-        verbose_name = 'Trilha de Aprendizado'
-        verbose_name_plural = 'Trilhas de Aprendizado'
+        verbose_name = 'Trilha'
+        verbose_name_plural = 'Trilhas'
+        # Garante que o nome seja único por sala
+        unique_together = ('sala', 'nome')
     
     def __str__(self):
         return f"{self.nome} - {self.sala.nome}"
@@ -78,6 +78,13 @@ class Trilha(models.Model):
     def total_conteudos(self):
         """Retorna o número total de conteúdos nesta trilha"""
         return ConteudoModulo.objects.filter(modulo__trilha=self).count()
+    
+    def conteudos_visualizados_usuario(self, usuario):
+        """Retorna quantos conteúdos o usuário visualizou"""
+        return VisualizacaoConteudo.objects.filter(
+            usuario=usuario,
+            conteudo__modulo__trilha=self
+        ).count()
     
     def conteudos_completos_usuario(self, usuario):
         """Retorna quantos conteúdos o usuário completou"""
@@ -88,28 +95,15 @@ class Trilha(models.Model):
         ).count()
     
     def progresso_usuario(self, usuario):
-        """Retorna o percentual de progresso do usuário (0-100)"""
+        """
+        Retorna o percentual de progresso do usuário (0-100).
+        Calcula baseado em conteúdos COMPLETADOS (não bloqueador).
+        """
         total = self.total_conteudos()
         if total == 0:
             return 0
         completos = self.conteudos_completos_usuario(usuario)
         return round((completos / total) * 100, 1)
-    
-    def esta_desbloqueada_para(self, usuario):
-        """Verifica se a trilha está desbloqueada para o usuário"""
-        # Verificar pontos
-        if self.pontos_necessarios > 0:
-            if usuario.pontos_totais < self.pontos_necessarios:
-                return False
-        
-        # Verificar trilha anterior
-        if self.trilha_anterior:
-            total_anterior = self.trilha_anterior.total_conteudos()
-            completos_anterior = self.trilha_anterior.conteudos_completos_usuario(usuario)
-            if total_anterior > 0 and completos_anterior < total_anterior:
-                return False
-        
-        return True
 
 
 class Modulo(models.Model):

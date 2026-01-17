@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar Conteúdo - {{ conteudo.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Editar Conteúdo</h2>
+            <p class="text-muted">Trilha: <strong>{{ trilha.nome }}</strong> > Módulo: <strong>{{ conteudo.modulo.titulo }}</strong></p>
+
+            <form method="post" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título do Conteúdo *</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="titulo" 
+                        name="titulo" 
+                        value="{{ conteudo.titulo }}" 
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="tipo" class="form-label">Tipo de Conteúdo *</label>
+                    <select class="form-select" id="tipo" name="tipo" required>
+                        <option value="">--- Selecione ---</option>
+                        <option value="texto" {% if conteudo.tipo == "texto" %}selected{% endif %}>Texto/Artigo</option>
+                        <option value="video" {% if conteudo.tipo == "video" %}selected{% endif %}>Vídeo</option>
+                        <option value="arquivo" {% if conteudo.tipo == "arquivo" %}selected{% endif %}>Arquivo/PDF</option>
+                        <option value="link" {% if conteudo.tipo == "link" %}selected{% endif %}>Link Externo</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="conteudo" class="form-label">Conteúdo de Texto</label>
+                    <textarea 
+                        class="form-control" 
+                        id="conteudo" 
+                        name="conteudo" 
+                        rows="5"
+                    >{{ conteudo.conteudo }}</textarea>
+                    <small class="form-text text-muted">Use para tipo "Texto/Artigo"</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="link" class="form-label">Link Externo</label>
+                    <input 
+                        type="url" 
+                        class="form-control" 
+                        id="link" 
+                        name="link" 
+                        value="{{ conteudo.link }}"
+                    >
+                    <small class="form-text text-muted">Use para tipo "Link" ou "Vídeo" (YouTube, etc)</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="arquivo" class="form-label">Arquivo</label>
+                    <input 
+                        type="file" 
+                        class="form-control" 
+                        id="arquivo" 
+                        name="arquivo"
+                    >
+                    {% if conteudo.arquivo %}
+                        <small class="form-text text-muted">
+                            Arquivo atual: <a href="{{ conteudo.arquivo.url }}" target="_blank">{{ conteudo.arquivo.name }}</a>
+                        </small>
+                    {% endif %}
+                    <small class="form-text text-muted d-block">Use para tipo "Arquivo" ou "Vídeo"</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="duracao_estimada" class="form-label">Duração Estimada (minutos)</label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="duracao_estimada" 
+                        name="duracao_estimada" 
+                        value="{{ conteudo.duracao_estimada }}"
+                        min="0"
+                    >
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Salvar Alterações
+                    </button>
+                    <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-secondary btn-lg">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
