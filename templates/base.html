@@ -94,6 +94,33 @@
             line-height: 1.5;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
+            padding-top: 70px; /* Espaço para navbar fixa */
+        }
+
+        /* Navbar custom inspirado no visual do docs do Bootstrap (mantendo cores do projeto) */
+        .navbar-custom {
+            background: linear-gradient(to bottom, #2A2A2A, var(--color-dark-bg));
+            border-bottom: 1px solid var(--color-dark-border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+        }
+
+        .navbar-custom .navbar-brand {
+            color: var(--color-primary) !important;
+            font-weight: 700;
+            text-shadow: 0 2px 6px rgba(255,193,7,0.12);
+        }
+
+        .navbar-custom .nav-link {
+            color: var(--color-dark-text) !important;
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: var(--color-primary) !important;
+        }
+        /* Garantir que utilitário text-primary use a cor primária do projeto */
+        .text-primary {
+            color: var(--color-primary) !important;
         }
 
         /* Utilitários de Cor Globais */

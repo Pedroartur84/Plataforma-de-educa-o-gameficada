@@ -409,8 +409,18 @@ def postar_missao(request, sala_id):
         
     if request.method == 'POST':
         form = MissaoForm(request.POST)
+        # limitar choices ao contexto da sala
+        from cursos.models import Trilha, Modulo
+        form.fields['trilha'].queryset = Trilha.objects.filter(sala=sala)
+        form.fields['modulo'].queryset = Modulo.objects.filter(trilha__sala=sala)
+
         if form.is_valid():
             missao = form.save(commit=False)
+            # validação extra: trilha/modulo devem pertencer à sala
+            if not missao.trilha or not missao.modulo or missao.trilha.sala_id != sala.id or missao.modulo.trilha_id != missao.trilha.id:
+                messages.error(request, 'Trilha ou módulo inválido para esta sala.')
+                return redirect('usuarios:sala_virtual', sala_id=sala_id)
+
             missao.sala = sala
             missao.save()
             messages.success(request, 'Missão postada com sucesso!')

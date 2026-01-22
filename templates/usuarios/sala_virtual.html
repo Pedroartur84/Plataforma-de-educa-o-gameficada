@@ -5,42 +5,23 @@
 {% block title %}Sala Virtual - {{ sala.nome }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<main class="flex-grow-1 container py-5">
 
     <!-- Cabeçalho + Botão Voltar - VERSÃO RESPONSIVA -->
     <div class="mb-4">
-        <!-- Layout para desktop -->
-        <div class="d-none d-md-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-start mb-4 flex-column flex-md-row gap-3">
             <div>
-                <h1 class="h3 mb-0 text-warning fw-bold">{{ sala.nome }}</h1>
+                <h1 class="display-5 fw-bold mb-1 text-primary">{{ sala.nome }}</h1>
                 <p class="text-muted mb-0">Criador: {{ sala.criador.get_nome_exibicao }}</p>
             </div>
-            <div class="buttons-container" style="max-width: 300px;">
+            <div class="d-flex gap-3 flex-wrap">
                 {% if is_professor_na_sala %}
-                <button type="button" class="btn btn-warning text-dark fw-bold btn-responsive btn-sm" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
-                    <i class="fas fa-plus"></i> Postar Missão
+                <button type="button" class="btn btn-primary btn-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
+                    <i class="fas fa-plus me-2"></i> Postar Missão
                 </button>
                 {% endif %}
-                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary btn-responsive btn-sm">
-                    <i class="fas fa-home"></i> Voltar
-                </a>
-            </div>
-        </div>
-
-        <!-- Layout para mobile -->
-        <div class="d-md-none">
-            <div class="text-center mb-3">
-                <h1 class="h4 text-warning fw-bold">{{ sala.nome }}</h1>
-                <p class="text-muted small">Criador: {{ sala.criador.get_nome_exibicao }}</p>
-            </div>
-            <div class="buttons-container">
-                {% if is_professor_na_sala %}
-                <button type="button" class="btn btn-warning text-dark fw-bold btn-responsive btn-sm" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
-                    <i class="fas fa-plus"></i> Postar Missão
-                </button>
-                {% endif %}
-                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary btn-responsive btn-sm">
-                    <i class="fas fa-home"></i> Voltar
+                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light btn-lg shadow-sm">
+                    <i class="fas fa-home me-2"></i> Voltar
                 </a>
             </div>
         </div>
@@ -88,21 +69,21 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                     {% for missao in missoes %}
                     <div class="col">
-                        <div class="card h-100 border-warning shadow-sm card-no-scale">
+                        <div class="card h-100 bg-dark border-0 shadow-sm">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-warning fw-bold">{{ missao.titulo }}</h5>
+                                <h5 class="card-title fw-bold text-primary">{{ missao.titulo }}</h5>
                                 <p class="card-text text-muted small flex-grow-1">{{ missao.descricao|truncatewords:18 }}</p>
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="badge bg-warning text-dark fs-6">{{ missao.pontos }} pts</span>
+                                        <span class="badge bg-primary text-dark fs-6">{{ missao.pontos }} pts</span>
                                         <span class="badge 
-                                            {% if missao.status == 'corrigida' %}bg-warning text-dark
-                                            {% elif missao.status == 'concluida' %}bg-primary
+                                            {% if missao.status == 'corrigida' %}bg-primary text-dark
+                                            {% elif missao.status == 'concluida' %}bg-secondary
                                             {% else %}bg-secondary{% endif %}">
                                             {{ missao.get_status_display }}
                                         </span>
                                     </div>
-                                    <a href="{% url 'usuarios:chat_missao' missao.id %}" class="btn btn-outline-warning btn-sm w-100">
+                                    <a href="{% url 'usuarios:chat_missao' missao.id %}" class="btn btn-outline-light btn-sm w-100">
                                         {% if is_professor_na_sala and missao.status == 'concluida' %}
                                             <i class="fas fa-check-double"></i> Corrigir
                                         {% elif missao.status == 'corrigida' %}
@@ -142,17 +123,17 @@
 
         <!-- CHAT -->
         <div class="tab-pane fade" id="chat" role="tabpanel">
-            <div class="card card-no-scale">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Chat Geral</h5>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark text-white border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots text-primary"></i> Chat Geral</h5>
                 </div>
-                <div class="card-body bg-dark text-white p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
-                    <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.05); background:#0b0b0b; min-height: 0;"></div>
+                <div class="card-body p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
+                    <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.03); background:var(--color-dark-bg); min-height: 0;"></div>
 
                     <form class="d-flex gap-2 flex-column flex-md-row" onsubmit="return false;">
                         {% csrf_token %}
                         <textarea id="sala-chat-input" class="form-control input-estilo bg-dark text-white flex-grow-1" rows="2" placeholder="Escreva uma mensagem..."></textarea>
-                        <button id="sala-chat-send" class="btn btn-warning text-dark btn-sm align-self-end" style="min-width: 80px;">Enviar</button>
+                        <button id="sala-chat-send" class="btn btn-primary text-dark btn-sm align-self-end" style="min-width: 80px;">Enviar</button>
                     </form>
                 </div>
             </div>
@@ -160,9 +141,9 @@
 
         <!-- RANKING -->
         <div class="tab-pane fade" id="ranking" role="tabpanel">
-            <div class="card border-warning shadow-lg card-no-scale">
-                <div class="card-header bg-warning text-dark text-center py-3 py-sm-4">
-                    <h4 class="mb-0 fw-bold"><i class="bi bi-trophy"></i> Ranking da Sala</h4>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark text-white text-center py-3 py-sm-4 border-bottom border-secondary">
+                    <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-trophy"></i> Ranking da Sala</h4>
                 </div>
                 <div class="card-body p-0 bg-dark text-white">
                     {% if ranking_sala %}
@@ -222,11 +203,11 @@
 
         <!-- TÍTULOS -->
         <div class="tab-pane fade" id="titulos" role="tabpanel">
-            <div class="card card-no-scale">
-                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 class="mb-0"><i class="bi bi-award"></i> Títulos da Sala</h5>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom border-secondary">
+                    <h5 class="mb-0"><i class="bi bi-award text-primary"></i> Títulos da Sala</h5>
                     {% if is_professor_na_sala %}
-                    <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#criarTituloSalaModal">
+                    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#criarTituloSalaModal">
                         <i class="bi bi-plus-circle"></i> Criar Título
                     </button>
                     {% endif %}
@@ -305,7 +286,8 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                     {% for trilha in trilhas %}
                     <div class="col">
-                        <div class="card h-100 border-info shadow-sm card-no-scale">
+                                <div class="col">
+                                    <div class="card h-100 bg-dark border-0 shadow-sm">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title text-info fw-bold">{{ trilha.nome }}</h5>
                                 <p class="card-text text-muted small flex-grow-1">{{ trilha.descricao|truncatewords:18 }}</p>
@@ -354,6 +336,7 @@
                     </button>
                 </div>
                 {% endif %}
+                
             {% else %}
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-diagram-3 fs-1 d-block mb-3 opacity-50"></i>
@@ -371,25 +354,29 @@
         </div>
 
         <!-- INFORMAÇÕES -->
-        <div class="tab-pane fade" id="info" role="tabpanel">
-            <div class="card card-no-scale">
+        <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div class="card bg-dark border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="text-warning"><i class="bi bi-info-circle"></i> Informações da Sala</h5>
+                    <h5 class="text-primary"><i class="bi bi-info-circle"></i> Informações da Sala</h5>
                     <hr>
-                    <p><strong>Código:</strong> <code>{{ sala.codigo }}</code></p>
-                    <p><strong>Criada em:</strong> {{ sala.data_criacao|date:"d/m/Y" }}</p>
-                    <p><strong>Descrição:</strong> {{ sala.descricao }}</p>
-                    <p><strong>Criador:</strong> {{ sala.criador.get_nome_exibicao }}</p>
-                    <p><strong>Seu papel:</strong> 
+                    <p><strong>Código:</strong> <code>{{ sala.codigo|default:"(não informado)" }}</code></p>
+                    <p><strong>Criada em:</strong> {{ sala.data_criacao|date:"d/m/Y"|default:"(data não disponível)" }}</p>
+                    <p><strong>Descrição:</strong> {{ sala.descricao|default:"(sem descrição)" }}</p>
+                    <p><strong>Criador:</strong> {{ sala.criador.get_nome_exibicao|default:"(desconhecido)" }}</p>
+                    <p><strong>Seu papel:</strong>
+                        {% if minha_participacao %}
                         <span class="badge {% if minha_participacao.tipo_na_sala == 'professor' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
                             {{ minha_participacao.get_tipo_na_sala_display }}
                         </span>
+                        {% else %}
+                        <span class="badge bg-secondary">(não associado)</span>
+                        {% endif %}
                     </p>
-                    
+
                     <hr>
-                    
+
                     <div class="d-flex flex-column gap-2">
-                        {% if minha_participacao.tipo_na_sala == 'professor' %}
+                        {% if minha_participacao and minha_participacao.tipo_na_sala == 'professor' %}
                         <div>
                             <a href="{% url 'usuarios:deixar_professor' sala.id %}" class="btn btn-outline-warning w-100">
                                 <i class="bi bi-box-arrow-left"></i> Deixar de Ser Professor
@@ -397,7 +384,7 @@
                             <small class="text-muted d-block mt-2">Você continuará como aluno na sala.</small>
                         </div>
                         {% endif %}
-                        
+
                         <div>
                             <a href="{% url 'usuarios:sair_sala' sala.id %}" class="btn btn-outline-danger w-100">
                                 <i class="bi bi-door-left"></i> Sair da Sala
@@ -410,7 +397,7 @@
         </div>
 
     </div>
-</div>
+</main>
 
 <!-- Modal para Postar Missão -->
 {% if is_professor_na_sala %}
@@ -447,6 +434,24 @@
                             <label for="data_limite" class="form-label text-white fw-bold">Data Limite</label>
                             <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
                             <div class="form-text text-white-50 small">Opcional</div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-white fw-bold">Trilha</label>
+                            <select id="select_trilha" name="trilha" class="form-select">
+                                <option value="">-- Selecione a Trilha --</option>
+                                {% for t in trilhas %}
+                                <option value="{{ t.id }}">{{ t.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-white fw-bold">Módulo</label>
+                            <select id="select_modulo" name="modulo" class="form-select">
+                                <option value="">-- Selecione o Módulo --</option>
+                                <!-- Será preenchido por JS ao escolher a trilha -->
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -543,8 +548,8 @@
 <!-- MODAL CRIAR TRILHA -->
 <div class="modal fade" id="criarTrilhaModal" tabindex="-1" aria-labelledby="criarTrilhaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-info">
-            <div class="modal-header bg-info text-dark border-info">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="criarTrilhaModalLabel">
                     <i class="bi bi-diagram-3"></i> Criar Nova Trilha
                 </h5>
@@ -563,10 +568,23 @@
                         <textarea class="form-control input-estilo" id="trilha_descricao" name="descricao" rows="3" 
                                   placeholder="O que o aluno vai aprender nessa trilha..."></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Missões que contam para a Trilha (opcional)</label>
+                        <div class="border rounded p-2 bg-dark" style="max-height:220px; overflow:auto;">
+                            {% for missao in missoes %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="missoes" value="{{ missao.id }}" id="criar_missao_{{ missao.id }}">
+                                <label class="form-check-label text-white" for="criar_missao_{{ missao.id }}">{{ missao.titulo }}</label>
+                            </div>
+                            {% empty %}
+                            <div class="text-muted small">Nenhuma missão disponível nesta sala.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer border-info gap-2 flex-column flex-sm-row">
+                <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
                     <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-info text-dark fw-bold w-100 w-sm-auto">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
                         <i class="bi bi-plus-circle"></i> Criar Trilha
                     </button>
                 </div>
@@ -578,8 +596,8 @@
 <!-- MODAL DETALHE TRILHA -->
 <div class="modal fade" id="detalheTrilhaModal" tabindex="-1" aria-labelledby="detalheTrilhaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content bg-dark text-white border-info">
-            <div class="modal-header bg-info text-dark border-info">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="detalheTrilhaModalLabel">
                     <i class="bi bi-diagram-3"></i> Detalhes da Trilha
                 </h5>
@@ -612,6 +630,19 @@
                     <div class="mb-3">
                         <label class="form-label text-white fw-bold">Descrição (opcional)</label>
                         <textarea class="form-control input-estilo" id="editar_trilha_descricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Missões que contam para a Trilha</label>
+                        <div class="border rounded p-2 bg-dark" style="max-height:220px; overflow:auto;">
+                            {% for missao in missoes %}
+                            <div class="form-check">
+                                <input class="form-check-input editar-missao-checkbox" type="checkbox" name="missoes" value="{{ missao.id }}" id="editar_missao_{{ missao.id }}">
+                                <label class="form-check-label text-white" for="editar_missao_{{ missao.id }}">{{ missao.titulo }}</label>
+                            </div>
+                            {% empty %}
+                            <div class="text-muted small">Nenhuma missão disponível nesta sala.</div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
@@ -652,7 +683,7 @@
     </div>
 </div>
 
-
+{% endif %}
 
 <!-- Bronze (única cor extra necessária) -->
 <style>
@@ -663,55 +694,202 @@
     const CURRENT_USER_ID = {{ request.user.id }};
     const CURRENT_USER_NAME = "{{ request.user.get_nome_exibicao }}";
     
-    // Carregar detalhes da trilha via AJAX
+    // Helper: obter cookie (CSRF)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Carregar detalhes da trilha via AJAX (agora com gestão inline de módulos se for professor)
     function carregarDetalheTrilha(trilhaId) {
         const content = document.getElementById('detalheTrilhaContent');
         content.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-info" role="status"><span class="visually-hidden">Carregando...</span></div></div>';
-        
+
         fetch(`/cursos/trilha/${trilhaId}/`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
+            headers: { 'Accept': 'application/json' }
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Erro ao carregar');
-            return response.json();
-        })
+        .then(r => { if (!r.ok) throw new Error('Erro ao carregar'); return r.json(); })
         .then(data => {
-            content.innerHTML = `
+            // Render básico
+            let html = `
                 <div class="mb-3">
-                    <h6 class="text-info fw-bold"><i class="bi bi-bookmark-fill"></i> Nome</h6>
+                    <h6 class="text-warning fw-bold"><i class="bi bi-bookmark-fill"></i> Nome</h6>
                     <p class="ms-3">${data.nome}</p>
                 </div>
                 <div class="mb-3">
-                    <h6 class="text-info fw-bold"><i class="bi bi-file-text"></i> Descrição</h6>
+                    <h6 class="text-warning fw-bold"><i class="bi bi-file-text"></i> Descrição</h6>
                     <p class="ms-3">${data.descricao || '<em class="text-muted">Sem descrição</em>'}</p>
                 </div>
                 <div class="mb-3">
-                    <h6 class="text-info fw-bold"><i class="bi bi-graph-up"></i> Seu Progresso</h6>
+                    <h6 class="text-warning fw-bold"><i class="bi bi-graph-up"></i> Seu Progresso</h6>
                     <div class="progress ms-3" style="height: 20px;">
-                        <div class="progress-bar bg-info" style="width: ${data.progresso}%;" role="progressbar">
-                            ${data.progresso}%
-                        </div>
+                        <div class="progress-bar bg-warning" style="width: ${data.progresso}%;" role="progressbar">${data.progresso}%</div>
                     </div>
                 </div>
-                ${data.pontos_necessarios > 0 ? `
-                <div class="mb-3">
-                    <h6 class="text-warning fw-bold"><i class="bi bi-star-fill"></i> Pontos Necessários</h6>
-                    <p class="ms-3">${data.pontos_necessarios}</p>
-                </div>
-                ` : ''}
             `;
+
+            // Missões
+            if (data.missoes_totais && data.missoes_totais > 0) {
+                html += `
+                    <div class="mb-3">
+                        <h6 class="text-warning fw-bold"><i class="bi bi-list-ul"></i> Missões</h6>
+                        <p class="ms-3 small">Concluídas: ${data.missoes_concluidas} / ${data.missoes_totais}</p>
+                        <ul class="ms-3">${data.missoes.map(m => `<li>${m.titulo}</li>`).join('')}</ul>
+                    </div>
+                `;
+            }
+
+            // Se for professor, adicionar formulário rápido para criar módulo
+            const ehProfessor = Boolean(data.eh_professor);
+            if (ehProfessor) {
+                html += `
+                    <div class="mb-3 border rounded p-3 bg-dark">
+                        <h6 class="text-warning fw-bold"><i class="bi bi-plus-circle"></i> Criar Módulo Rápido</h6>
+                        <div class="row g-2">
+                            <div class="col-12 col-md-6">
+                                <input id="novo_modulo_titulo" class="form-control input-estilo bg-dark text-white" placeholder="Título do módulo">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <input id="novo_modulo_descricao" class="form-control input-estilo bg-dark text-white" placeholder="Descrição (opcional)">
+                            </div>
+                            <div class="col-12 text-end mt-2">
+                                <button class="btn btn-sm btn-warning text-dark" onclick="criarModuloAjax(${trilhaId})">Criar Módulo</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Módulos (lista gerenciada)
+            if (data.modulos && data.modulos.length > 0) {
+                html += `<div class="mb-3"><h6 class="text-warning fw-bold"><i class="bi bi-columns-gap"></i> Módulos</h6><div class="list-group ms-3">`;
+
+                data.modulos.forEach(mod => {
+                    html += `
+                        <div class="list-group-item bg-dark border-secondary mb-2 d-flex justify-content-between align-items-start">
+                            <div class="me-3">
+                                <strong class="text-white">${mod.titulo}</strong>
+                                <div class="small text-muted">${(mod.descricao||'').substring(0,150)}</div>
+                                <div class="small text-muted">${mod.total_conteudos} conteúdos</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-warning fw-bold mb-2">${mod.progresso}%</div>
+                                ${ehProfessor ? `
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-warning" onclick="abrirEditarModulo(${mod.id}, ${trilhaId})">Editar</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="excluirModuloAjax(${mod.id}, ${trilhaId})">Excluir</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            } else {
+                html += `<div class="mb-3"><em class="text-muted">Sem módulos nesta trilha.</em></div>`;
+            }
+
+            content.innerHTML = html;
         })
-        .catch(error => {
+        .catch(err => {
             content.innerHTML = '<p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Erro ao carregar detalhes</p>';
-            console.error('Erro:', error);
+            console.error(err);
         });
+    }
+
+    // Funções AJAX para CRUD de módulos
+    function criarModuloAjax(trilhaId) {
+        const titulo = document.getElementById('novo_modulo_titulo').value.trim();
+        const descricao = document.getElementById('novo_modulo_descricao').value.trim();
+        if (!titulo) return alert('Título do módulo é obrigatório.');
+
+        const csrftoken = getCookie('csrftoken');
+        const body = new URLSearchParams();
+        body.append('titulo', titulo);
+        body.append('descricao', descricao);
+
+        fetch(`/cursos/trilha/${trilhaId}/criar-modulo/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => {
+            if (!r.ok) throw new Error('Erro ao criar módulo');
+            return r.text();
+        })
+        .then(() => {
+            carregarDetalheTrilha(trilhaId);
+        })
+        .catch(e => { alert('Erro ao criar módulo'); console.error(e); });
+    }
+
+    function abrirEditarModulo(moduloId, trilhaId) {
+        // Abrir prompt simples (poderíamos usar modal dedicado)
+        const novoTitulo = prompt('Novo título do módulo:');
+        if (novoTitulo === null) return; // cancelado
+        const novaDesc = prompt('Nova descrição (deixe em branco para manter):');
+        editarModuloAjax(moduloId, trilhaId, novoTitulo, novaDesc || '');
+    }
+
+    function editarModuloAjax(moduloId, trilhaId, titulo, descricao) {
+        if (!titulo) return alert('Título obrigatório.');
+        const csrftoken = getCookie('csrftoken');
+        const body = new URLSearchParams();
+        body.append('titulo', titulo);
+        body.append('descricao', descricao);
+
+        fetch(`/cursos/modulo/${moduloId}/editar/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => { if (!r.ok) throw new Error('Erro ao editar'); return r.text(); })
+        .then(() => carregarDetalheTrilha(trilhaId))
+        .catch(e => { alert('Erro ao editar módulo'); console.error(e); });
+    }
+
+    function excluirModuloAjax(moduloId, trilhaId) {
+        if (!confirm('Deseja realmente excluir este módulo e todos os seus conteúdos?')) return;
+        const csrftoken = getCookie('csrftoken');
+        const body = new URLSearchParams();
+        body.append('confirm', '1');
+
+        fetch(`/cursos/modulo/${moduloId}/excluir/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => { if (!r.ok) throw new Error('Erro ao excluir'); return r.text(); })
+        .then(() => carregarDetalheTrilha(trilhaId))
+        .catch(e => { alert('Erro ao excluir módulo'); console.error(e); });
     }
     
     // Carregar formulário de edição
     function carregarEditarTrilha(trilhaId) {
+        // Limpar e desabilitar o formulário enquanto carrega
+        const nomeInput = document.getElementById('editar_trilha_nome');
+        const descInput = document.getElementById('editar_trilha_descricao');
+        const form = document.getElementById('editarTrilhaForm');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        nomeInput.value = '';
+        descInput.value = '';
+        submitBtn.disabled = true;
+        form.action = '#';
+
         fetch(`/cursos/trilha/${trilhaId}/`, {
             method: 'GET',
             headers: {
@@ -723,13 +901,27 @@
             return response.json();
         })
         .then(data => {
-            document.getElementById('editar_trilha_nome').value = data.nome;
-            document.getElementById('editar_trilha_descricao').value = data.descricao || '';
-            
-            const form = document.getElementById('editarTrilhaForm');
+            nomeInput.value = data.nome || '';
+            descInput.value = data.descricao || '';
+
             form.action = `/cursos/trilha/${trilhaId}/editar/`;
+            submitBtn.disabled = false;
+            // marcar checkboxes de missões
+            try {
+                const selected = (data.missoes || []).map(m => String(m.id));
+                document.querySelectorAll('.editar-missao-checkbox').forEach(chk => {
+                    chk.checked = selected.includes(chk.value);
+                });
+            } catch (e) {
+                console.error('Erro ao marcar missões:', e);
+            }
         })
         .catch(error => {
+            // Em caso de erro, manter campos vazios e impedir envio
+            nomeInput.value = '';
+            descInput.value = '';
+            form.action = '#';
+            submitBtn.disabled = true;
             alert('Erro ao carregar dados da trilha');
             console.error('Erro:', error);
         });
@@ -745,6 +937,38 @@
         // Reset do formulário para garantir que é enviado corretamente
         form.method = 'POST';
     }
+
+    // Preencher select de módulos ao escolher uma trilha no modal de criação de missão
+    function carregarModulos(trilhaId) {
+        const sel = document.getElementById('select_modulo');
+        sel.innerHTML = '<option value="">-- Carregando --</option>';
+        if (!trilhaId) {
+            sel.innerHTML = '<option value="">-- Selecione o Módulo --</option>';
+            return;
+        }
+        fetch(`/cursos/trilha/${trilhaId}/`, { method: 'GET', headers: { 'Accept': 'application/json' }})
+            .then(r => { if (!r.ok) throw new Error('Erro'); return r.json(); })
+            .then(data => {
+                sel.innerHTML = '<option value="">-- Selecione o Módulo --</option>';
+                if (data.modulos && data.modulos.length) {
+                    data.modulos.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = m.titulo;
+                        sel.appendChild(opt);
+                    });
+                }
+            })
+            .catch(e => { sel.innerHTML = '<option value="">-- Erro ao carregar --</option>'; console.error(e); });
+    }
+
+    // Vincular onchange do select de trilha (se existir na página)
+    document.addEventListener('DOMContentLoaded', function() {
+        const trilhaSel = document.getElementById('select_trilha');
+        if (trilhaSel) {
+            trilhaSel.addEventListener('change', function() { carregarModulos(this.value); });
+        }
+    });
 </script>
 <script src="{% static 'js/chat_sala.js' %}"></script>
 {% endblock %}

@@ -4,12 +4,12 @@
 {% block title %}Atribuir Professor - {{ sala.nome }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<main class="flex-grow-1 container py-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-8">
-            <div class="card card-no-scale">
-                <div class="card-header">
-                    <h5 class="mb-0">👨‍🏫 Atribuir Professor - {{ sala.nome }}</h5>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark border-bottom border-secondary">
+                    <h1 class="display-5 fw-bold mb-0 text-primary">👨‍🏫 Atribuir Professor - {{ sala.nome }}</h1>
                 </div>
                 
                 <div class="card-body">
@@ -36,11 +36,11 @@
                                 {% endfor %}
                             </div>
 
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="d-flex gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
                                     ✓ Atribuir como Professor
                                 </button>
-                                <a href="{% url 'usuarios:sala_virtual' sala.id %}" class="btn btn-outline-secondary">
+                                <a href="{% url 'usuarios:sala_virtual' sala.id %}" class="btn btn-outline-light btn-lg">
                                     Cancelar
                                 </a>
                             </div>

@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Navbar -->
-<nav class="navbar fixed-top navbar-expand-lg">
+<nav class="navbar fixed-top navbar-expand-lg navbar-custom">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Player</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -47,31 +47,28 @@
 </nav>
 
 <div class="content container">
-    <!-- TÍTULO ACIMA DOS BOTÕES -->
-    <h1>Salas Criadas</h1>
-    <p class="lead">
-        Esta página exibe as salas criadas na plataforma. Abaixo, você verá uma lista de salas disponíveis, com opções para entrar ou criar novas.
-    </p>
-
-    <!-- BOTÕES PRINCIPAIS ALINHADOS À ESQUERDA -->
-    <div class="buttons-container" style="max-width: 400px;">
-        <a href="{% url 'usuarios:criar_sala' %}" class="btn btn-primary btn-responsive">
-            Criar Nova Sala
-        </a>
-        
-        <!-- BOTÃO ENTRAR POR CÓDIGO -->
-        <button type="button" class="btn btn-primary btn-responsive" data-bs-toggle="modal" data-bs-target="#codigoModal">
-            Entrar com Código
-        </button>
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-column flex-md-row gap-3">
+        <div>
+            <h1 class="display-5">Salas Criadas</h1>
+            <p class="lead text-muted">Esta página exibe as salas criadas na plataforma. Abaixo, você verá uma lista de salas disponíveis.</p>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{% url 'usuarios:criar_sala' %}" class="btn btn-primary btn-lg shadow-sm">
+                Criar Nova Sala
+            </a>
+            <button type="button" class="btn btn-outline-light btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#codigoModal">
+                Entrar com Código
+            </button>
+        </div>
     </div>
 
     <!-- MODAL PARA ENTRAR COM CÓDIGO (ESTILO ADAPTADO DO POSTAR MISSÃO) -->
     <div class="modal fade" id="codigoModal" tabindex="-1" aria-labelledby="codigoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content bg-dark text-white border-warning">
-                <div class="modal-header bg-warning text-dark border-warning">
-                    <h5 class="modal-title fw-bold" id="codigoModalLabel"><i class="bi bi-qr-code-scan"></i> Entrar com Código</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content bg-dark text-white border border-warning">
+                <div class="modal-header bg-dark text-white border-bottom border-warning">
+                    <h5 class="modal-title fw-bold" id="codigoModalLabel"><i class="bi bi-qr-code-scan text-primary"></i> Entrar com Código</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
 
                 <form method="post" action="{% url 'usuarios:pag_principal' %}">
@@ -89,9 +86,9 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer border-warning">
+                    <div class="modal-footer border-top border-warning">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fas fa-sign-in-alt"></i> Entrar na Sala</button>
+                        <button type="submit" class="btn btn-primary text-dark fw-bold"><i class="fas fa-sign-in-alt"></i> Entrar na Sala</button>
                     </div>
                 </form>
             </div>
@@ -102,13 +99,13 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for sala in salas %}
         <div class="col">
-            <div class="card h-100">
+            <div class="card h-100 bg-dark text-white border-0 shadow-sm">
                 <div class="card-body">
-                    <h3 class="card-title mb-2">{{ sala.nome }}</h3>
-                    <p class="card-text text-muted">Código: <strong>{{ sala.codigo }}</strong></p>
-                    <p class="card-text text-muted">Criada por: <strong>{{ sala.criador.username }}</strong></p>
+                    <h3 class="card-title mb-2 fw-bold">{{ sala.nome }}</h3>
+                    <p class="card-text text-muted">Código: <strong class="text-white">{{ sala.codigo }}</strong></p>
+                    <p class="card-text text-muted">Criada por: <strong class="text-white">{{ sala.criador.get_nome_exibicao }}</strong></p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span><i class="bi bi-people"></i> Participantes (futuramente)</span>
+                        <span class="text-muted"><i class="bi bi-people"></i> Participantes: <strong class="text-white">{{ sala.participantes.count }}</strong></span>
                         <a href="{% url 'usuarios:sala_virtual' sala.id %}" class="btn btn-sm btn-primary">Entrar</a>
                     </div>
                 </div>

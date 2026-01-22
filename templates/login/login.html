@@ -4,8 +4,8 @@
 {% block title %}Login - Player{% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center flex-grow-1 py-4">
-    <div class="auth-card p-4 p-md-5 rounded-4 shadow">
+<main class="flex-grow-1 d-flex justify-content-center align-items-center py-5">
+    <div class="auth-card p-4 p-md-5 rounded-4 shadow bg-dark border-0">
         <div class="text-center mb-4">
             <img src="{% static 'img/web_hi_res_512-Photoroom.png' %}" class="logo-auth mb-3" alt="Player Logo">
             <h2 class="h3 mb-2">Acesse sua conta</h2>
@@ -42,7 +42,7 @@
                 <a href="#" class="text-accent small">Esqueceu a senha?</a>
             </div>
             
-            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-2 mb-3 shadow-sm">
                 <i class="bi bi-box-arrow-in-right me-2"></i> Entrar
             </button>
             
@@ -53,5 +53,5 @@
             </div>
         </form>
     </div>
-</div>
+</main>
 {% endblock %}

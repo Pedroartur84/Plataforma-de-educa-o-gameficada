@@ -4,18 +4,18 @@
 {% block title %}{{ conteudo.titulo }} - Player{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<main class="flex-grow-1 container py-5">
     
     <!-- Breadcrumb e Navegação -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{% url 'cursos:lista_trilhas' %}" class="text-warning">
-                    <i class="bi bi-map"></i> Trilhas
+                <a href="{% url 'cursos:lista_trilhas' %}" class="text-primary">
+                    <i class="bi bi-map text-primary"></i> Trilhas
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="text-warning">
+                <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="text-primary">
                     {{ trilha.nome }}
                 </a>
             </li>
@@ -24,7 +24,7 @@
     </nav>
 
     <!-- Barra de Progresso no Módulo -->
-    <div class="card card-no-scale mb-4 border-warning">
+    <div class="card bg-dark border-0 shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">
@@ -43,9 +43,9 @@
     </div>
 
     <!-- Card Principal do Conteúdo -->
-    <div class="card card-no-scale mb-4">
-        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-primary">
                 {% if conteudo.tipo == 'video' %}
                     <i class="bi bi-play-circle-fill"></i>
                 {% elif conteudo.tipo == 'arquivo' %}
@@ -58,7 +58,7 @@
                 {{ conteudo.titulo }}
             </h4>
             
-            {% if visualizacao.completo %}
+                {% if visualizacao.completo %}
                 <span class="badge bg-success">
                     <i class="bi bi-check-circle-fill"></i> Completo
                 </span>
@@ -200,8 +200,8 @@
                     Próximo <i class="bi bi-arrow-right"></i>
                 </a>
             {% else %}
-                <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" 
-                   class="btn btn-success">
+                          <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" 
+                              class="btn btn-success">
                     <i class="bi bi-check-circle"></i> Finalizar Módulo
                 </a>
             {% endif %}
@@ -210,10 +210,10 @@
         <!-- Marcar Completo -->
         <div>
             {% if not visualizacao.completo %}
-                <form method="post" style="display: inline;">
+                    <form method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit" name="marcar_completo" 
-                            class="btn btn-warning text-dark">
+                            class="btn btn-primary text-dark">
                         <i class="bi bi-check-circle"></i> Marcar como Completo
                     </button>
                 </form>
@@ -221,7 +221,7 @@
                 <form method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit" name="marcar_incompleto" 
-                            class="btn btn-outline-warning">
+                            class="btn btn-outline-light">
                         <i class="bi bi-arrow-clockwise"></i> Refazer
                     </button>
                 </form>
@@ -230,10 +230,10 @@
     </div>
 
     <!-- Lista de Outros Conteúdos do Módulo -->
-    <div class="card card-no-scale">
-        <div class="card-header bg-dark text-white">
+    <div class="card bg-dark border-0 shadow-sm">
+        <div class="card-header bg-dark border-bottom border-secondary text-white">
             <h6 class="mb-0">
-                <i class="bi bi-list-ul"></i> Conteúdos do Módulo: {{ modulo.titulo }}
+                <i class="bi bi-list-ul text-primary"></i> Conteúdos do Módulo: {{ modulo.titulo }}
             </h6>
         </div>
         <div class="list-group list-group-flush">

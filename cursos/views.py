@@ -80,7 +80,22 @@ def lista_trilhas(request):
             trilha.professor == request.user or 
             request.user.tipo_usuario == 'admin'
         )
-        
+        # Construir lista de módulos com progresso e contagens para exibição direta
+        modulos_info = []
+        for modulo in trilha.modulos.all().order_by('ordem'):
+            try:
+                mod_prog = modulo.progresso_usuario(request.user)
+            except Exception:
+                mod_prog = 0
+            modulos_info.append({
+                'id': modulo.id,
+                'titulo': modulo.titulo,
+                'descricao': modulo.descricao,
+                'ordem': modulo.ordem,
+                'progresso': mod_prog,
+                'total_conteudos': modulo.total_conteudos(),
+            })
+
         trilhas_com_progresso.append({
             'trilha': trilha,
             'progresso': progresso,
@@ -88,10 +103,19 @@ def lista_trilhas(request):
             'completos': conteudos_completos,
             'visualizados': conteudos_visualizados,
             'eh_professor': eh_professor,
+            'modulos_info': modulos_info,
         })
     
+    # Agrupar trilhas por sala para exibição: cada item contém 'sala' e 'trilhas'
+    salas_map = {}
+    for item in trilhas_com_progresso:
+        sala = item['trilha'].sala
+        salas_map.setdefault(sala.id, {'sala': sala, 'trilhas': []})['trilhas'].append(item)
+
+    salas_trilhas = list(salas_map.values())
+
     return render(request, 'cursos/lista_trilhas.html', {
-        'trilhas_com_progresso': trilhas_com_progresso,
+        'salas_trilhas': salas_trilhas,
     })
 
 
@@ -121,14 +145,63 @@ def detalhe_trilha(request, trilha_id):
     # Calcular progresso geral da trilha
     progresso_geral = trilha.progresso_usuario(request.user)
     
+    # Se for professor querendo ver o progresso de um aluno específico,
+    # permitir passar ?aluno_id=<id> para consultar o progresso daquele aluno.
+    aluno_id = request.GET.get('aluno_id')
+    from usuarios.models import correcaoMissao
+
+    usuario_para_calculo = request.user
+    if aluno_id and (trilha.professor == request.user or request.user.tipo_usuario == 'admin'):
+        try:
+            from usuarios.models import Usuario
+            usuario_para_calculo = Usuario.objects.get(id=int(aluno_id))
+        except Exception:
+            usuario_para_calculo = request.user
+
+    # Calcular progresso baseado em missões associadas à trilha (se houver)
+    from usuarios.models import Missao as MissaoModel
+    missoes_trilha = list(MissaoModel.objects.filter(trilha=trilha))
+    total_missoes = len(missoes_trilha)
+    missoes_concluidas = 0
+    if total_missoes > 0:
+        missoes_concluidas = correcaoMissao.objects.filter(
+            aluno=usuario_para_calculo,
+            missao__in=missoes_trilha,
+            pontos_atingidos__gt=0
+        ).count()
+
     data = {
         'id': trilha.id,
         'nome': trilha.nome,
         'descricao': trilha.descricao,
         'progresso': progresso_geral,
-        'professor': trilha.professor.get_nome_exibicao(),
-        'pontos_necessarios': trilha.pontos_necessarios,
+        'professor': trilha.professor.get_nome_exibicao() if trilha.professor else None,
+        'pontos_necessarios': getattr(trilha, 'pontos_necessarios', 0) or 0,
+        'missoes': [{'id': m.id, 'titulo': m.titulo} for m in missoes_trilha],
+        'missoes_totais': total_missoes,
+        'missoes_concluidas': missoes_concluidas,
+        'eh_professor': (trilha.professor == request.user or request.user.tipo_usuario == 'admin')
     }
+    # Incluir lista de módulos com dados relevantes (título, descrição, ordem, progresso e contagem de conteúdos)
+    modulos_data = []
+    for modulo in trilha.modulos.all().order_by('ordem'):
+        try:
+            progresso_mod = modulo.progresso_usuario(usuario_para_calculo)
+        except Exception:
+            progresso_mod = 0
+
+        mod_missoes_count = MissaoModel.objects.filter(modulo=modulo).count()
+        modulos_data.append({
+            'id': modulo.id,
+            'titulo': modulo.titulo,
+            'descricao': modulo.descricao,
+            'ordem': modulo.ordem,
+            'progresso': progresso_mod,
+            'total_conteudos': modulo.total_conteudos(),
+            'missoes_relacionadas': mod_missoes_count,
+        })
+
+    data['modulos'] = modulos_data
     
     return JsonResponse(data)
 
@@ -244,6 +317,7 @@ def criar_trilha(request, sala_id):
     if request.method == 'POST':
         nome = request.POST.get('nome', '').strip()
         descricao = request.POST.get('descricao', '').strip()
+        missoes_ids = request.POST.getlist('missoes')
         
         if not nome:
             messages.error(request, 'O nome da trilha é obrigatório.')
@@ -264,6 +338,14 @@ def criar_trilha(request, sala_id):
             ordem=ordem_atual,
             professor=request.user  # O professor responsável é quem criou
         )
+        # Associar missões selecionadas (se houver) via FK em Missao
+        if missoes_ids:
+            try:
+                ids = [int(i) for i in missoes_ids]
+                from usuarios.models import Missao as MissaoModel
+                MissaoModel.objects.filter(id__in=ids, sala=sala).update(trilha=trilha)
+            except Exception:
+                pass
         
         messages.success(request, f'✓ Trilha "{nome}" criada com sucesso!')
         return redirect('usuarios:sala_virtual', sala_id=sala_id)
@@ -288,6 +370,7 @@ def editar_trilha(request, trilha_id):
     if request.method == 'POST':
         nome = request.POST.get('nome', '').strip()
         descricao = request.POST.get('descricao', '').strip()
+        missoes_ids = request.POST.getlist('missoes')
         
         if not nome:
             messages.error(request, 'O nome da trilha é obrigatório.')
@@ -301,6 +384,18 @@ def editar_trilha(request, trilha_id):
         trilha.nome = nome
         trilha.descricao = descricao
         trilha.save()
+
+        # Atualizar missões associadas via FK: definir selecionadas para esta trilha e limpar outras
+        try:
+            from usuarios.models import Missao as MissaoModel
+            if missoes_ids is not None:
+                selected = [int(i) for i in missoes_ids]
+                # Atribuir trilha às selecionadas
+                MissaoModel.objects.filter(id__in=selected, sala=trilha.sala).update(trilha=trilha)
+                # Remover trilha de missões que antes pertenciam a esta trilha mas não foram selecionadas
+                MissaoModel.objects.filter(trilha=trilha).exclude(id__in=selected).update(trilha=None)
+        except Exception:
+            pass
         
         messages.success(request, f'✓ Trilha "{nome}" atualizada com sucesso!')
         return redirect('usuarios:sala_virtual', sala_id=trilha.sala.id)

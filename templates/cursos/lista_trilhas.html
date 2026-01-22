@@ -4,13 +4,13 @@
 {% block title %}Trilhas de Aprendizado - Player{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<main class="flex-grow-1 container py-5">
     <!-- Cabeçalho -->
     <div class="mb-4">
         <!-- Desktop -->
-        <div class="d-none d-md-flex justify-content-between align-items-center">
+                <div class="d-none d-md-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 text-warning mb-1">
+                <h1 class="h3 text-primary mb-1">
                     <i class="bi bi-map"></i> Trilhas de Aprendizado
                 </h1>
                 <p class="text-muted mb-0">Explore conteúdos estruturados e avance no seu aprendizado</p>
@@ -32,17 +32,21 @@
         </div>
     </div>
 
-    {% if trilhas_com_progresso %}
-        <div class="row g-4">
-            {% for item in trilhas_com_progresso %}
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 border-{% if item.desbloqueada %}warning{% else %}secondary{% endif %} shadow-sm card-no-scale
-                            {% if not item.desbloqueada %}opacity-75{% endif %}">
-                    <div class="card-body d-flex flex-column">
+    {% if salas_trilhas %}
+            <div>
+            {% for sala_item in salas_trilhas %}
+                <div class="mb-4">
+                    <h4 class="text-warning mb-2"><i class="bi bi-door-open"></i> {{ sala_item.sala.nome }}</h4>
+                    <p class="text-muted small mb-3">{{ sala_item.sala.descricao }}</p>
+                    <div class="row g-4">
+                        {% for item in sala_item.trilhas %}
+                            <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 bg-dark border-0 shadow-sm">
+                                <div class="card-body d-flex flex-column">
                         
                         <!-- Cabeçalho com Status -->
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title text-warning mb-0 flex-grow-1">
+                            <h5 class="card-title text-primary mb-0 flex-grow-1">
                                 {% if not item.desbloqueada %}
                                     <i class="bi bi-lock-fill text-muted"></i>
                                 {% elif item.progresso == 100 %}
@@ -54,7 +58,7 @@
                                 {% endif %}
                                 {{ item.trilha.nome }}
                             </h5>
-                            <span class="badge bg-info ms-2">{{ item.total_conteudos }}</span>
+                            <span class="badge bg-secondary ms-2">{{ item.total_conteudos }}</span>
                         </div>
 
                         <!-- Descrição -->
@@ -73,9 +77,9 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small class="text-muted">Progresso</small>
-                                <small class="text-warning fw-bold">{{ item.progresso }}%</small>
+                                    <small class="text-primary fw-bold">{{ item.progresso }}%</small>
                             </div>
-                            <div class="progress" style="height: 10px; border-radius: 5px;">
+                                <div class="progress" style="height: 10px; border-radius: 5px;">
                                 <div class="progress-bar bg-gradient" 
                                      style="width: {{ item.progresso }}%; background: linear-gradient(90deg, #FFC107 0%, #FFA000 100%);"
                                      role="progressbar" 
@@ -87,25 +91,44 @@
                             <small class="text-muted">{{ item.completos }}/{{ item.total_conteudos }} concluídos</small>
                         </div>
 
-                        <!-- Requisitos (se bloqueada) -->
-                        {% if not item.desbloqueada %}
-                            <div class="alert alert-secondary small py-2 px-3 mb-3">
-                                <i class="bi bi-info-circle"></i> 
-                                <strong>Requisitos:</strong><br>
-                                {% if item.trilha.pontos_necessarios > 0 %}
-                                    • {{ item.trilha.pontos_necessarios }} pontos necessários<br>
-                                {% endif %}
-                                {% if item.trilha.trilha_anterior %}
-                                    • Complete "{{ item.trilha.trilha_anterior.nome }}" primeiro
-                                {% endif %}
+                        <!-- Acordeão de Módulos (visível para todos) -->
+                        {% if item.modulos_info %}
+                        <div class="mt-3">
+                            <div class="accordion" id="accordion-{{ item.trilha.id }}">
+                                {% for mod in item.modulos_info %}
+                                <div class="accordion-item bg-dark border-secondary mb-2">
+                                    <h2 class="accordion-header" id="heading-{{ mod.id }}">
+                                        <button class="accordion-button collapsed bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ mod.id }}" aria-expanded="false" aria-controls="collapse-{{ mod.id }}">
+                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                                <div class="text-truncate me-3">
+                                                    {{ mod.titulo }}
+                                                    <div class="small text-muted">{{ mod.descricao|truncatewords:12 }}</div>
+                                                </div>
+                                                <div class="text-end ms-2">
+                                                    <div class="small text-muted">{{ mod.total_conteudos }} conteúdos</div>
+                                                    <div class="small text-warning fw-bold">{{ mod.progresso }}%</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-{{ mod.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ mod.id }}" data-bs-parent="#accordion-{{ item.trilha.id }}">
+                                        <div class="accordion-body bg-dark text-muted">
+                                            <small>Ver conteúdos e progresso por módulo na página da trilha.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
+                        </div>
                         {% endif %}
+
+                        <!-- Requisitos desativados aqui para priorizar módulos como navegação principal -->
 
                         <!-- Botão de Ação -->
                         <div class="mt-auto">
                             {% if item.desbloqueada %}
                                 <a href="{% url 'cursos:detalhe_trilha' item.trilha.id %}" 
-                                   class="btn btn-outline-warning btn-sm w-100">
+                                   class="btn btn-outline-light btn-sm w-100">
                                     {% if item.progresso == 0 %}
                                         <i class="bi bi-play-circle"></i> Começar Trilha
                                     {% elif item.progresso == 100 %}
@@ -139,9 +162,12 @@
                                 </span>
                             {% endif %}
                         </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     {% else %}
@@ -152,46 +178,10 @@
             </div>
             <h5 class="text-muted">Nenhuma trilha disponível</h5>
             <p class="text-muted">Entre em uma sala para acessar trilhas de aprendizado.</p>
-            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-warning text-dark mt-3">
+            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary text-dark mt-3">
                 <i class="bi bi-door-open"></i> Explorar Salas
             </a>
         </div>
     {% endif %}
-</div>
-
-<style>
-/* Animação suave no hover */
-.card-no-scale:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3) !important;
-    transition: all 0.3s ease;
-}
-
-/* Animação da barra de progresso */
-.progress-bar {
-    transition: width 0.6s ease;
-}
-
-/* Badge arredondado */
-.badge {
-    border-radius: 20px;
-    padding: 0.35em 0.75em;
-}
-
-/* Cards bloqueados */
-.opacity-75 {
-    opacity: 0.75;
-}
-
-/* Responsividade adicional */
-@media (max-width: 576px) {
-    .card-title {
-        font-size: 1rem;
-    }
-    
-    .card-text {
-        font-size: 0.85rem;
-    }
-}
-</style>
+</main>
 {% endblock %}

@@ -201,6 +201,9 @@ class Missao(models.Model):
     ]
 
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name='missoes')
+    # Associação pedagógica: uma missão deve pertencer a uma trilha e a um módulo dentro da sala.
+    trilha = models.ForeignKey('cursos.Trilha', on_delete=models.SET_NULL, null=True, blank=True, related_name='missoes')
+    modulo = models.ForeignKey('cursos.Modulo', on_delete=models.SET_NULL, null=True, blank=True, related_name='missoes')
     titulo = models.CharField(max_length=200)
     descricao = models.TextField()
     pontos = models.IntegerField(default=10)

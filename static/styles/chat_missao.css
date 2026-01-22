@@ -7,16 +7,16 @@
 
 .chat-container {
     background: var(--color-dark-bg);
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-    background-size: 450px;
-    background-repeat: repeat;
+    /* Removed heavy repeating background image to keep UI clean and performant */
+    background-size: cover;
+    background-repeat: no-repeat;
     scroll-behavior: smooth;
 }
 
 .message {
     display: flex;
     margin-bottom: 1rem;
-    animation: fadeIn 0.4s ease-out;
+    animation: fadeIn 0.2s ease-out;
 }
 
 .message.text-end {
@@ -84,21 +84,8 @@
    CARDS E CONTAINERS
    ============================================ */
 
-.card-no-scale {
-    border: 1px solid var(--color-dark-border);
-    background-color: var(--color-dark-card);
-    color: var(--color-dark-text);
-    box-shadow: none;
-    transition: all 0.3s;
-}
-
-.card-no-scale .card-header {
-    border-bottom: 1px solid var(--color-dark-border);
-}
-
-.card-no-scale .card-body {
-    color: inherit;
-}
+/* Cards agora padronizados via classes utilitárias em templates: 
+   use `card bg-dark border-0 shadow-sm` para cards escuros consistentes. */
 
 /* ============================================
    FORMULÁRIOS
@@ -187,13 +174,12 @@
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-    background: var(--color-primary-dark);
-    opacity: 0.5;
+    background: rgba(255,193,7,0.25);
     border-radius: 4px;
 }
 
 .chat-container::-webkit-scrollbar-thumb:hover {
-    opacity: 0.7;
+    opacity: 0.5;
 }
 
 /* ============================================

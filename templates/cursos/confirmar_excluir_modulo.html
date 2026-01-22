@@ -4,7 +4,7 @@
 {% block title %}Excluir Módulo - {{ modulo.titulo }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<main class="flex-grow-1 container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="alert alert-danger" role="alert">
@@ -14,7 +14,7 @@
                 <p class="text-muted">Trilha: <strong>{{ trilha.nome }}</strong></p>
             </div>
 
-            <div class="card border-danger">
+            <div class="card bg-dark border-0 shadow-sm">
                 <div class="card-body">
                     <p class="card-text mb-3">
                         <strong>Esta ação é irreversível!</strong>
@@ -32,7 +32,7 @@
                             <button type="submit" class="btn btn-danger btn-lg">
                                 Sim, excluir módulo
                             </button>
-                            <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-secondary btn-lg">
+                            <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-outline-light btn-lg">
                                 Cancelar
                             </a>
                         </div>
@@ -41,5 +41,5 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}

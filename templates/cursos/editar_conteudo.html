@@ -4,10 +4,10 @@
 {% block title %}Editar Conteúdo - {{ conteudo.titulo }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<main class="flex-grow-1 container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h2>Editar Conteúdo</h2>
+            <h1 class="display-5 fw-bold mb-2">Editar Conteúdo</h1>
             <p class="text-muted">Trilha: <strong>{{ trilha.nome }}</strong> > Módulo: <strong>{{ conteudo.modulo.titulo }}</strong></p>
 
             <form method="post" enctype="multipart/form-data" class="mt-4">
@@ -88,15 +88,15 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm">
                         Salvar Alterações
                     </button>
-                    <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-secondary btn-lg">
+                    <a href="{% url 'cursos:detalhe_trilha' trilha.id %}" class="btn btn-outline-light btn-lg">
                         Cancelar
                     </a>
                 </div>
             </form>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}

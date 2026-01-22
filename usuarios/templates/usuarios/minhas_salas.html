@@ -4,18 +4,18 @@
 {% block title %}Minhas Salas - Player{% endblock %}
 
 {% block content %}
-<main class="content container" style="margin-top: calc(var(--space-lg) + 4rem);">
-    <h2 class="text-accent">Minhas Salas</h2>
+<main class="flex-grow-1 container py-5">
+    <h1 class="display-5 fw-bold text-primary">Minhas Salas</h1>
     {% if salas %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for sala in salas %}
         <div class="col">
-            <div class="card h-100 bg-azul" style="border-radius: var(--border-radius-lg); padding: var(--space-md);">
+            <div class="card h-100 bg-dark border-0 shadow-sm">
                 <div class="card-body">
-                    <h3 class="card-title mb-2">{{ sala.nome }}</h3>
+                    <h3 class="card-title fw-bold mb-2 text-white">{{ sala.nome }}</h3>
                     <p class="card-text text-muted">Criada por: <strong>{{ sala.criador.username }}</strong></p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span><i class="bi bi-people"></i> Participantes (futuramente)</span>
+                        <span class="text-muted"><i class="bi bi-people"></i> Participantes</span>
                         <a href="{% url 'usuarios:detalhe_sala' sala.id %}" class="btn btn-sm btn-primary">Entrar</a>
                     </div>
                 </div>

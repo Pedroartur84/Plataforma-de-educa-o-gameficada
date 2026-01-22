@@ -60,6 +60,9 @@ class Trilha(models.Model):
         verbose_name="Professor Responsável",
         help_text="Professor que criou e gerencia esta trilha"
     )
+
+    # Missões associadas à trilha (permite que o professor escolha quais missões contam para o progresso)
+    # Nota: associação direta de missões foi removida em favor de FK em `Missao` (missoes vinculam-se à trilha)
     
     # Metadata
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -74,6 +77,7 @@ class Trilha(models.Model):
     
     def __str__(self):
         return f"{self.nome} - {self.sala.nome}"
+
     
     def total_conteudos(self):
         """Retorna o número total de conteúdos nesta trilha"""
@@ -117,12 +121,7 @@ class Modulo(models.Model):
     ordem = models.IntegerField(default=0, verbose_name="Ordem")
     
     # Relacionar com missões existentes (opcional)
-    missoes = models.ManyToManyField(
-        Missao, 
-        blank=True,
-        verbose_name="Missões Relacionadas",
-        help_text="Missões que fazem parte deste módulo"
-    )
+    # Nota: missões agora devem referenciar o módulo via FK em `Missao`.
     
     criado_em = models.DateTimeField(auto_now_add=True)
     

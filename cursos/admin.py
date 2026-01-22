@@ -8,6 +8,7 @@ from .models import (
     Aula, Progresso,  # Antigos
     Trilha, Modulo, ConteudoModulo, VisualizacaoConteudo  # Novos
 )
+from usuarios.models import Missao
 
 # ==============================
 # ADMIN DOS MODELS ANTIGOS (readonly para preservar dados)
@@ -74,6 +75,13 @@ class ConteudoModuloInline(admin.TabularInline):
     fields = ('titulo', 'tipo', 'ordem', 'duracao_estimada')
 
 
+class MissaoInline(admin.TabularInline):
+    """Permite editar missões relacionadas diretamente no módulo"""
+    model = Missao
+    extra = 0
+    fields = ('titulo', 'pontos', 'status', 'data_criacao')
+
+
 @admin.register(Modulo)
 class ModuloAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'trilha', 'ordem', 'total_conteudos', 'criado_em')
@@ -85,14 +93,8 @@ class ModuloAdmin(admin.ModelAdmin):
         ('Informações Básicas', {
             'fields': ('trilha', 'titulo', 'descricao', 'ordem')
         }),
-        ('Missões Relacionadas', {
-            'fields': ('missoes',),
-            'description': 'Vincule missões existentes a este módulo (opcional)'
-        }),
     )
-    
-    filter_horizontal = ('missoes',)
-    inlines = [ConteudoModuloInline]
+    inlines = [ConteudoModuloInline, MissaoInline]
     
     def total_conteudos(self, obj):
         """Mostra o total de conteúdos no módulo"""

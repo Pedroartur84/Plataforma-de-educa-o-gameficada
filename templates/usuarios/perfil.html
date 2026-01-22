@@ -9,7 +9,7 @@
         <div class="col-12 col-lg-10">
             
             <!-- Cabeçalho do Perfil -->
-            <div class="card card-no-scale mb-4 border-warning">
+            <div class="card bg-dark border-0 shadow-sm mb-4">
                 <div class="card-body text-center py-4">
                     {% if usuario.foto %}
                         <img src="{{ usuario.foto.url }}" alt="Foto de Perfil" 
@@ -21,13 +21,10 @@
                             <i class="bi bi-person"></i>
                         </div>
                     {% endif %}
-                    
-                    <h2 class="text-warning mb-1">{{ usuario.get_nome_exibicao }}</h2>
+
+                    <h2 class="display-5 fw-bold text-primary mb-1">{{ usuario.get_nome_exibicao }}</h2>
                     <p class="text-muted mb-2">{{ usuario.email }}</p>
-                    <span class="badge 
-                        {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark
-                        {% elif usuario.tipo_usuario == 'admin' %}bg-danger
-                        {% else %}bg-primary{% endif %} px-3 py-2">
+                    <span class="badge {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark {% elif usuario.tipo_usuario == 'admin' %}bg-danger {% else %}bg-primary {% endif %} px-3 py-2">
                         {{ usuario.get_tipo_usuario_display }}
                     </span>
                 </div>
@@ -37,10 +34,10 @@
                 
                 <!-- Coluna Esquerda: Editar Perfil -->
                 <div class="col-12 col-md-6">
-                    <div class="card card-no-scale h-100">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-pencil"></i> Editar Perfil</h5>
-                        </div>
+                        <div class="card bg-dark border-0 shadow-sm h-100">
+                            <div class="card-header bg-dark border-bottom border-secondary">
+                                <h5 class="mb-0"><i class="bi bi-pencil text-primary"></i> Editar Perfil</h5>
+                            </div>
                         <div class="card-body">
                             {% if messages %}
                                 {% for message in messages %}
@@ -98,9 +95,9 @@
                 <div class="col-12 col-md-6">
                     
                     <!-- Estatísticas -->
-                    <div class="card card-no-scale mb-4">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Estatísticas</h5>
+                    <div class="card bg-dark border-0 shadow-sm mb-4">
+                        <div class="card-header bg-dark border-bottom border-secondary">
+                            <h5 class="mb-0"><i class="bi bi-graph-up text-primary"></i> Estatísticas</h5>
                         </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-around text-center">
@@ -121,9 +118,9 @@
                     </div>
 
                     <!-- Títulos Globais -->
-                    <div class="card card-no-scale">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0"><i class="bi bi-award"></i> Títulos Globais</h5>
+                    <div class="card bg-dark border-0 shadow-sm">
+                        <div class="card-header bg-dark border-bottom border-secondary">
+                            <h5 class="mb-0"><i class="bi bi-award text-primary"></i> Títulos Globais</h5>
                         </div>
                         <div class="card-body">
                             {% if titulos_globais %}

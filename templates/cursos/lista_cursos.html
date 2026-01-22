@@ -4,15 +4,15 @@
 {% block title %}Cursos - Player{% endblock %}
 
 {% block content %}
-<div class="container home-container">
-    <h1 class="text-accent">Meus Cursos</h1>
+<main class="flex-grow-1 container py-5">
+    <h1 class="display-5 fw-bold text-primary mb-3">Meus Cursos</h1>
     <form method="GET" class="mb-3">
         <div class="input-group">
 
             <input type="text" name="q" value="{{ query }}" class="form-control input-estilo" placeholder="Pesquisar cursos...">
             <button type="submit" class="btn btn-primary">Buscar</button>
 
-            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-primary">
+            <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light">
             <i class="fas fa-home"></i> Voltar
             </a>
 
@@ -20,9 +20,9 @@
     </form>
     <div class="features-grid">
         {% for sala in salas %}
-        <div class="feature-item card">
+        <div class="feature-item card bg-dark border-0 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">{{ sala.nome }}</h5>
+                <h5 class="card-title fw-bold text-white">{{ sala.nome }}</h5>
                 <p class="card-text text-muted">{{ sala.descricao|truncatewords:20 }}</p>
                 <a href="{% url 'cursos:detalhe_curso' sala.id %}" class="btn btn-primary">Acessar</a>
             </div>
@@ -31,6 +31,7 @@
         <p class="text-muted">Nenhum curso disponível.</p>
         {% endfor %}
     </div>
-</div>
+    
+</main>
 {% endblock %}
 

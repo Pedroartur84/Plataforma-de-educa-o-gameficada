@@ -122,12 +122,24 @@ class SalaForm(forms.ModelForm):
 class MissaoForm(forms.ModelForm):
     class Meta:
         model = Missao
-        fields = ['titulo', 'descricao', 'pontos']
+        fields = ['titulo', 'descricao', 'pontos', 'trilha', 'modulo']
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'pontos': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
+            'trilha': forms.Select(attrs={'class': 'form-select'}),
+            'modulo': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        trilha = cleaned.get('trilha')
+        modulo = cleaned.get('modulo')
+        if not trilha or not modulo:
+            raise forms.ValidationError('É obrigatório selecionar Trilha e Módulo para a missão.')
+        if modulo.trilha_id != trilha.id:
+            raise forms.ValidationError('O módulo selecionado não pertence à trilha selecionada.')
+        return cleaned
         
 
 class MensagemMissaoForm(forms.ModelForm):

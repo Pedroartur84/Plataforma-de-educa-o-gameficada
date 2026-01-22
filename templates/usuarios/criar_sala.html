@@ -4,12 +4,12 @@
 {% block title %}Criar Sala - Player{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<main class="flex-grow-1 container py-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-8">
-            <div class="card card-no-scale">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Criar Nova Sala</h5>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark border-bottom border-secondary d-flex align-items-center justify-content-between">
+                    <h1 class="h5 mb-0 text-primary">Criar Nova Sala</h1>
                     <small class="text-muted">Configure sua sala de aula</small>
                 </div>
                 <form method="post" class="card-body">
@@ -31,18 +31,18 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">Criar Sala</button>
-                        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-secondary">Voltar</a>
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">Criar Sala</button>
+                        <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light btn-lg">Voltar</a>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="col-12 col-md-4 mt-3 mt-md-0">
-            <div class="card card-no-scale">
-                <div class="card-header">
-                    <h6 class="mb-0">Informações</h6>
+            <div class="card bg-dark border-0 shadow-sm">
+                <div class="card-header bg-dark border-bottom border-secondary">
+                    <h6 class="mb-0 text-primary">Informações</h6>
                 </div>
                 <div class="card-body">
                     <p class="small text-muted">Use um nome claro e objetivo para a sala.</p>

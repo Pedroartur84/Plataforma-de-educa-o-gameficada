@@ -4,40 +4,23 @@
 {% block title %}Sair da Sala - {{ sala.nome }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<main class="flex-grow-1 container py-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-6">
-            <div class="card card-no-scale">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">🚪 Confirmação</h5>
-                </div>
-                
+            <div class="card bg-dark border-0 shadow-sm">
                 <div class="card-body">
-                    <h6 class="mb-3">Sair da sala?</h6>
-                    
-                    <p class="text-muted mb-4">
-                        Você tem certeza que deseja sair da sala <strong>{{ sala.nome }}</strong>?
-                    </p>
-
-                    <p class="small text-muted mb-4">
-                        ⚠️ Após confirmar, você perderá acesso a todas as atividades dessa sala.
-                    </p>
-
-                    <form method="post" class="mb-0">
+                    <h5 class="mb-3 text-primary">Sair da Sala</h5>
+                    <p class="text-muted">Tem certeza que deseja sair da sala <strong>{{ sala.nome }}</strong>?</p>
+                    <form method="post">
                         {% csrf_token %}
-                        
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-danger">
-                                Sim, sair da Sala
-                            </button>
-                            <a href="{% url 'usuarios:sala_virtual' sala.id %}" class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg">Sair</button>
+                            <a href="{% url 'usuarios:sala_virtual' sala.id %}" class="btn btn-outline-light btn-lg">Cancelar</a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}

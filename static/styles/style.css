@@ -27,12 +27,6 @@
     gap: var(--space-md);
 }
 
-.home-container {
-    max-width: 800px;
-    padding: var(--space-lg);
-    margin: 0 auto;
-}
-
 /* Sistema de z-index */
 :root {
     --z-index-base: 0;
@@ -108,7 +102,7 @@
 
 /* ===== 4. NAVEGAÇÃO E OFFCANVAS ===== */
 body {
-    padding-top: 56px;
+    padding-top: 70px;
     padding-bottom: 20px;
     overflow: auto;
 }
@@ -235,27 +229,6 @@ body {
     margin-bottom: var(--space-lg);
 }
 
-.project-description {
-    background-color: var(--color-dark-card-light);
-    border: 1px solid var(--color-dark-border);
-    border-radius: var(--border-radius-lg);
-    padding: clamp(var(--space-md), 3vw, var(--space-xl));
-    margin-bottom: var(--space-xl);
-    width: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.project-description h2 {
-    color: var(--color-primary);
-    font-weight: 600;
-}
-
-.project-description p {
-    color: var(--color-dark-text-secondary);
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
 /* Botões responsivos na home */
 .buttons-container {
     display: flex;
@@ -299,16 +272,6 @@ body {
     .lead {
         font-size: 1rem;
     }
-}
-
-/* ===== 6. AUTENTICAÇÃO ===== */
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: var(--space-md);
-    background-color: var(--color-dark-bg);
 }
 
 .auth-card {
@@ -398,20 +361,6 @@ body {
     font-size: 0.9rem;
 }
 
-.feature-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    background-color: var(--color-primary);
-    color: var(--color-dark-bg);
-    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
-}
-
 .bg-azul { background-color: rgba(255, 193, 7, 0.15); color: var(--color-primary); }
 .bg-laranja { background-color: rgba(255, 193, 7, 0.15); color: var(--color-primary); }
 
@@ -423,20 +372,12 @@ body {
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    /* Removido scale para evitar animações agressivas; mantém shadow mais evidente */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.38);
 }
 
 /* nova classe: card sem trasform no hover */
-.card-no-scale{
-    transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
-}
-
-.card-no-scale:hover {
-    transform: none;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    border-color: var(--color-primary);
-}
+.card-no-scale{ /* deprecated: use card bg-dark border-0 shadow-sm in templates */ }
 
 /* CORREÇÃO ESPECÍFICA PARA card-text text-muted */
 .card-text.text-muted {
@@ -465,12 +406,6 @@ body {
         width: 100%;
         max-width: none;
         padding: var(--space-md);
-    }
-    
-    .feature-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.25rem;
     }
 }
 
@@ -514,16 +449,6 @@ body {
     border-radius: var(--border-radius-lg);
     transition: all var(--transition-normal);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.cta-section {
-    background-color: var(--color-dark-card);
-    padding: 2rem;
-}
-
-.cta-section h3 {
-    color: var(--color-primary);
-    font-weight: 600;
 }
 
 /* Ajustes para alertas e textos */
@@ -725,38 +650,6 @@ div.text-muted {
     }
 }
 
-/* ===== SEÇÃO CTA MELHORADA ===== */
-
-.cta-section {
-    background: linear-gradient(135deg, var(--color-dark-card) 0%, var(--color-dark-card-light) 100%);
-    border: 1px solid var(--color-dark-border);
-    border-radius: var(--border-radius-lg);
-    padding: clamp(var(--space-lg), 4vw, var(--space-xxl));
-    margin: var(--space-xl) auto;
-    max-width: 800px;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.cta-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--color-primary), transparent);
-}
-
-.cta-section h3 {
-    color: var(--color-primary);
-    font-weight: 600;
-    margin-bottom: var(--space-lg);
-    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-}
-
 .cta-section .buttons-container {
     justify-content: center;
     align-items: center;
@@ -764,14 +657,6 @@ div.text-muted {
 
 /* Responsividade para CTA */
 @media (max-width: 768px) {
-    .cta-section {
-        padding: var(--space-lg);
-        margin: var(--space-md) auto;
-    }
-    
-    .cta-section h3 {
-        margin-bottom: var(--space-md);
-    }
 }
 
 /* ===== UTILITÁRIOS COMPLEMENTARES ===== */
@@ -788,9 +673,6 @@ div.text-muted {
 
 /* Ajustes para ranking em mobile */
 @media (max-width: 768px) {
-    .list-group-numbered {
-        padding-left: 0;
-    }
     
     .list-group-item {
         padding: 1rem 0.75rem;

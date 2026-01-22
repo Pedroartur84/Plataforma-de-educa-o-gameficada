@@ -4,61 +4,51 @@
 {% block title %}Player - Aprendizado Gamificado{% endblock %}
 
 {% block content %}
-<main class="flex-grow-1 py-5">
-    <div class="container text-center">
-        <div class="home-content">
-            <img src="{% static 'img/web_hi_res_512-Photoroom.png' %}" class="logo-main mb-4" alt="Player Logo"/>
-            <h1 class="display-5 fw-bold mb-3">Player</h1>
+<main class="flex-grow-1">
+    <section class="hero py-5">
+        <div class="container text-center">
+            <img src="{% static 'img/web_hi_res_512-Photoroom.png' %}" class="logo-main mb-4" style="--logo-height:200px;" alt="Player Logo"/>
+            <h1 class="display-4 fw-bold mb-3">Player</h1>
             <p class="lead mb-4">Transforme seu aprendizado em uma <span class="text-accent">aventura épica</span>!</p>
-            
-            <div class="cta-section mb-5">
-                <h3 class="h4 mb-4">Pronto para começar?</h3>
-                <div class="buttons-container">
-                    <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login
-                    </a>
-                    <a href="{% url 'usuarios:cadastro' %}" class="btn btn-primary btn-responsive btn-sm">
-                        <i class="bi bi-person-plus me-2"></i> Cadastre-se
-                    </a>
-                </div>
+
+            <div class="mb-4">
+                <a href="{% url 'usuarios:login' %}" class="btn btn-primary btn-lg me-3 shadow-sm">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Fazer Login
+                </a>
+                <a href="{% url 'usuarios:cadastro' %}" class="btn btn-outline-light btn-lg shadow-sm">
+                    <i class="bi bi-person-plus me-2"></i> Cadastre-se
+                </a>
             </div>
-            
-            <div class="project-description mb-5 p-4 rounded-4">
-                <h2 class="h3 mb-4">Objetivo do Projeto</h2>
-                <p class="mb-4">
-                    O Player é uma aplicação de estudos gamificada que transforma o processo de aprendizagem 
-                    em uma jornada emocionante. Através de elementos de jogos como missões, recompensas, 
-                    níveis e rankings, motivamos os estudantes a alcançarem seus objetivos educacionais 
-                    de forma divertida e engajadora.
-                </p>
-                
-                <div class="features-grid mt-5">
-                    <div class="feature-item">
-                        <div class="feature-icon bg-azul">
-                            <i class="bi bi-trophy"></i>
+
+            <div class="container mt-5">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm bg-dark text-white">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Missões</h5>
+                                <p class="card-text text-muted">Complete desafios educacionais</p>
+                            </div>
                         </div>
-                        <h3 class="h4 mt-3">Missões</h3>
-                        <p class="text-muted mt-2">Complete desafios educacionais</p>
                     </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon bg-laranja">
-                            <i class="bi bi-star"></i>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm bg-dark text-white">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Recompensas</h5>
+                                <p class="card-text text-muted">Ganhe pontos e conquistas</p>
+                            </div>
                         </div>
-                        <h3 class="h4 mt-3">Recompensas</h3>
-                        <p class="text-muted mt-2">Ganhe pontos e conquistas</p>
                     </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon bg-azul">
-                            <i class="bi bi-graph-up"></i>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm bg-dark text-white">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">Progresso</h5>
+                                <p class="card-text text-muted">Acompanhe sua evolução</p>
+                            </div>
                         </div>
-                        <h3 class="h4 mt-3">Progresso</h3>
-                        <p class="text-muted mt-2">Acompanhe sua evolução</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </main>
 {% endblock %}
