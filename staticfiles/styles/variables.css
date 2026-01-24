@@ -20,6 +20,15 @@
       --color-dark-mode-text: #FFFFFF;
       --color-dark-mode-card: #333333;
 
+      /* Variáveis adicionais para dark theme */
+      --color-dark-bg: #212121;
+      --color-dark-text: #FFFFFF;
+      --color-dark-text-secondary: #E0E0E0;
+      --color-dark-text-muted: #B0B0B0;
+      --color-dark-card: #333333;
+      --color-dark-card-light: #424242;
+      --color-dark-border: #555555;
+
       /* Espaçamentos baseados em escala modular */
       --space-xxs: 0.25rem;
       --space-xs: 0.5rem;

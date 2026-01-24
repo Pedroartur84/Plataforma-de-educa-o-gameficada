@@ -9,84 +9,103 @@
         <div class="col-12 col-lg-10">
             
             <!-- Cabeçalho do Perfil -->
-            <div class="card bg-dark border-0 shadow-sm mb-4">
-                <div class="card-body text-center py-4">
+            <div class="card bg-dark border-0 shadow-lg mb-4 position-relative overflow-hidden">
+                <div class="card-body text-center py-5">
                     {% if usuario.foto %}
                         <img src="{{ usuario.foto.url }}" alt="Foto de Perfil" 
-                             class="rounded-circle mb-3" 
-                             style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--color-primary);">
+                             class="rounded-circle mb-3 border border-warning border-3 shadow" 
+                             style="width: 140px; height: 140px; object-fit: cover; transition: transform 0.3s ease;"
+                             onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     {% else %}
-                        <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-3" 
-                             style="width: 120px; height: 120px; font-size: 3rem; border: 4px solid var(--color-primary);">
+                        <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-3 border border-warning border-3 shadow" 
+                             style="width: 140px; height: 140px; font-size: 4rem; transition: transform 0.3s ease;"
+                             onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             <i class="bi bi-person"></i>
                         </div>
                     {% endif %}
 
-                    <h2 class="display-5 fw-bold text-primary mb-1">{{ usuario.get_nome_exibicao }}</h2>
-                    <p class="text-muted mb-2">{{ usuario.email }}</p>
-                    <span class="badge {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark {% elif usuario.tipo_usuario == 'admin' %}bg-danger {% else %}bg-primary {% endif %} px-3 py-2">
-                        {{ usuario.get_tipo_usuario_display }}
+                    <h2 class="display-5 fw-bold text-primary mb-2">{{ usuario.get_nome_exibicao }}</h2>
+                    <p class="text-muted mb-3 fs-5">{{ usuario.email }}</p>
+                    <span class="badge {% if usuario.tipo_usuario == 'professor' %}bg-warning text-dark{% elif usuario.tipo_usuario == 'admin' %}bg-danger{% else %}bg-primary{% endif %} px-4 py-2 fs-6 shadow-sm">
+                        <i class="bi bi-star-fill me-1"></i>{{ usuario.get_tipo_usuario_display }}
                     </span>
+                </div>
+                <!-- Elemento decorativo -->
+                <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 8rem; color: var(--color-primary);">
+                    <i class="bi bi-trophy-fill"></i>
                 </div>
             </div>
 
             <div class="row g-4">
                 
                 <!-- Coluna Esquerda: Editar Perfil -->
-                <div class="col-12 col-md-6">
-                        <div class="card bg-dark border-0 shadow-sm h-100">
-                            <div class="card-header bg-dark border-bottom border-secondary">
-                                <h5 class="mb-0"><i class="bi bi-pencil text-primary"></i> Editar Perfil</h5>
-                            </div>
-                        <div class="card-body">
+                <div class="col-12 col-lg-6">
+                    <div class="card bg-dark border-0 shadow-lg h-100 position-relative overflow-hidden">
+                        <div class="card-header bg-gradient border-0 text-white py-4">
+                            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i>Editar Perfil</h5>
+                        </div>
+                        <div class="card-body p-4">
                             {% if messages %}
                                 {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>{{ message }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                                 {% endfor %}
                             {% endif %}
 
-                            <form method="post" enctype="multipart/form-data">
+                            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                                 {% csrf_token %}
                                 
-                                <div class="mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Nome</label>
-                                    {{ form.first_name }}
+                                <div class="mb-4">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label text-white fw-semibold fs-6">Nome</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-warning text-dark border-0"><i class="bi bi-person"></i></span>
+                                        {{ form.first_name }}
+                                    </div>
                                     {% if form.first_name.errors %}
                                         <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
                                     {% endif %}
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
-                                    {{ form.last_name }}
+                                <div class="mb-4">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label text-white fw-semibold fs-6">Sobrenome</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-warning text-dark border-0"><i class="bi bi-person"></i></span>
+                                        {{ form.last_name }}
+                                    </div>
                                     {% if form.last_name.errors %}
                                         <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
                                     {% endif %}
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="{{ form.foto.id_for_label }}" class="form-label">Foto de Perfil</label>
-                                    {{ form.foto }}
+                                <div class="mb-4">
+                                    <label for="{{ form.foto.id_for_label }}" class="form-label text-white fw-semibold fs-6">Foto de Perfil</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-warning text-dark border-0"><i class="bi bi-camera"></i></span>
+                                        {{ form.foto }}
+                                    </div>
                                     {% if form.foto.errors %}
                                         <div class="text-danger small mt-1">{{ form.foto.errors }}</div>
                                     {% endif %}
-                                    <small class="text-muted d-block mt-1">
-                                        Formatos aceitos: JPG, PNG, GIF (máx. 5MB)
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>Formatos aceitos: JPG, PNG, GIF (máx. 5MB)
                                     </small>
                                 </div>
 
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-warning text-dark">
-                                        <i class="bi bi-check-circle"></i> Salvar Alterações
+                                <div class="d-flex gap-3 flex-column flex-sm-row">
+                                    <button type="submit" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm">
+                                        <i class="bi bi-check-circle me-2"></i>Salvar Alterações
                                     </button>
-                                    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-secondary">
-                                        <i class="bi bi-arrow-left"></i> Voltar
+                                    <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light fw-bold px-4 py-2">
+                                        <i class="bi bi-arrow-left me-2"></i>Voltar
                                     </a>
                                 </div>
                             </form>
+                        </div>
+                        <!-- Elemento decorativo -->
+                        <div class="position-absolute bottom-0 start-0 opacity-5" style="font-size: 6rem; color: var(--color-primary);">
+                            <i class="bi bi-pencil"></i>
                         </div>
                     </div>
                 </div>
@@ -95,63 +114,35 @@
                 <div class="col-12 col-md-6">
                     
                     <!-- Estatísticas -->
-                    <div class="card bg-dark border-0 shadow-sm mb-4">
-                        <div class="card-header bg-dark border-bottom border-secondary">
-                            <h5 class="mb-0"><i class="bi bi-graph-up text-primary"></i> Estatísticas</h5>
+                    <div class="card bg-dark border-0 shadow-lg mb-4 position-relative overflow-hidden">
+                        <div class="card-header bg-gradient border-0 text-white py-4">
+                            <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Estatísticas</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-around text-center">
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ usuario.pontos_totais }}</div>
-                                    <small class="text-muted">Pontos Totais</small>
+                        <div class="card-body p-4">
+                            <div class="row text-center g-4">
+                                <div class="col-4">
+                                    <div class="p-3 bg-warning bg-opacity-10 rounded-3 shadow-sm">
+                                        <div class="h2 text-warning mb-1 fw-bold">{{ usuario.pontos_totais }}</div>
+                                        <small class="text-muted fw-semibold">Pontos Totais</small>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ usuario.missoes_completadas_globais }}</div>
-                                    <small class="text-muted">Missões Completas</small>
+                                <div class="col-4">
+                                    <div class="p-3 bg-primary bg-opacity-10 rounded-3 shadow-sm">
+                                        <div class="h2 text-primary mb-1 fw-bold">{{ usuario.missoes_completadas_globais }}</div>
+                                        <small class="text-muted fw-semibold">Missões</small>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="h3 text-warning mb-0">{{ titulos_globais.count }}</div>
-                                    <small class="text-muted">Títulos</small>
+                                <div class="col-4">
+                                    <div class="p-3 bg-success bg-opacity-10 rounded-3 shadow-sm">
+                                        <div class="h2 text-success mb-1 fw-bold">{{ titulos_globais.count }}</div>
+                                        <small class="text-muted fw-semibold">Títulos</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Títulos Globais -->
-                    <div class="card bg-dark border-0 shadow-sm">
-                        <div class="card-header bg-dark border-bottom border-secondary">
-                            <h5 class="mb-0"><i class="bi bi-award text-primary"></i> Títulos Globais</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if titulos_globais %}
-                                <div class="list-group list-group-flush">
-                                    {% for titulo in titulos_globais %}
-                                    <div class="list-group-item bg-dark border-secondary">
-                                        <div class="d-flex align-items-center gap-3">
-                                            {% if titulo.icone %}
-                                                <img src="{{ titulo.icone.url }}" alt="{{ titulo.nome }}" 
-                                                     class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                                            {% else %}
-                                                <div class="bg-warning text-dark rounded d-flex align-items-center justify-content-center" 
-                                                     style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                                    <i class="bi bi-trophy"></i>
-                                                </div>
-                                            {% endif %}
-                                            <div class="flex-grow-1">
-                                                <h6 class="mb-1 text-warning">{{ titulo.nome }}</h6>
-                                                <p class="mb-0 small text-muted">{{ titulo.descricao }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="text-center py-4 text-muted">
-                                    <i class="bi bi-award fs-1 opacity-50"></i>
-                                    <p class="mt-3 mb-0">Você ainda não conquistou títulos globais.</p>
-                                    <small>Complete missões para ganhar títulos!</small>
-                                </div>
-                            {% endif %}
+                        <!-- Elemento decorativo -->
+                        <div class="position-absolute top-0 end-0 opacity-10" style="font-size: 4rem; color: var(--color-primary);">
+                            <i class="bi bi-bar-chart"></i>
                         </div>
                     </div>
 
@@ -160,4 +151,17 @@
         </div>
     </div>
 </div>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, var(--color-dark-card) 0%, var(--color-dark-bg) 100%);
+}
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+</style>
 {% endblock %}

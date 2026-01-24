@@ -183,41 +183,10 @@
 }
 
 /* ============================================
-   RESPONSIVIDADE
+   RESPONSIVIDADE MOBILE-FIRST
    ============================================ */
 
-/* Tablets (md) */
-@media (max-width: 768px) {
-    .nav-tabs .nav-link {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.85rem;
-    }
-
-    .nav-tabs .nav-link span {
-        display: none;
-    }
-
-    .nav-tabs .nav-link i {
-        margin-right: 0;
-    }
-
-    .card-no-scale {
-        margin-bottom: 1rem;
-    }
-
-    .message-bubble {
-        max-width: 95%;
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-}
-
-/* Celulares (sm) */
+/* Telas pequenas (até 576px) */
 @media (max-width: 576px) {
     .nav-tabs {
         gap: 0;
@@ -293,7 +262,38 @@
     }
 }
 
-/* Celulares muito pequenos (xs) */
+/* Tablets (até 768px) */
+@media (max-width: 768px) {
+    .nav-tabs .nav-link {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .nav-tabs .nav-link span {
+        display: none;
+    }
+
+    .nav-tabs .nav-link i {
+        margin-right: 0;
+    }
+
+    .card-no-scale {
+        margin-bottom: 1rem;
+    }
+
+    .message-bubble {
+        max-width: 95%;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Celulares muito pequenos (até 380px) */
 @media (max-width: 380px) {
     .message-bubble {
         padding: 6px 8px;

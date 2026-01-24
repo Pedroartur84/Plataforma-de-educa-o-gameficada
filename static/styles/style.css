@@ -721,3 +721,54 @@ div.text-muted {
         font-size: 0.8rem;
     }
 }
+
+/* ===== MODAIS PERSONALIZADOS ===== */
+.modal-content {
+    border: 2px solid var(--color-primary);
+    border-radius: var(--border-radius-lg);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--color-dark-border);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--color-dark-border);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Responsividade dos modais */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100vw - 1rem);
+    }
+    
+    .modal-content {
+        border-radius: var(--border-radius-md);
+    }
+    
+    .modal-fullscreen-sm-down {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .modal-fullscreen-sm-down .modal-content {
+        height: 100%;
+        border: none;
+        border-radius: 0;
+    }
+}

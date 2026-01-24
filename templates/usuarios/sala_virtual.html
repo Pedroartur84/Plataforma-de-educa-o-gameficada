@@ -20,6 +20,9 @@
                     <i class="fas fa-plus me-2"></i> Postar Missão
                 </button>
                 {% endif %}
+                <button type="button" class="btn btn-outline-info btn-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#infoSalaModal">
+                    <i class="bi bi-info-circle me-2"></i> Informações
+                </button>
                 <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light btn-lg shadow-sm">
                     <i class="fas fa-home me-2"></i> Voltar
                 </a>
@@ -28,35 +31,30 @@
     </div>
 
     <!-- ABAS -->
-    <ul class="nav nav-tabs mb-4" id="salaTabs" role="tablist">
-        <li class="nav-item" role="presentation">
+    <ul class="nav nav-tabs mb-4 d-flex flex-nowrap overflow-auto" id="salaTabs" role="tablist" style="scrollbar-width: thin;">
+        <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link active" id="missoes-tab" data-bs-toggle="tab" data-bs-target="#missoes" type="button">
                 <i class="bi bi-list-task"></i> Missões
             </button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button">
                 <i class="bi bi-chat-dots"></i> Chat
             </button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="ranking-tab" data-bs-toggle="tab" data-bs-target="#ranking" type="button">
                 <i class="bi bi-trophy"></i> Ranking
             </button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos" type="button">
                 <i class="bi bi-award"></i> Títulos
             </button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="trilhas-tab" data-bs-toggle="tab" data-bs-target="#trilhas" type="button">
                 <i class="bi bi-diagram-3"></i> Trilhas
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button">
-                <i class="bi bi-info-circle"></i> Informações
             </button>
         </li>
     </ul>
@@ -127,7 +125,7 @@
                 <div class="card-header bg-dark text-white border-bottom border-secondary">
                     <h5 class="mb-0"><i class="bi bi-chat-dots text-primary"></i> Chat Geral</h5>
                 </div>
-                <div class="card-body p-2 p-md-3 d-flex flex-column" style="height: 380px; max-height: calc(100vh - 250px);">
+                <div class="card-body p-2 p-md-3 d-flex flex-column" style="height: 60vh; max-height: calc(100vh - 300px); min-height: 300px;">
                     <div id="sala-chat-messages" class="flex-grow-1 overflow-auto mb-3 p-2 rounded" style="border:1px solid rgba(255,255,255,0.03); background:var(--color-dark-bg); min-height: 0;"></div>
 
                     <form class="d-flex gap-2 flex-column flex-md-row" onsubmit="return false;">
@@ -353,49 +351,6 @@
             {% endif %}
         </div>
 
-        <!-- INFORMAÇÕES -->
-        <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
-            <div class="card bg-dark border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="text-primary"><i class="bi bi-info-circle"></i> Informações da Sala</h5>
-                    <hr>
-                    <p><strong>Código:</strong> <code>{{ sala.codigo|default:"(não informado)" }}</code></p>
-                    <p><strong>Criada em:</strong> {{ sala.data_criacao|date:"d/m/Y"|default:"(data não disponível)" }}</p>
-                    <p><strong>Descrição:</strong> {{ sala.descricao|default:"(sem descrição)" }}</p>
-                    <p><strong>Criador:</strong> {{ sala.criador.get_nome_exibicao|default:"(desconhecido)" }}</p>
-                    <p><strong>Seu papel:</strong>
-                        {% if minha_participacao %}
-                        <span class="badge {% if minha_participacao.tipo_na_sala == 'professor' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
-                            {{ minha_participacao.get_tipo_na_sala_display }}
-                        </span>
-                        {% else %}
-                        <span class="badge bg-secondary">(não associado)</span>
-                        {% endif %}
-                    </p>
-
-                    <hr>
-
-                    <div class="d-flex flex-column gap-2">
-                        {% if minha_participacao and minha_participacao.tipo_na_sala == 'professor' %}
-                        <div>
-                            <a href="{% url 'usuarios:deixar_professor' sala.id %}" class="btn btn-outline-warning w-100">
-                                <i class="bi bi-box-arrow-left"></i> Deixar de Ser Professor
-                            </a>
-                            <small class="text-muted d-block mt-2">Você continuará como aluno na sala.</small>
-                        </div>
-                        {% endif %}
-
-                        <div>
-                            <a href="{% url 'usuarios:sair_sala' sala.id %}" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-door-left"></i> Sair da Sala
-                            </a>
-                            <small class="text-muted d-block mt-2">Você perderá acesso a todas as atividades desta sala.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </main>
 
@@ -403,27 +358,43 @@
 {% if is_professor_na_sala %}
 <div class="modal fade" id="postarMissaoModal" tabindex="-1" aria-labelledby="postarMissaoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
-        <div class="modal-content bg-dark text-white border-warning">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="postarMissaoModalLabel">
-                    <i class="fas fa-plus"></i> Postar Nova Missão
+                    <i class="fas fa-plus me-2"></i>Postar Nova Missão
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" action="{% url 'usuarios:postar_missao' sala.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="alert alert-info bg-info bg-opacity-10 border-info mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if sala.criador.foto %}
+                                <img src="{{ sala.criador.foto.url }}" alt="Criador" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <small class="text-info">
+                                    <strong>{{ sala.criador.get_nome_exibicao }}</strong> está criando uma missão para <strong>{{ sala.nome }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
                         <label for="titulo" class="form-label text-white fw-bold">Título da Missão</label>
                         <input type="text" class="form-control input-estilo" id="titulo" name="titulo" required 
                                placeholder="Ex: Atividade de Matemática">
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="descricao" class="form-label text-white fw-bold">Descrição</label>
                         <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="4" 
                                   placeholder="Descreva os objetivos e requisitos da missão..." required></textarea>
                     </div>
-                    <div class="row g-2">
+                    <div class="row g-3">
                         <div class="col-sm-6">
                             <label for="pontos" class="form-label text-white fw-bold">Pontos</label>
                             <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
@@ -436,10 +407,10 @@
                             <div class="form-text text-white-50 small">Opcional</div>
                         </div>
                     </div>
-                    <div class="row g-2 mt-3">
+                    <div class="row g-3 mt-3">
                         <div class="col-12 col-md-6">
                             <label class="form-label text-white fw-bold">Trilha</label>
-                            <select id="select_trilha" name="trilha" class="form-select">
+                            <select id="select_trilha" name="trilha" class="form-select input-estilo">
                                 <option value="">-- Selecione a Trilha --</option>
                                 {% for t in trilhas %}
                                 <option value="{{ t.id }}">{{ t.nome }}</option>
@@ -448,7 +419,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label text-white fw-bold">Módulo</label>
-                            <select id="select_modulo" name="modulo" class="form-select">
+                            <select id="select_modulo" name="modulo" class="form-select input-estilo">
                                 <option value="">-- Selecione o Módulo --</option>
                                 <!-- Será preenchido por JS ao escolher a trilha -->
                             </select>
@@ -469,38 +440,48 @@
 <!-- MODAL CRIAR TÍTULO DA SALA -->
 <div class="modal fade" id="criarTituloSalaModal" tabindex="-1" aria-labelledby="criarTituloSalaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-warning">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="criarTituloSalaModalLabel">
-                    <i class="bi bi-award"></i> Criar Título da Sala
+                    <i class="bi bi-award me-2"></i>Criar Título da Sala
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" action="{% url 'usuarios:criar_titulo_sala' sala.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <div class="alert alert-info bg-info bg-opacity-10 border-info mb-3">
-                        <small>
-                            <i class="bi bi-info-circle"></i> 
-                            Este título será específico para <strong>{{ sala.nome }}</strong>
-                        </small>
+                    <div class="alert alert-info bg-info bg-opacity-10 border-info mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if sala.criador.foto %}
+                                <img src="{{ sala.criador.foto.url }}" alt="Criador" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <small class="text-info">
+                                    <strong>{{ sala.criador.get_nome_exibicao }}</strong> está criando um título para <strong>{{ sala.nome }}</strong>
+                                </small>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="nome_sala" class="form-label text-white fw-bold">Nome do Título</label>
                         <input type="text" class="form-control input-estilo bg-dark text-white" 
                                id="nome_sala" name="nome" required maxlength="100"
                                placeholder="Ex: Aluno Destaque">
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="descricao_sala" class="form-label text-white fw-bold">Descrição</label>
                         <textarea class="form-control input-estilo bg-dark text-white" 
                                   id="descricao_sala" name="descricao" rows="3" required
                                   placeholder="Descreva o que o aluno precisa fazer..."></textarea>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-6">
                             <div class="mb-3">
                                 <label for="pontos_sala" class="form-label text-white fw-bold">Pontos na Sala</label>
@@ -685,9 +666,135 @@
 
 {% endif %}
 
+<!-- MODAL INFORMAÇÕES DA SALA -->
+<div class="modal fade" id="infoSalaModal" tabindex="-1" aria-labelledby="infoSalaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
+            <div class="modal-header bg-warning text-dark border-warning">
+                <h5 class="modal-title fw-bold" id="infoSalaModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Informações da Sala
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info bg-info bg-opacity-10 border-info mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if sala.criador.foto %}
+                            <img src="{{ sala.criador.foto.url }}" alt="Criador" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-person"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <small class="text-info">
+                                <strong>{{ sala.criador.get_nome_exibicao }}</strong> criou <strong>{{ sala.nome }}</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                            <h6 class="text-warning mb-3"><i class="bi bi-tag me-2"></i>Detalhes Básicos</h6>
+                            <div class="mb-2">
+                                <strong class="text-white">Código:</strong>
+                                <code class="ms-2 bg-secondary px-2 py-1 rounded">{{ sala.codigo|default:"(não informado)" }}</code>
+                            </div>
+                            <div class="mb-2">
+                                <strong class="text-white">Criada em:</strong>
+                                <span class="ms-2 text-muted">{{ sala.data_criacao|date:"d/m/Y"|default:"(data não disponível)" }}</span>
+                            </div>
+                            <div>
+                                <strong class="text-white">Criador:</strong>
+                                <span class="ms-2 text-primary">{{ sala.criador.get_nome_exibicao|default:"(desconhecido)" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 col-md-6">
+                        <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                            <h6 class="text-warning mb-3"><i class="bi bi-person-badge me-2"></i>Seu Papel</h6>
+                            {% if minha_participacao %}
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge {% if minha_participacao.tipo_na_sala == 'professor' %}bg-warning text-dark{% else %}bg-primary{% endif %} px-3 py-2 me-3">
+                                        {{ minha_participacao.get_tipo_na_sala_display }}
+                                    </span>
+                                    <small class="text-muted">
+                                        {% if minha_participacao.tipo_na_sala == 'professor' %}
+                                            Você pode gerenciar missões e alunos
+                                        {% else %}
+                                            Você pode acessar missões e participar
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2">Não associado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                            <h6 class="text-warning mb-3"><i class="bi bi-file-text me-2"></i>Descrição</h6>
+                            <p class="text-muted mb-0">{{ sala.descricao|default:"<em>Sem descrição disponível</em>"|safe }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4 border-secondary">
+                
+                <div class="d-flex flex-column gap-3">
+                    {% if minha_participacao and minha_participacao.tipo_na_sala == 'professor' %}
+                    <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-50 rounded-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-exclamation-triangle text-warning fs-4 mt-1"></i>
+                            <div>
+                                <h6 class="text-warning mb-2">Ações do Professor</h6>
+                                <a href="{% url 'usuarios:deixar_professor' sala.id %}" class="btn btn-outline-warning w-100 w-md-auto">
+                                    <i class="bi bi-box-arrow-left me-2"></i>Deixar de Ser Professor
+                                </a>
+                                <small class="text-muted d-block mt-2">Você continuará como aluno na sala.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-50 rounded-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-door-closed text-danger fs-4 mt-1"></i>
+                            <div>
+                                <h6 class="text-danger mb-2">Sair da Sala</h6>
+                                <a href="{% url 'usuarios:sair_sala' sala.id %}" class="btn btn-outline-danger w-100 w-md-auto">
+                                    <i class="bi bi-door-left me-2"></i>Sair da Sala
+                                </a>
+                                <small class="text-muted d-block mt-2">Você perderá acesso a todas as atividades desta sala.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bronze (única cor extra necessária) -->
 <style>
     .text-bronze { color: #CD7F32 !important; }
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
 </style>
 <script>
     const CHAT_MESSAGES_URL = "{% url 'usuarios:sala_messages' sala.id %}";
