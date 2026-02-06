@@ -14,6 +14,10 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
+import logging
+
+# Logger para debug de envio de emails
+logger = logging.getLogger(__name__)
 
 def login_view(request):
     """Exibe e processa o formulário de login."""
@@ -56,16 +60,23 @@ def cadastro(request):
                 'activation_link': activation_link,
             })
 
-            send_mail(
-                subject='Ative sua conta',
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-
-            messages.success(request, 'Cadastro realizado. Verifique seu e-mail para ativar a conta.')
-            return redirect('usuarios:login')
+            try:
+                num_sent = send_mail(
+                    subject='Ative sua conta',
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+                logger.info(f'Email de ativação enviado para {user.email}. Status: {num_sent} email(s) enviado(s).')
+                messages.success(request, 'Cadastro realizado. Verifique seu e-mail para ativar a conta.')
+                return redirect('usuarios:login')
+            except Exception as e:
+                logger.error(f'Erro ao enviar email de ativação para {user.email}: {str(e)}')
+                messages.error(request, f'Erro ao enviar email de ativação. Tente novamente. Erro: {str(e)}')
+                # Opcionalmente, deleta o usuário criado se o email falhar
+                user.delete()
+                return redirect('usuarios:cadastro')
     else:
         form = CadastroForm()
     return render(request, 'cadastro/cadastrar.html', {'form': form})

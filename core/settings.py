@@ -108,11 +108,38 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Configuração de email usando API do SendGrid (HTTPS/443 - funciona no Render free)
+# Backend: sendgrid_backend.SendgridBackend (do pacote django-sendgrid-v5)
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')  # Carrega do .env ou variável de ambiente
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Desabilitar sandbox para enviar emails de verdade
 DEFAULT_FROM_EMAIL = 'contatoplayer040@gmail.com'
 
 # Flags úteis para lógica de verificação por email
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+# Logging para erros de email (debug)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'email_debug.log',
+        },
+    },
+    'loggers': {
+        'sendgrid': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'django.core.mail': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
+}
