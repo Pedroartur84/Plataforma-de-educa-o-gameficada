@@ -7,6 +7,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
 from django.http import JsonResponse, HttpResponseBadRequest
 import json
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.urls import reverse
 
 def login_view(request):
     """Exibe e processa o formulário de login."""
@@ -31,17 +38,56 @@ def login_view(request):
     return render(request, 'login/login.html', {'form': form})
 
 def cadastro(request):
-    """Exibe e processa o formulário de cadastro."""
+    """Exibe e processa o formulário de cadastro. Cria usuário inativo e envia email de ativação."""
     if request.method == 'POST':
         form = CadastroForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Cadastro realizado com sucesso! Faça login.')
-            return redirect('usuarios:pag_principal')
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            # Gerar token e enviar email de ativação
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            activation_link = request.build_absolute_uri(reverse('usuarios:ativar', args=[uid, token]))
+
+            message = render_to_string('usuarios/activation_email.html', {
+                'user': user,
+                'activation_link': activation_link,
+            })
+
+            send_mail(
+                subject='Ative sua conta',
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, 'Cadastro realizado. Verifique seu e-mail para ativar a conta.')
+            return redirect('usuarios:login')
     else:
         form = CadastroForm()
     return render(request, 'cadastro/cadastrar.html', {'form': form})
+
+
+def ativar(request, uidb64, token):
+    """Ativa a conta se o token for válido e faz login automático."""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = Usuario.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, 'Conta ativada com sucesso! Você foi autenticado.')
+        return redirect('usuarios:pag_principal')
+    else:
+        messages.error(request, 'Link de ativação inválido ou expirado.')
+        return redirect('usuarios:login')
 
 @login_required
 def principal(request):

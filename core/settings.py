@@ -106,3 +106,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Seu modelo de usuário customizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
+
+# Configuração de email usando SMTP do SendGrid
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  # usuário fixo para autenticação SMTP com API Key
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'contatoplayer040@gmail.com'
+
+# Flags úteis para lógica de verificação por email (sem django-allauth, mas úteis)
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
