@@ -384,45 +384,57 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label for="titulo" class="form-label text-white fw-bold">Título da Missão</label>
-                        <input type="text" class="form-control input-estilo" id="titulo" name="titulo" required 
-                               placeholder="Ex: Atividade de Matemática">
-                    </div>
-                    <div class="mb-4">
-                        <label for="descricao" class="form-label text-white fw-bold">Descrição</label>
-                        <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="4" 
-                                  placeholder="Descreva os objetivos e requisitos da missão..." required></textarea>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <label for="pontos" class="form-label text-white fw-bold">Pontos</label>
-                            <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
-                                   min="1" max="1000" value="10" required>
-                            <div class="form-text text-white-50 small">Pontos da missão</div>
+
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-pencil-square me-2"></i>Informações Básicas</h6>
+                        <div class="mb-3">
+                            <label for="titulo" class="form-label text-white fw-bold">Título da Missão</label>
+                            <input type="text" class="form-control input-estilo" id="titulo" name="titulo" required 
+                                   placeholder="Ex: Atividade de Matemática">
                         </div>
-                        <div class="col-sm-6">
-                            <label for="data_limite" class="form-label text-white fw-bold">Data Limite</label>
-                            <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
-                            <div class="form-text text-white-50 small">Opcional</div>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label text-white fw-bold">Descrição</label>
+                            <textarea class="form-control input-estilo" id="descricao" name="descricao" rows="4" 
+                                      placeholder="Descreva os objetivos e requisitos da missão..." required></textarea>
                         </div>
                     </div>
-                    <div class="row g-3 mt-3">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label text-white fw-bold">Trilha</label>
-                            <select id="select_trilha" name="trilha" class="form-select input-estilo">
-                                <option value="">-- Selecione a Trilha --</option>
-                                {% for t in trilhas %}
-                                <option value="{{ t.id }}">{{ t.nome }}</option>
-                                {% endfor %}
-                            </select>
+
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-gear me-2"></i>Configurações</h6>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label for="pontos" class="form-label text-white fw-bold">Pontos</label>
+                                <input type="number" class="form-control input-estilo" id="pontos" name="pontos" 
+                                       min="1" max="1000" value="10" required>
+                                <div class="form-text text-white-50 small">Pontos da missão</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="data_limite" class="form-label text-white fw-bold">Data Limite</label>
+                                <input type="datetime-local" class="form-control input-estilo" id="data_limite" name="data_limite">
+                                <div class="form-text text-white-50 small">Opcional</div>
+                            </div>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label text-white fw-bold">Módulo</label>
-                            <select id="select_modulo" name="modulo" class="form-select input-estilo">
-                                <option value="">-- Selecione o Módulo --</option>
-                                <!-- Será preenchido por JS ao escolher a trilha -->
-                            </select>
+                    </div>
+
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                        <h6 class="text-warning mb-3"><i class="bi bi-diagram-3 me-2"></i>Estrutura</h6>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label text-white fw-bold">Trilha</label>
+                                <select id="select_trilha" name="trilha" class="form-select input-estilo">
+                                    <option value="">-- Selecione a Trilha --</option>
+                                    {% for t in trilhas %}
+                                    <option value="{{ t.id }}">{{ t.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label text-white fw-bold">Módulo</label>
+                                <select id="select_modulo" name="modulo" class="form-select input-estilo">
+                                    <option value="">-- Selecione o Módulo --</option>
+                                    <!-- Será preenchido por JS ao escolher a trilha -->
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -439,7 +451,7 @@
 
 <!-- MODAL CRIAR TÍTULO DA SALA -->
 <div class="modal fade" id="criarTituloSalaModal" tabindex="-1" aria-labelledby="criarTituloSalaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
         <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="criarTituloSalaModalLabel">
@@ -467,57 +479,55 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="nome_sala" class="form-label text-white fw-bold">Nome do Título</label>
-                        <input type="text" class="form-control input-estilo bg-dark text-white" 
-                               id="nome_sala" name="nome" required maxlength="100"
-                               placeholder="Ex: Aluno Destaque">
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Informações do Título</h6>
+                        <div class="mb-3">
+                            <label for="nome_sala" class="form-label text-white fw-bold">Nome do Título</label>
+                            <input type="text" class="form-control input-estilo" 
+                                   id="nome_sala" name="nome" required maxlength="100"
+                                   placeholder="Ex: Aluno Destaque">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricao_sala" class="form-label text-white fw-bold">Descrição</label>
+                            <textarea class="form-control input-estilo" 
+                                      id="descricao_sala" name="descricao" rows="3" required
+                                      placeholder="Descreva o que o aluno precisa fazer..."></textarea>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="descricao_sala" class="form-label text-white fw-bold">Descrição</label>
-                        <textarea class="form-control input-estilo bg-dark text-white" 
-                                  id="descricao_sala" name="descricao" rows="3" required
-                                  placeholder="Descreva o que o aluno precisa fazer..."></textarea>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="mb-3">
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-gear me-2"></i>Requisitos</h6>
+                        <div class="row g-3">
+                            <div class="col-6">
                                 <label for="pontos_sala" class="form-label text-white fw-bold">Pontos na Sala</label>
-                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                <input type="number" class="form-control input-estilo" 
                                        id="pontos_sala" name="pontos_necessarios" 
                                        min="0" value="50">
-                                <div class="form-text text-white-50 small">
-                                    Pontos nesta sala
-                                </div>
+                                <div class="form-text text-white-50 small">Mínimo necessário</div>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="mb-3">
+                            <div class="col-6">
                                 <label for="missoes_sala" class="form-label text-white fw-bold">Missões na Sala</label>
-                                <input type="number" class="form-control input-estilo bg-dark text-white" 
+                                <input type="number" class="form-control input-estilo" 
                                        id="missoes_sala" name="missoes_necessarias" 
                                        min="0" value="3">
-                                <div class="form-text text-white-50 small">
-                                    Missões nesta sala
-                                </div>
+                                <div class="form-text text-white-50 small">Mínimo necessário</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="icone_sala" class="form-label text-white fw-bold">Ícone (Opcional)</label>
-                        <input type="file" class="form-control input-estilo bg-dark text-white" 
-                               id="icone_sala" name="icone" accept="image/*">
-                        <div class="form-text text-white-50 small">
-                            Recomendado: PNG transparente 256x256px
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                        <h6 class="text-warning mb-3"><i class="bi bi-image me-2"></i>Ícone</h6>
+                        <div class="mb-3">
+                            <label for="icone_sala" class="form-label text-white fw-bold">Arquivo de Ícone</label>
+                            <input type="file" class="form-control input-estilo" 
+                                   id="icone_sala" name="icone" accept="image/*">
+                            <div class="form-text text-white-50 small">PNG transparente 256x256px (opcional)</div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-warning">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm">
+                <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
                         <i class="bi bi-check-circle"></i> Criar Título
                     </button>
                 </div>
@@ -528,45 +538,69 @@
 
 <!-- MODAL CRIAR TRILHA -->
 <div class="modal fade" id="criarTrilhaModal" tabindex="-1" aria-labelledby="criarTrilhaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-warning">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="criarTrilhaModalLabel">
-                    <i class="bi bi-diagram-3"></i> Criar Nova Trilha
+                    <i class="bi bi-diagram-3 me-2"></i>Criar Nova Trilha
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" action="{% url 'cursos:criar_trilha' sala_id=sala.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="trilha_nome" class="form-label text-white fw-bold">Nome da Trilha</label>
-                        <input type="text" class="form-control input-estilo" id="trilha_nome" name="nome" required 
-                               placeholder="Ex: Python Básico">
+                    <div class="alert alert-info bg-info bg-opacity-10 border-info mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if sala.criador.foto %}
+                                <img src="{{ sala.criador.foto.url }}" alt="Criador" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <small class="text-info">
+                                    <strong>{{ sala.criador.get_nome_exibicao }}</strong> está criando uma trilha para <strong>{{ sala.nome }}</strong>
+                                </small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="trilha_descricao" class="form-label text-white fw-bold">Descrição (opcional)</label>
-                        <textarea class="form-control input-estilo" id="trilha_descricao" name="descricao" rows="3" 
-                                  placeholder="O que o aluno vai aprender nessa trilha..."></textarea>
+
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Informações da Trilha</h6>
+                        <div class="mb-3">
+                            <label for="trilha_nome" class="form-label text-white fw-bold">Nome da Trilha</label>
+                            <input type="text" class="form-control input-estilo" id="trilha_nome" name="nome" required 
+                                   placeholder="Ex: Python Básico">
+                        </div>
+                        <div class="mb-3">
+                            <label for="trilha_descricao" class="form-label text-white fw-bold">Descrição</label>
+                            <textarea class="form-control input-estilo" id="trilha_descricao" name="descricao" rows="3" 
+                                      placeholder="O que o aluno vai aprender nessa trilha..."></textarea>
+                            <div class="form-text text-white-50 small">Opcional</div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label text-white fw-bold">Missões que contam para a Trilha (opcional)</label>
-                        <div class="border rounded p-2 bg-dark" style="max-height:220px; overflow:auto;">
+
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                        <h6 class="text-warning mb-3"><i class="bi bi-list-task me-2"></i>Missões</h6>
+                        <label class="form-label text-white fw-bold mb-2">Missões que contam para a Trilha</label>
+                        <div class="border rounded p-2 bg-dark" style="max-height:250px; overflow-y:auto;">
                             {% for missao in missoes %}
-                            <div class="form-check">
+                            <div class="form-check mb-2">
                                 <input class="form-check-input" type="checkbox" name="missoes" value="{{ missao.id }}" id="criar_missao_{{ missao.id }}">
                                 <label class="form-check-label text-white" for="criar_missao_{{ missao.id }}">{{ missao.titulo }}</label>
                             </div>
                             {% empty %}
-                            <div class="text-muted small">Nenhuma missão disponível nesta sala.</div>
+                            <div class="text-muted small text-center py-3">Nenhuma missão disponível nesta sala.</div>
                             {% endfor %}
                         </div>
+                        <div class="form-text text-white-50 small mt-2">Opcional</div>
                     </div>
                 </div>
                 <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
                     <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
-                        <i class="bi bi-plus-circle"></i> Criar Trilha
+                        <i class="bi bi-plus-circle me-2"></i>Criar Trilha
                     </button>
                 </div>
             </form>
@@ -577,15 +611,19 @@
 <!-- MODAL DETALHE TRILHA -->
 <div class="modal fade" id="detalheTrilhaModal" tabindex="-1" aria-labelledby="detalheTrilhaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content bg-dark text-white border-warning">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="detalheTrilhaModalLabel">
-                    <i class="bi bi-diagram-3"></i> Detalhes da Trilha
+                    <i class="bi bi-diagram-3 me-2"></i>Detalhes da Trilha
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="detalheTrilhaContent">
-                <p class="text-muted">Carregando...</p>
+                <div class="text-center py-4">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -593,35 +631,40 @@
 
 <!-- MODAL EDITAR TRILHA -->
 <div class="modal fade" id="editarTrilhaModal" tabindex="-1" aria-labelledby="editarTrilhaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-warning">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content bg-dark text-white border-warning" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-warning text-dark border-warning">
                 <h5 class="modal-title fw-bold" id="editarTrilhaModalLabel">
-                    <i class="bi bi-pencil"></i> Editar Trilha
+                    <i class="bi bi-pencil me-2"></i>Editar Trilha
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="editarTrilhaForm">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label text-white fw-bold">Nome da Trilha</label>
-                        <input type="text" class="form-control input-estilo" id="editar_trilha_nome" name="nome" required>
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary mb-4">
+                        <h6 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Informações</h6>
+                        <div class="mb-3">
+                            <label class="form-label text-white fw-bold">Nome da Trilha</label>
+                            <input type="text" class="form-control input-estilo" id="editar_trilha_nome" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white fw-bold">Descrição</label>
+                            <textarea class="form-control input-estilo" id="editar_trilha_descricao" name="descricao" rows="3"></textarea>
+                            <div class="form-text text-white-50 small">Opcional</div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label text-white fw-bold">Descrição (opcional)</label>
-                        <textarea class="form-control input-estilo" id="editar_trilha_descricao" name="descricao" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-white fw-bold">Missões que contam para a Trilha</label>
-                        <div class="border rounded p-2 bg-dark" style="max-height:220px; overflow:auto;">
+                    <div class="bg-dark-card p-3 rounded-3 border border-secondary">
+                        <h6 class="text-warning mb-3"><i class="bi bi-list-task me-2"></i>Missões</h6>
+                        <label class="form-label text-white fw-bold mb-2">Missões que contam para a Trilha</label>
+                        <div class="border rounded p-2 bg-dark" style="max-height:250px; overflow-y:auto;">
                             {% for missao in missoes %}
-                            <div class="form-check">
+                            <div class="form-check mb-2">
                                 <input class="form-check-input editar-missao-checkbox" type="checkbox" name="missoes" value="{{ missao.id }}" id="editar_missao_{{ missao.id }}">
                                 <label class="form-check-label text-white" for="editar_missao_{{ missao.id }}">{{ missao.titulo }}</label>
                             </div>
                             {% empty %}
-                            <div class="text-muted small">Nenhuma missão disponível nesta sala.</div>
+                            <div class="text-muted small text-center py-3">Nenhuma missão disponível nesta sala.</div>
                             {% endfor %}
                         </div>
                     </div>
@@ -629,7 +672,7 @@
                 <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
                     <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
-                        <i class="bi bi-check-circle"></i> Salvar Mudanças
+                        <i class="bi bi-check-circle me-2"></i>Salvar Mudanças
                     </button>
                 </div>
             </form>
@@ -640,23 +683,27 @@
 <!-- MODAL EXCLUIR TRILHA -->
 <div class="modal fade" id="excluirTrilhaModal" tabindex="-1" aria-labelledby="excluirTrilhaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-danger">
+        <div class="modal-content bg-dark text-white border-danger" style="animation: modalFadeIn 0.3s ease-out;">
             <div class="modal-header bg-danger text-white border-danger">
                 <h5 class="modal-title fw-bold" id="excluirTrilhaModalLabel">
-                    <i class="bi bi-exclamation-triangle"></i> Confirmar Exclusão
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir a trilha <strong id="excluirTrilhaNome"></strong>?</p>
-                <p class="text-muted small">⚠️ Todos os módulos e conteúdos serão removidos permanentemente.</p>
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-danger mb-3">
+                    <i class="bi bi-exclamation-circle me-2 text-danger"></i>
+                    <strong>Esta ação é irreversível!</strong>
+                </div>
+                <p class="mb-2">Tem certeza que deseja excluir a trilha <strong id="excluirTrilhaNome"></strong>?</p>
+                <p class="text-muted small">Todos os módulos, conteúdos e relações serão removidos permanentemente.</p>
             </div>
-            <div class="modal-footer border-danger gap-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form method="post" id="excluirTrilhaForm" style="display: inline;">
+            <div class="modal-footer border-danger gap-2 flex-column flex-sm-row">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" id="excluirTrilhaForm" style="display: contents;">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash"></i> Sim, Excluir
+                    <button type="submit" class="btn btn-danger w-100 w-sm-auto fw-bold">
+                        <i class="bi bi-trash me-2"></i>Sim, Excluir Trilha
                     </button>
                 </form>
             </div>

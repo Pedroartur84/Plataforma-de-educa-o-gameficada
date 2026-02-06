@@ -343,6 +343,12 @@ body {
     border-color: var(--color-primary);
 }
 
+/* Card escuro para modais e componentes */
+.bg-dark-card {
+    background-color: var(--color-dark-card) !important;
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
 .feature-item h3 {
     color: var(--color-dark-text);
     font-weight: 600;

@@ -122,3 +122,11 @@
     .chat-container, #sala-chat-messages { height: 200px !important; }
 }
 
+/* Desktop - Modais com scroll */
+@media (min-width: 769px) {
+    .modal-dialog-scrollable .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+}
+
