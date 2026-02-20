@@ -146,7 +146,7 @@
 </head>
 <body>
     <!-- PWA -->
-    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#ffc107">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -171,6 +171,13 @@
             .then(reg => console.log('SW registrado:', reg.scope))
             .catch(err => console.error('SW falhou:', err));
         });
+      }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(reg => console.log('Service Worker registrado com escopo:', reg.scope))
+          .catch(err => console.error('Falha ao registrar o Service Worker:', err));
       }
     </script>
 </body>
