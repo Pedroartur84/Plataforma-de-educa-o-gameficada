@@ -145,6 +145,15 @@
     </style>
 </head>
 <body>
+    <!-- PWA -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#ffc107">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Player">
+    <link rel="apple-touch-icon" href="{% static 'icons/maskable_icon_x192.png' %}">
+
     {% block navbar %}{% endblock %}
     
     <div class="container mt-5">
@@ -155,5 +164,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     {% endblock %}
     
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registrado:', reg.scope))
+            .catch(err => console.error('SW falhou:', err));
+        });
+      }
+    </script>
 </body>
 </html>

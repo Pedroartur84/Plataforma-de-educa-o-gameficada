@@ -1,0 +1,24 @@
+{
+  "name": "Player - Plataforma de Aprendizado",
+  "short_name": "Player",
+  "description": "Plataforma gamificada de aprendizado",
+  "start_url": "/usuarios/principal/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#ffc107",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -28,6 +28,7 @@ urlpatterns = [
     path('', views.home, name='home'), #pagina inicial
     path('usuarios/', include('usuarios.urls', namespace='usuarios')), #incluir as urls de ususarios, prefixo usuarios
     path('cursos/', include('cursos.urls', 'cursos')), #incluir as urls de cursos, prefixo cursos
+    path('sw.js', views.service_worker, name='service_worker'),
 ]
 
 # Servir arquivos de mídia durante o desenvolvimento
