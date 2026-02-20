@@ -5,14 +5,16 @@ const STATIC_ASSETS = [
   '/static/styles/style.css',
   '/static/js/chat_sala.js',
   '/static/manifest.json',
-  '/static/icons/maskable_icon_x192.png',
-  '/static/icons/maskable_icon_x512.png',
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png',
 ];
 
 // Instalação: faz cache dos arquivos estáticos
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then((cache) => 
+      Promise.allSettled(STATIC_ASSETS.map((asset) => cache.add(asset)))
+    )
   );
   self.skipWaiting();
 });

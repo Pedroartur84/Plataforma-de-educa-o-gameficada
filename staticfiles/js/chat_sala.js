@@ -11,15 +11,33 @@ function renderMessages(container, messages) {
     container.innerHTML = '';
     messages.forEach(m => {
         const item = document.createElement('div');
-        item.className = 'chat-message mb-2';
+        item.className = 'chat-message mb-2 d-flex align-items-start gap-2';
+        const avatar = document.createElement('div');
+        avatar.className = 'flex-shrink-0';
+        if (m.usuario_foto) {
+            const img = document.createElement('img');
+            img.src = m.usuario_foto;
+            img.alt = m.usuario_nome;
+            img.className = 'rounded-circle';
+            img.style.width = '32px';
+            img.style.height = '32px';
+            img.style.objectFit = 'cover';
+            avatar.appendChild(img);
+        } else {
+            avatar.innerHTML = '<div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="bi bi-person"></i></div>';
+        }
+        const content = document.createElement('div');
+        content.className = 'flex-grow-1';
         const author = document.createElement('div');
         author.className = 'small text-white-50';
         author.textContent = `${m.usuario_nome} • ${new Date(m.criado_em).toLocaleString()}`;
         const text = document.createElement('div');
         text.className = 'text-white';
         text.textContent = m.texto;
-        item.appendChild(author);
-        item.appendChild(text);
+        content.appendChild(author);
+        content.appendChild(text);
+        item.appendChild(avatar);
+        item.appendChild(content);
         container.appendChild(item);
     });
     // rolar para baixo
