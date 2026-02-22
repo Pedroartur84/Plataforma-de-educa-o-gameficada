@@ -16,14 +16,14 @@
             </div>
             <div class="d-flex gap-3 flex-wrap">
                 {% if is_professor_na_sala %}
-                <button type="button" class="btn btn-primary btn-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
+                <button type="button" class="btn btn-primary btn-sm btn-md-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#postarMissaoModal">
                     <i class="fas fa-plus me-2"></i> Postar Missão
                 </button>
                 {% endif %}
-                <button type="button" class="btn btn-outline-info btn-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#infoSalaModal">
+                <button type="button" class="btn btn-outline-info btn-sm btn-md-lg shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#infoSalaModal">
                     <i class="bi bi-info-circle me-2"></i> Informações
                 </button>
-                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light btn-lg shadow-sm">
+                <a href="{% url 'usuarios:pag_principal' %}" class="btn btn-outline-light btn-sm btn-md-lg shadow-sm">
                     <i class="fas fa-home me-2"></i> Voltar
                 </a>
             </div>
@@ -34,27 +34,27 @@
     <ul class="nav nav-tabs mb-4 d-flex flex-nowrap overflow-auto" id="salaTabs" role="tablist" style="scrollbar-width: thin;">
         <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link active" id="missoes-tab" data-bs-toggle="tab" data-bs-target="#missoes" type="button">
-                <i class="bi bi-list-task"></i> Missões
+                <i class="bi bi-list-task"></i> <span>Missões</span>
             </button>
         </li>
         <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button">
-                <i class="bi bi-chat-dots"></i> Chat
+                <i class="bi bi-chat-dots"></i> <span>Chat</span>
             </button>
         </li>
         <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="ranking-tab" data-bs-toggle="tab" data-bs-target="#ranking" type="button">
-                <i class="bi bi-trophy"></i> Ranking
+                <i class="bi bi-trophy"></i> <span>Ranking</span>
             </button>
         </li>
         <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos" type="button">
-                <i class="bi bi-award"></i> Títulos
+                <i class="bi bi-award"></i> <span>Títulos</span>
             </button>
         </li>
         <li class="nav-item flex-shrink-0" role="presentation">
             <button class="nav-link" id="trilhas-tab" data-bs-toggle="tab" data-bs-target="#trilhas" type="button">
-                <i class="bi bi-diagram-3"></i> Trilhas
+                <i class="bi bi-diagram-3"></i> <span>Trilhas</span>
             </button>
         </li>
     </ul>
@@ -307,18 +307,28 @@
                                             onclick="carregarDetalheTrilha({{ trilha.id }})">
                                         <i class="bi bi-eye"></i> Ver Detalhes
                                     </button>
-                                    
+
                                     {% if is_professor_na_sala %}
-                                    <button type="button" class="btn btn-outline-warning btn-sm w-100 mb-2"
-                                            data-bs-toggle="modal" data-bs-target="#editarTrilhaModal"
-                                            onclick="carregarEditarTrilha({{ trilha.id }})">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
-                                            data-bs-toggle="modal" data-bs-target="#excluirTrilhaModal"
-                                            onclick="confirmarExcluirTrilha({{ trilha.id }}, '{{ trilha.nome }}')">
-                                        <i class="bi bi-trash"></i> Excluir
-                                    </button>
+                                    <div class="dropdown mt-1">
+                                        <button class="btn btn-outline-secondary btn-sm w-100 dropdown-toggle" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots"></i> Gerenciar
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-dark">
+                                            <li>
+                                                <button class="dropdown-item" onclick="carregarEditarTrilha({{ trilha.id }})" 
+                                                        data-bs-toggle="modal" data-bs-target="#editarTrilhaModal">
+                                                    <i class="bi bi-pencil me-2"></i>Editar
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" onclick="confirmarExcluirTrilha({{ trilha.id }}, '{{ trilha.nome }}')"
+                                                        data-bs-toggle="modal" data-bs-target="#excluirTrilhaModal">
+                                                    <i class="bi bi-trash me-2"></i>Excluir
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -439,15 +449,16 @@
                     </div>
                 </div>
                 <div class="modal-footer border-warning gap-2 flex-column flex-sm-row">
-                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 w-sm-auto">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 order-1 order-sm-2">
                         <i class="fas fa-paper-plane"></i> Postar Missão
                     </button>
+                    <button type="button" class="btn btn-secondary w-100 order-2 order-sm-1" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- MODAL CRIAR TÍTULO DA SALA -->
 <div class="modal fade bottom-sheet" id="criarTituloSalaModal" tabindex="-1" aria-labelledby="criarTituloSalaModalLabel" aria-hidden="true">
@@ -710,8 +721,6 @@
         </div>
     </div>
 </div>
-
-{% endif %}
 
 <!-- MODAL INFORMAÇÕES DA SALA -->
 <div class="modal fade bottom-sheet" id="infoSalaModal" tabindex="-1" aria-labelledby="infoSalaModalLabel" aria-hidden="true">
@@ -991,11 +1000,9 @@
     }
 
     function abrirEditarModulo(moduloId, trilhaId) {
-        // Abrir prompt simples (poderíamos usar modal dedicado)
-        const novoTitulo = prompt('Novo título do módulo:');
-        if (novoTitulo === null) return; // cancelado
-        const novaDesc = prompt('Nova descrição (deixe em branco para manter):');
-        editarModuloAjax(moduloId, trilhaId, novoTitulo, novaDesc || '');
+        document.getElementById('editar_modulo_id').value = moduloId;
+        document.getElementById('editar_modulo_trilha_id').value = trilhaId;
+        new bootstrap.Modal(document.getElementById('editarModuloModal')).show();
     }
 
     function editarModuloAjax(moduloId, trilhaId, titulo, descricao) {

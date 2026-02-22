@@ -314,3 +314,34 @@
         font-size: 0.75rem;
     }
 }
+
+/* Correção da altura do chat para dispositivos móveis */
+#sala-chat-messages {
+    /* Fallback para navegadores antigos */
+    height: 55vh;
+    /* Altura dinâmica considerando teclado virtual */
+    height: calc(100dvh - 320px);
+    min-height: 200px;
+    max-height: 500px;
+}
+
+@media (max-width: 576px) {
+    #sala-chat-messages {
+        height: calc(100dvh - env(keyboard-inset-height, 0px) - 280px);
+        min-height: 180px;
+    }
+
+    #chat .card-body {
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - 200px);
+    }
+
+    #chat form {
+        position: sticky;
+        bottom: 0;
+        background: var(--color-dark-card);
+        padding: 8px;
+        z-index: 10;
+    }
+}

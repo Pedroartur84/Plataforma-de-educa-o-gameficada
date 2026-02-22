@@ -778,3 +778,55 @@ div.text-muted {
         border-radius: 0;
     }
 }
+
+/* ===== Estilos para Bottom Sheet ===== */
+@media (max-width: 575.98px) {
+    .bottom-sheet .modal-dialog {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        max-width: 100%;
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .bottom-sheet.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    .bottom-sheet .modal-content {
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    .bottom-sheet .modal-header::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        margin: 0 auto 12px;
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .bottom-sheet .modal-header {
+        position: relative;
+        padding-top: 28px;
+        border-radius: 20px 20px 0 0;
+    }
+}
+
+@media (min-width: 576px) {
+    .bottom-sheet .modal-dialog {
+        max-width: 560px;
+        margin: 1.75rem auto;
+    }
+}
