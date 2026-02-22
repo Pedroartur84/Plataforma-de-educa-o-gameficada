@@ -119,6 +119,10 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
+# Configurações de login obrigatórias para PWAs funcionarem bem
+LOGIN_URL = '/usuarios/login/'              # ← O Django vai redirecionar para cá quando precisar de login
+LOGIN_REDIRECT_URL = '/usuarios/principal/'  # ← Depois do login, volta para a página principal
+
 # Logging para erros de email (debug)
 LOGGING = {
     'version': 1,

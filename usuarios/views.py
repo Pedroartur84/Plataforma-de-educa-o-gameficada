@@ -32,6 +32,12 @@ def login_view(request):
                 login(request, user)
                 if not form.cleaned_data.get('remember_me'):
                     request.session.set_expiry(0)  # Sessão do navegador
+                
+                # Adicionando redirecionamento para a URL original
+                next_url = request.GET.get('next', None)
+                if next_url:
+                    return redirect(next_url)
+                
                 return redirect('usuarios:pag_principal')
             else:
                 messages.error(request, 'Credenciais inválidas.')
