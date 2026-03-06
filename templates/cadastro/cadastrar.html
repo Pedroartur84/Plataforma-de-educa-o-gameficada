@@ -10,6 +10,7 @@
             <img src="{% static 'img/web_hi_res_512-Photoroom.png' %}" class="logo-auth mb-3" alt="Player Logo">
             <h2 class="h3 mb-2">Crie sua conta</h2>
             <p class="text-muted">Comece sua jornada de aprendizado</p>
+            <p class="text-warning">Após o cadastro, um e-mail será enviado para o endereço cadastrado. Verifique sua caixa de entrada e spam.</p>
         </div>
         
         <form method="post" action="{% url 'usuarios:cadastro' %}">
@@ -37,6 +38,7 @@
             <div class="form-floating mb-3">
                 {{ form.password1 }}
                 <label for="{{ form.password1.id_for_label }}">Senha</label>
+                <small class="text-muted">A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.</small>
                 {% if form.password1.errors %}
                     <div class="invalid-feedback d-block">
                         {% for error in form.password1.errors %}
